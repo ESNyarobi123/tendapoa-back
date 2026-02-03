@@ -1,0 +1,187 @@
+/// Job Model
+class Job {
+  final int id;
+  final String title;
+  final String? description;
+  final int? categoryId;
+  final String? categoryName;
+  final int price;
+  final String status;
+  final String? imageUrl;
+  final double? lat;
+  final double? lng;
+  final String? addressText;
+  final String? phone;
+  final int? userId;
+  final String? userName;
+  final String? userPhotoUrl;
+  final int? workerId;
+  final String? workerName;
+  final String? completionCode;
+  final DateTime? createdAt;
+  final double? distance;
+  final List<JobComment>? comments;
+
+  Job({
+    required this.id,
+    required this.title,
+    this.description,
+    this.categoryId,
+    this.categoryName,
+    required this.price,
+    required this.status,
+    this.imageUrl,
+    this.lat,
+    this.lng,
+    this.addressText,
+    this.phone,
+    this.userId,
+    this.userName,
+    this.userPhotoUrl,
+    this.workerId,
+    this.workerName,
+    this.completionCode,
+    this.createdAt,
+    this.distance,
+    this.comments,
+  });
+
+  factory Job.fromJson(Map<String, dynamic> json) {
+    return Job(
+      id: json['id'] ?? 0,
+      title: json['title'] ?? '',
+      description: json['description'],
+      categoryId: json['category_id'],
+      categoryName: json['category']?['name'] ?? json['category_name'],
+      price: json['price'] is String
+          ? int.tryParse(json['price']) ?? 0
+          : (json['price'] ?? 0),
+      status: json['status'] ?? 'open',
+      imageUrl: json['image_url'],
+      lat: json['lat'] is String
+          ? double.tryParse(json['lat'])
+          : json['lat']?.toDouble(),
+      lng: json['lng'] is String
+          ? double.tryParse(json['lng'])
+          : json['lng']?.toDouble(),
+      addressText: json['address_text'],
+      phone: json['phone'],
+      userId: json['user_id'],
+      userName: json['user']?['name'] ?? json['user_name'],
+      userPhotoUrl:
+          json['user']?['profile_photo_url'] ?? json['user_photo_url'],
+      workerId: json['worker_id'],
+      workerName: json['worker']?['name'] ?? json['worker_name'],
+      completionCode: json['completion_code'],
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : null,
+      distance: json['distance'] is String
+          ? double.tryParse(json['distance'])
+          : json['distance']?.toDouble(),
+      comments: json['comments'] != null
+          ? (json['comments'] as List)
+              .map((c) => JobComment.fromJson(c))
+              .toList()
+          : null,
+    );
+  }
+
+  bool get isOpen => status == 'open';
+  bool get isPending => status == 'pending';
+  bool get isPaid => status == 'paid';
+  bool get isAccepted => status == 'accepted';
+  bool get isCompleted => status == 'completed';
+  bool get isCancelled => status == 'cancelled';
+}
+
+/// Job Comment / Application
+class JobComment {
+  final int id;
+  final int jobId;
+  final int userId;
+  final String? userName;
+  final String? userPhoto;
+  final String message;
+  final int? proposedPrice;
+  final bool isApplication;
+  final DateTime? createdAt;
+
+  JobComment({
+    required this.id,
+    required this.jobId,
+    required this.userId,
+    this.userName,
+    this.userPhoto,
+    required this.message,
+    this.proposedPrice,
+    this.isApplication = false,
+    this.createdAt,
+  });
+
+  factory JobComment.fromJson(Map<String, dynamic> json) {
+    return JobComment(
+      id: json['id'] ?? 0,
+      jobId: json['job_id'] ?? 0,
+      userId: json['user_id'] ?? 0,
+      userName: json['user']?['name'] ?? json['user_name'],
+      userPhoto: json['user']?['profile_photo_url'],
+      message: json['message'] ?? '',
+      proposedPrice: json['proposed_price'],
+      isApplication: json['is_application'] ?? false,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : null,
+    );
+  }
+}
+
+/// Nearby Workers Response
+class NearbyWorkersResponse {
+  final int count;
+  final List<NearbyWorker> workers;
+
+  NearbyWorkersResponse({required this.count, required this.workers});
+
+  factory NearbyWorkersResponse.fromJson(Map<String, dynamic> json) {
+    return NearbyWorkersResponse(
+      count: json['count'] ?? 0,
+      workers: json['workers'] != null
+          ? (json['workers'] as List)
+              .map((w) => NearbyWorker.fromJson(w))
+              .toList()
+          : [],
+    );
+  }
+}
+
+class NearbyWorker {
+  final int id;
+  final String name;
+  final double? lat;
+  final double? lng;
+  final double? distance;
+
+  NearbyWorker(
+      {required this.id,
+      required this.name,
+      this.lat,
+      this.lng,
+      this.distance});
+
+  factory NearbyWorker.fromJson(Map<String, dynamic> json) {
+    return NearbyWorker(
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      lat: json['lat'] is String
+          ? double.tryParse(json['lat'])
+          : json['lat']?.toDouble(),
+      lng: json['lng'] is String
+          ? double.tryParse(json['lng'])
+          : json['lng']?.toDouble(),
+      distance: json['distance'] is String
+          ? double.tryParse(json['distance'])
+          : json['distance']?.toDouble(),
+    );
+  }
+}

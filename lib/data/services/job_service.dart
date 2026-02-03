@@ -1,0 +1,160 @@
+import '../models/models.dart' as models;
+import 'api_service.dart';
+
+/// Job Service
+class JobService {
+  static JobService? _instance;
+  final ApiService _api = ApiService();
+
+  JobService._internal();
+
+  factory JobService() {
+    _instance ??= JobService._internal();
+    return _instance!;
+  }
+
+  Future<List<models.Category>> getCategories() async {
+    final response = await _api.get('/categories', requiresAuth: false);
+    final data = response.data!['data'] as List;
+    return data.map((c) => models.Category.fromJson(c)).toList();
+  }
+
+  Future<Map<String, dynamic>> getHome() async {
+    final response = await _api.get('/home', requiresAuth: false);
+    return response.data!['data'];
+  }
+
+  Future<models.NearbyWorkersResponse> getNearbyWorkers({
+    required double lat,
+    required double lng,
+    double radius = 5,
+  }) async {
+    final response = await _api.get(
+      '/workers/nearby',
+      queryParams: {'lat': lat, 'lng': lng, 'radius': radius},
+      requiresAuth: false,
+    );
+    final data = response.data!['data'] ?? response.data!;
+    return models.NearbyWorkersResponse.fromJson(data);
+  }
+
+  Future<Map<String, dynamic>> getFeed({
+    String? category,
+    double? distance,
+    int page = 1,
+  }) async {
+    final response = await _api.get(
+      '/feed',
+      queryParams: {
+        if (category != null) 'category': category,
+        if (distance != null) 'distance': distance,
+        'page': page,
+      },
+    );
+    return response.data!;
+  }
+
+  Future<Map<String, dynamic>> postJob({
+    required String title,
+    required int categoryId,
+    required int price,
+    required String description,
+    required double lat,
+    required double lng,
+    required String phone,
+    String? addressText,
+    dynamic image,
+  }) async {
+    final Map<String, String> fields = {
+      'title': title,
+      'category_id': categoryId.toString(),
+      'price': price.toString(),
+      'description': description,
+      'lat': lat.toString(),
+      'lng': lng.toString(),
+      'phone': phone,
+      if (addressText != null) 'address_text': addressText,
+    };
+
+    if (image != null) {
+      final response = await _api.postMultipart(
+        '/jobs',
+        fields: fields,
+        files: {'image': image},
+      );
+      return response.data!;
+    } else {
+      final response = await _api.post(
+        '/jobs',
+        body: fields,
+      );
+      return response.data!;
+    }
+  }
+
+  Future<List<models.Job>> getMyJobs() async {
+    final response = await _api.get('/jobs/my');
+    final dynamic rawData = response.data!['data'] ?? [];
+    List dataList = [];
+    if (rawData is Map) {
+      dataList = rawData.values.toList();
+    } else if (rawData is List) {
+      dataList = rawData;
+    }
+    return dataList.map((j) => models.Job.fromJson(j)).toList();
+  }
+
+  Future<models.Job> getJobDetails(int jobId) async {
+    final response = await _api.get('/jobs/$jobId');
+    final data = response.data!['data'] ?? response.data!;
+    return models.Job.fromJson(data);
+  }
+
+  Future<models.Job> selectWorker(int jobId, int commentId) async {
+    final response = await _api.post('/jobs/$jobId/accept/$commentId');
+    final data = response.data!['data'] ?? response.data!;
+    return models.Job.fromJson(data);
+  }
+
+  Future<void> cancelJob(int jobId) async {
+    await _api.post('/jobs/$jobId/cancel');
+  }
+
+  Future<Map<String, dynamic>> retryPayment(int jobId) async {
+    final response = await _api.post('/jobs/$jobId/retry-payment');
+    return response.data!;
+  }
+
+  Future<List<models.Job>> getAssignedJobs() async {
+    final response = await _api.get('/worker/assigned');
+    final dynamic rawData =
+        response.data!['data']?['data'] ?? response.data!['data'] ?? [];
+    List dataList = [];
+    if (rawData is Map) {
+      dataList = rawData.values.toList();
+    } else if (rawData is List) {
+      dataList = rawData;
+    }
+    return dataList.map((j) => models.Job.fromJson(j)).toList();
+  }
+
+  Future<void> applyForJob(int jobId, String message) async {
+    await _api.post(
+      '/jobs/$jobId/comment',
+      body: {'message': message, 'is_application': true},
+    );
+  }
+
+  Future<Map<String, dynamic>> completeJob(int jobId, String code) async {
+    final response = await _api.post(
+      '/worker/jobs/$jobId/complete',
+      body: {'code': code},
+    );
+    return response.data!;
+  }
+
+  Future<models.WorkerDashboard> getWorkerDashboard() async {
+    final response = await _api.get('/dashboard');
+    return models.WorkerDashboard.fromJson(response.data!['data']);
+  }
+}

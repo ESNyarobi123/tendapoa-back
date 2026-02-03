@@ -1,0 +1,75 @@
+name: tendapoa
+description: "Tendapoa - Pata Fundi Karibu Nawe"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  
+  # Networking
+  http: ^1.2.0
+  dio: ^5.4.0
+  
+  # State Management
+  provider: ^6.1.1
+  
+  # Local Storage
+  shared_preferences: ^2.2.2
+  flutter_secure_storage: ^9.0.0
+  
+  # UI & Design
+  google_fonts: ^6.1.0
+  flutter_svg: ^2.0.9
+  cached_network_image: ^3.3.1
+  shimmer: ^3.0.0
+  lottie: ^3.1.0
+  flutter_animate: ^4.5.0
+  
+  # Navigation
+  go_router: ^13.2.0
+  
+  # Location & Maps
+  geolocator: ^11.0.0
+  geocoding: ^3.0.0
+  flutter_map: ^6.1.0
+  latlong2: ^0.9.0
+  
+  # Image Handling
+  image_picker: ^1.0.7
+  image_cropper: ^11.0.0
+  
+  # Icons
+  iconsax: ^0.0.8
+  
+  # Utils
+  intl: ^0.20.0
+  timeago: ^3.6.1
+  url_launcher: ^6.2.5
+  flutter_localizations:
+    sdk: flutter
+  pull_to_refresh: ^2.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/tendalogo.jpg"
+  min_sdk_android: 21
+
+flutter:
+  generate: true
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/animations/
