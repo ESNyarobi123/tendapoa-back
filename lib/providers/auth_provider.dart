@@ -8,10 +8,12 @@ class AuthProvider extends ChangeNotifier {
 
   User? _user;
   bool _isLoading = false;
+  bool _isInitialized = false;
   String? _error;
 
   User? get user => _user;
   bool get isLoading => _isLoading;
+  bool get isInitialized => _isInitialized;
   String? get error => _error;
 
   bool get isAuthenticated => _user != null;
@@ -23,8 +25,33 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> _init() async {
-    _user = await _storageService.getUser();
-    notifyListeners();
+    try {
+      // Ensure storage is initialized first
+      await _storageService.init();
+      _user = await _storageService.getUser();
+      
+      // Also verify token exists (user data without token is invalid)
+      final token = await _storageService.getToken();
+      if (_user != null && token == null) {
+        // User data exists but no token - clear invalid state
+        _user = null;
+        await _storageService.deleteUser();
+      }
+      
+      _isInitialized = true;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('AuthProvider init error: $e');
+      _isInitialized = true;
+      notifyListeners();
+    }
+  }
+  
+  /// Wait for initialization to complete
+  Future<void> waitForInit() async {
+    while (!_isInitialized) {
+      await Future.delayed(const Duration(milliseconds: 50));
+    }
   }
 
   Future<bool> login(String email, String password) async {

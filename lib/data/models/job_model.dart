@@ -142,12 +142,12 @@ class JobComment {
   factory JobComment.fromJson(Map<String, dynamic> json) {
     return JobComment(
       id: json['id'] ?? 0,
-      jobId: json['job_id'] ?? 0,
+      jobId: json['work_order_id'] ?? json['job_id'] ?? 0,
       userId: json['user_id'] ?? 0,
       userName: json['user']?['name'] ?? json['user_name'],
       userPhoto: json['user']?['profile_photo_url'],
       message: json['message'] ?? '',
-      proposedPrice: json['proposed_price'],
+      proposedPrice: json['bid_amount'] ?? json['proposed_price'],
       isApplication: json['is_application'] ?? false,
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'])

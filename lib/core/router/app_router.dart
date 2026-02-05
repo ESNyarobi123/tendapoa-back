@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 import '../../ui/screens/screens.dart';
 import '../../data/models/models.dart';
 
@@ -43,6 +44,16 @@ class AppRouter {
         return _buildRoute(const WorkerHomeScreen(), settings);
       case postJob:
         return _buildRoute(const PostJobScreen(), settings);
+      case map:
+        final args = settings.arguments as Map<String, dynamic>?;
+        return _buildRoute(
+          MapScreen(
+            jobs: args?['jobs'] as List<Job>?,
+            initialLocation: args?['initialLocation'] as LatLng?,
+            fetchFromApi: args?['fetchFromApi'] as bool? ?? false,
+          ),
+          settings,
+        );
       case jobDetails:
         final args = settings.arguments as Map<String, dynamic>?;
         if (args == null) {

@@ -165,10 +165,30 @@ class JobService {
     return response.data!['data'] ?? response.data!;
   }
 
+  /// Get assigned jobs response with pending and active jobs separated
+  Future<Map<String, dynamic>> getAssignedJobsResponse() async {
+    final response = await _api.get('/worker/assigned');
+    return response.data!;
+  }
+
   Future<List<models.Job>> getAssignedJobs() async {
     final response = await _api.get('/worker/assigned');
+    // Use pending_jobs (status = 'assigned') - these need accept/decline
     final dynamic rawData =
-        response.data!['data']?['data'] ?? response.data!['data'] ?? [];
+        response.data!['pending_jobs'] ?? response.data!['data'] ?? [];
+    List dataList = [];
+    if (rawData is Map) {
+      dataList = rawData.values.toList();
+    } else if (rawData is List) {
+      dataList = rawData;
+    }
+    return dataList.map((j) => models.Job.fromJson(j)).toList();
+  }
+
+  Future<List<models.Job>> getActiveJobs() async {
+    final response = await _api.get('/worker/assigned');
+    // Use active_jobs (status = 'in_progress' or 'ready_for_confirmation')
+    final dynamic rawData = response.data!['active_jobs'] ?? [];
     List dataList = [];
     if (rawData is Map) {
       dataList = rawData.values.toList();

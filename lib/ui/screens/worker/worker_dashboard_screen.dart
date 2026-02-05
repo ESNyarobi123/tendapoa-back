@@ -230,16 +230,19 @@ class _WorkerDashboardScreenState extends State<WorkerDashboardScreen> {
                                 ),
                               ),
                               // Settings Icon
-                              Container(
-                                width: 45,
-                                height: 45,
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: const Icon(
-                                  Icons.settings_outlined,
-                                  color: Colors.white,
+                              GestureDetector(
+                                onTap: () => Navigator.pushNamed(context, AppRouter.settingsPage),
+                                child: Container(
+                                  width: 45,
+                                  height: 45,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Icon(
+                                    Icons.settings_outlined,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ],

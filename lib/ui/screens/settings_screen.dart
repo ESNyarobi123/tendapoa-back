@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/constants/constants.dart';
 import '../../providers/providers.dart';
 
@@ -170,21 +171,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   _buildSectionHeader('MSAADA NA TAARIFA'),
                   _buildSettingsCard([
                     _buildSettingItem(
-                      icon: Icons.help_outline_rounded,
-                      title: 'Kitovu cha Msaada',
-                      onTap: () {},
+                      icon: Icons.support_agent_rounded,
+                      title: 'Wasiliana Nasi (WhatsApp)',
+                      subtitle: 'Pata msaada haraka',
+                      iconColor: const Color(0xFF25D366),
+                      onTap: () => _openWhatsApp(),
+                    ),
+                    const Divider(height: 1),
+                    _buildSettingItem(
+                      icon: Icons.payments_outlined,
+                      title: 'Sera ya Malipo na Ada',
+                      subtitle: 'Fees & Payments Policy',
+                      onTap: () => _openUrl('https://tendapoa.com/fees-payments-policy'),
                     ),
                     const Divider(height: 1),
                     _buildSettingItem(
                       icon: Icons.description_outlined,
                       title: 'Vigezo na Masharti',
-                      onTap: () {},
-                    ),
-                    const Divider(height: 1),
-                    _buildSettingItem(
-                      icon: Icons.privacy_tip_outlined,
-                      title: 'Sera ya Faragha',
-                      onTap: () {},
+                      subtitle: 'Terms & Conditions',
+                      onTap: () => _openUrl('https://tendapoa.com/terms-and-conditions'),
                     ),
                   ]),
 
@@ -278,17 +283,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required IconData icon,
     required String title,
     String? subtitle,
+    Color? iconColor,
     required VoidCallback onTap,
   }) {
+    final color = iconColor ?? AppColors.primary;
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
       leading: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: const Color(0xFFEEF2FF),
+          color: color.withOpacity(0.1),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Icon(icon, color: AppColors.primary, size: 20),
+        child: Icon(icon, color: color, size: 20),
       ),
       title: Text(
         title,
@@ -602,5 +609,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
+  }
+
+  Future<void> _openUrl(String url) async {
+    final uri = Uri.parse(url);
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        _showSnackbar('Imeshindikana kufungua link', isError: true);
+      }
+    } catch (e) {
+      _showSnackbar('Hitilafu: $e', isError: true);
+    }
+  }
+
+  Future<void> _openWhatsApp() async {
+    const whatsappUrl = 'https://api.whatsapp.com/send/?phone=255626957138&text&type=phone_number&app_absent=0';
+    await _openUrl(whatsappUrl);
   }
 }

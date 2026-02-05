@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -13,15 +14,51 @@ class WorkerJobsScreen extends StatefulWidget {
   State<WorkerJobsScreen> createState() => _WorkerJobsScreenState();
 }
 
-class _WorkerJobsScreenState extends State<WorkerJobsScreen> {
+class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBindingObserver {
   bool _isProcessing = false;
+  Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<WorkerProvider>().loadAssignedJobs();
     });
+    _startAutoRefresh();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _refreshTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _loadJobs();
+      _startAutoRefresh();
+    } else if (state == AppLifecycleState.paused) {
+      _refreshTimer?.cancel();
+    }
+  }
+
+  void _startAutoRefresh() {
+    _refreshTimer?.cancel();
+    _refreshTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (mounted) {
+        _loadJobs();
+      } else {
+        _refreshTimer?.cancel();
+      }
+    });
+  }
+
+  Future<void> _loadJobs() async {
+    if (!mounted) return;
+    await context.read<WorkerProvider>().loadAssignedJobs();
   }
 
   Future<void> _handleAccept(Job job) async {
@@ -77,7 +114,10 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> {
   @override
   Widget build(BuildContext context) {
     final worker = context.watch<WorkerProvider>();
-    final activeJob = worker.currentActiveJob;
+    // Use activeJobsFromAssigned for jobs already accepted (in_progress)
+    final activeJobs = worker.activeJobsFromAssigned;
+    final activeJob = activeJobs.isNotEmpty ? activeJobs.first : null;
+    // assignedJobs now only contains jobs with status='assigned' (need accept/decline)
     final assignedJobs = worker.assignedJobs;
 
     return Scaffold(

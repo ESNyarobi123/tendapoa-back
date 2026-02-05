@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../core/constants/constants.dart';
 import '../../../core/router/app_router.dart';
 import '../../../data/models/models.dart';
+import '../../../data/services/job_service.dart';
 import '../../../providers/providers.dart';
 import '../chat/chat_list_screen.dart';
 
@@ -902,7 +903,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
+    _tabController = TabController(length: 6, vsync: this);
     _tabController.addListener(() {
       if (mounted) setState(() {});
     });
@@ -927,6 +928,9 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
   List<Job> _getPostedJobs(List<Job> jobs) =>
       jobs.where((j) => j.status == 'posted' || j.status == 'open').toList();
   
+  List<Job> _getPendingPaymentJobs(List<Job> jobs) =>
+      jobs.where((j) => j.status == 'pending_payment' || j.status == 'pending').toList();
+  
   List<Job> _getCancelledJobs(List<Job> jobs) =>
       jobs.where((j) => j.status == 'cancelled').toList();
 
@@ -937,6 +941,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
     final inProgressJobs = _getInProgressJobs(allJobs);
     final completedJobs = _getCompletedJobs(allJobs);
     final postedJobs = _getPostedJobs(allJobs);
+    final pendingPaymentJobs = _getPendingPaymentJobs(allJobs);
     final cancelledJobs = _getCancelledJobs(allJobs);
 
     return Scaffold(
@@ -1065,10 +1070,11 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                         labelPadding: const EdgeInsets.symmetric(horizontal: 4),
                         tabs: [
                           _buildTabChip('Zote', allJobs.length, _tabController.index == 0),
-                          _buildTabChip('Zimeposti', postedJobs.length, _tabController.index == 1),
-                          _buildTabChip('Zinaendelea', inProgressJobs.length, _tabController.index == 2),
-                          _buildTabChip('Kamili', completedJobs.length, _tabController.index == 3),
-                          _buildTabChip('Zimefutwa', cancelledJobs.length, _tabController.index == 4),
+                          _buildTabChip('Pending', pendingPaymentJobs.length, _tabController.index == 1),
+                          _buildTabChip('Zimeposti', postedJobs.length, _tabController.index == 2),
+                          _buildTabChip('Zinaendelea', inProgressJobs.length, _tabController.index == 3),
+                          _buildTabChip('Kamili', completedJobs.length, _tabController.index == 4),
+                          _buildTabChip('Zimefutwa', cancelledJobs.length, _tabController.index == 5),
                         ],
                       ),
                     ),
@@ -1083,6 +1089,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                 controller: _tabController,
                 children: [
                   _buildJobList(allJobs),
+                  _buildPendingPaymentJobList(pendingPaymentJobs),
                   _buildJobList(postedJobs),
                   _buildJobList(inProgressJobs),
                   _buildJobList(completedJobs),
@@ -1175,6 +1182,432 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
         ),
       ),
     );
+  }
+
+  Widget _buildPendingPaymentJobList(List<Job> jobs) {
+    if (jobs.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: const Color(0xFF22C55E).withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.check_circle_outline_rounded,
+                size: 48,
+                color: Color(0xFF22C55E),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Hakuna kazi zinazosubiri malipo',
+              style: TextStyle(
+                color: Color(0xFF22C55E),
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Kazi zote zimelipwa vizuri!',
+              style: TextStyle(
+                color: Colors.grey[400],
+                fontSize: 13,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.fromLTRB(20, 15, 20, 20),
+      itemCount: jobs.length,
+      itemBuilder: (ctx, i) => _buildPendingPaymentJobCard(jobs[i]),
+    );
+  }
+
+  Widget _buildPendingPaymentJobCard(Job job) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFFECACA), width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFEF4444).withOpacity(0.1),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Warning Banner
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: const BoxDecoration(
+              color: Color(0xFFFEF2F2),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(18),
+                topRight: Radius.circular(18),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEF4444).withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.warning_amber_rounded, 
+                    color: Color(0xFFEF4444), size: 18),
+                ),
+                const SizedBox(width: 10),
+                const Expanded(
+                  child: Text(
+                    'Malipo hayajakamilika',
+                    style: TextStyle(
+                      color: Color(0xFFEF4444),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEF4444),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Text(
+                    'PENDING',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Job Content
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Image
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: job.imageUrl != null && job.imageUrl!.isNotEmpty
+                          ? Image.network(
+                              job.imageUrl!,
+                              width: 60,
+                              height: 60,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Container(
+                                width: 60,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFEF2F2),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const Icon(Icons.work_outline_rounded, 
+                                  color: Color(0xFFEF4444), size: 28),
+                              ),
+                            )
+                          : Container(
+                              width: 60,
+                              height: 60,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFEF2F2),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(Icons.work_outline_rounded, 
+                                color: Color(0xFFEF4444), size: 28),
+                            ),
+                    ),
+                    const SizedBox(width: 12),
+                    // Title & Category
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            job.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1E293B),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF1F5F9),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  job.categoryName ?? 'Kazi',
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    color: Color(0xFF64748B),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                // Price Info
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Kiasi cha kulipa:',
+                        style: TextStyle(
+                          color: Color(0xFF64748B),
+                          fontSize: 13,
+                        ),
+                      ),
+                      Text(
+                        'TZS ${_formatJobPrice(job.price)}',
+                        style: const TextStyle(
+                          color: Color(0xFF1E293B),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Action Buttons
+                Row(
+                  children: [
+                    // Delete Button
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _showDeleteConfirmation(job),
+                        icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                        label: const Text('FUTA'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFFEF4444),
+                          side: const BorderSide(color: Color(0xFFEF4444)),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // Retry Payment Button
+                    Expanded(
+                      flex: 2,
+                      child: ElevatedButton.icon(
+                        onPressed: () => _retryPayment(job),
+                        icon: const Icon(Icons.refresh_rounded, size: 18),
+                        label: const Text('LIPIA TENA'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF22C55E),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showDeleteConfirmation(Job job) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEF4444).withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.delete_outline_rounded, 
+                color: Color(0xFFEF4444), size: 24),
+            ),
+            const SizedBox(width: 12),
+            const Text('Futa Kazi?', style: TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: Text(
+          'Una uhakika unataka kufuta kazi "${job.title}"?\n\nKazi hii haijakulipiwa, kwa hiyo itafutwa kabisa.',
+          style: const TextStyle(color: Color(0xFF64748B)),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('HAPANA'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFEF4444),
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('NDIYO, FUTA'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true && mounted) {
+      try {
+        final jobService = JobService();
+        await jobService.cancelJob(job.id);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('✅ Kazi imefutwa'),
+              backgroundColor: Color(0xFF22C55E),
+            ),
+          );
+          context.read<ClientProvider>().loadMyJobs();
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('❌ Imeshindikana: $e'),
+              backgroundColor: const Color(0xFFEF4444),
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  Future<void> _retryPayment(Job job) async {
+    try {
+      // Show loading
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(color: Color(0xFF22C55E)),
+              const SizedBox(height: 20),
+              const Text(
+                'Inaanzisha malipo...',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Tafadhali subiri',
+                style: TextStyle(color: Colors.grey[500], fontSize: 13),
+              ),
+            ],
+          ),
+        ),
+      );
+
+      final jobService = JobService();
+      final result = await jobService.retryPayment(job.id);
+      
+      if (mounted) Navigator.pop(context); // Close loading dialog
+
+      if (result['success'] == true && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('📱 Thibitisha malipo kwenye simu yako!'),
+            backgroundColor: Color(0xFF22C55E),
+            duration: Duration(seconds: 5),
+          ),
+        );
+        
+        // Start polling for payment status
+        _pollPaymentStatus(job.id);
+      }
+    } catch (e) {
+      if (mounted) Navigator.pop(context); // Close loading dialog
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('❌ Imeshindikana: $e'),
+            backgroundColor: const Color(0xFFEF4444),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _pollPaymentStatus(int jobId) async {
+    final jobService = JobService();
+    int attempts = 0;
+    const maxAttempts = 30; // Poll for 60 seconds (30 * 2 seconds)
+
+    while (attempts < maxAttempts && mounted) {
+      await Future.delayed(const Duration(seconds: 2));
+      attempts++;
+
+      try {
+        final status = await jobService.pollPayment(jobId);
+        if (status['done'] == true) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('✅ Malipo yamekamilika! Kazi imeposti.'),
+                backgroundColor: Color(0xFF22C55E),
+              ),
+            );
+            context.read<ClientProvider>().loadMyJobs();
+          }
+          return;
+        }
+      } catch (e) {
+        // Continue polling
+      }
+    }
   }
 
   Widget _buildJobList(List<Job> jobs) {

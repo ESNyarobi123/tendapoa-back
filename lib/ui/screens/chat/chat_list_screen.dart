@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../core/constants/constants.dart';
 import '../../../core/router/app_router.dart';
 import '../../../data/models/models.dart';
 import '../../../data/services/chat_service.dart';
+
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
 
@@ -10,20 +12,54 @@ class ChatListScreen extends StatefulWidget {
   State<ChatListScreen> createState() => _ChatListScreenState();
 }
 
-class _ChatListScreenState extends State<ChatListScreen> {
+class _ChatListScreenState extends State<ChatListScreen> with WidgetsBindingObserver {
   bool _isLoading = true;
   List<ChatConversation> _conversations = [];
+  Timer? _refreshTimer;
+  final ChatService _chatService = ChatService();
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadConversations();
+    _startAutoRefresh();
   }
 
-  Future<void> _loadConversations() async {
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _refreshTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _loadConversations(silent: true);
+      _startAutoRefresh();
+    } else if (state == AppLifecycleState.paused) {
+      _refreshTimer?.cancel();
+    }
+  }
+
+  void _startAutoRefresh() {
+    _refreshTimer?.cancel();
+    _refreshTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (mounted) {
+        _loadConversations(silent: true);
+      } else {
+        _refreshTimer?.cancel();
+      }
+    });
+  }
+
+  Future<void> _loadConversations({bool silent = false}) async {
+    if (!silent && mounted) {
+      setState(() => _isLoading = true);
+    }
     try {
-      final chatService = ChatService();
-      final conversations = await chatService.getConversations();
+      final conversations = await _chatService.getConversations();
       if (mounted) {
         setState(() {
           _conversations = conversations;
@@ -45,6 +81,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
         backgroundColor: AppColors.background,
         elevation: 0,
         centerTitle: true,
+        automaticallyImplyLeading: false,
         title: const Text(
           'Meseji',
           style: TextStyle(
@@ -82,47 +119,85 @@ class _ChatListScreenState extends State<ChatListScreen> {
   Widget _buildConversationItem(ChatConversation conversation) {
     final otherUser = conversation.otherUser;
     final job = conversation.job;
+    final hasUnread = conversation.unreadCount > 0;
     
     return InkWell(
-      onTap: () {
-        Navigator.pushNamed(
+      onTap: () async {
+        await Navigator.pushNamed(
           context,
           AppRouter.chatRoom,
           arguments: {'conversation': conversation},
         );
+        // Refresh after returning from chat room
+        _loadConversations(silent: true);
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: hasUnread ? const Color(0xFFF0F9FF) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+        ),
         child: Row(
           children: [
-            // Profile Picture
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: const Color(0xFFDBEAFE),
-                shape: BoxShape.circle,
-                image: otherUser?.profilePhotoUrl != null
-                    ? DecorationImage(
-                        image: NetworkImage(otherUser!.profilePhotoUrl!),
-                        fit: BoxFit.cover,
-                      )
-                    : null,
-              ),
-              child: otherUser?.profilePhotoUrl == null
-                  ? Center(
-                      child: Text(
-                        otherUser?.name.isNotEmpty == true
-                            ? otherUser!.name[0].toUpperCase()
-                            : 'U',
-                        style: const TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
+            // Profile Picture with unread indicator
+            Stack(
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFDBEAFE),
+                    shape: BoxShape.circle,
+                    border: hasUnread 
+                      ? Border.all(color: AppColors.primary, width: 2)
+                      : null,
+                    image: otherUser?.profilePhotoUrl != null
+                        ? DecorationImage(
+                            image: NetworkImage(otherUser!.profilePhotoUrl!),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
+                  ),
+                  child: otherUser?.profilePhotoUrl == null
+                      ? Center(
+                          child: Text(
+                            otherUser?.name.isNotEmpty == true
+                                ? otherUser!.name[0].toUpperCase()
+                                : 'U',
+                            style: const TextStyle(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+                        )
+                      : null,
+                ),
+                // Unread badge
+                if (hasUnread)
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFEF4444),
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
+                      child: Center(
+                        child: Text(
+                          conversation.unreadCount > 9 ? '9+' : '${conversation.unreadCount}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    )
-                  : null,
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(width: 16),
             // Content
@@ -130,36 +205,66 @@ class _ChatListScreenState extends State<ChatListScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    otherUser?.name ?? 'Mtumiaji',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF1E293B),
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          otherUser?.name ?? 'Mtumiaji',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: hasUnread ? FontWeight.bold : FontWeight.w600,
+                            color: const Color(0xFF1E293B),
+                          ),
+                        ),
+                      ),
+                      if (hasUnread)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF22C55E),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Text(
+                            'MPYA',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 8,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    job?.title ?? conversation.lastMessage ?? 'Hakuna ujumbe',
+                    conversation.lastMessage ?? job?.title ?? 'Hakuna ujumbe',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 14,
-                      color: conversation.unreadCount > 0
-                          ? const Color(0xFF64748B)
+                      fontWeight: hasUnread ? FontWeight.w600 : FontWeight.normal,
+                      color: hasUnread
+                          ? const Color(0xFF1E293B)
                           : const Color(0xFF94A3B8),
                     ),
                   ),
                 ],
               ),
             ),
+            const SizedBox(width: 8),
             // Time
-            Text(
-              _formatTime(conversation.lastMessageAt),
-              style: const TextStyle(
-                fontSize: 12,
-                color: Color(0xFF94A3B8),
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  _formatTime(conversation.lastMessageAt),
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: hasUnread ? FontWeight.bold : FontWeight.normal,
+                    color: hasUnread ? AppColors.primary : const Color(0xFF94A3B8),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

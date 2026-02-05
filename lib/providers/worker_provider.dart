@@ -101,13 +101,20 @@ class WorkerProvider extends ChangeNotifier {
     loadJobsFeed();
   }
 
-  // Assigned Jobs (jobs where worker was selected by muhitaji)
+  // Assigned Jobs (jobs where worker was selected by muhitaji - needs accept/decline)
   List<Job> _assignedJobs = [];
   List<Job> get assignedJobs => _assignedJobs;
 
+  // Active Jobs from assigned endpoint (in_progress, ready_for_confirmation)
+  List<Job> _activeJobsFromAssigned = [];
+  List<Job> get activeJobsFromAssigned => _activeJobsFromAssigned;
+
   Future<void> loadAssignedJobs() async {
     try {
+      // Get pending jobs (status = 'assigned') - need accept/decline
       _assignedJobs = await _jobService.getAssignedJobs();
+      // Get active jobs (status = 'in_progress' or 'ready_for_confirmation')
+      _activeJobsFromAssigned = await _jobService.getActiveJobs();
       notifyListeners();
     } catch (e) {
       _error = e.toString();

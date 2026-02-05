@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import '../../../core/constants/constants.dart';
 import '../../../core/router/app_router.dart';
 import '../../../data/models/models.dart';
@@ -168,6 +170,19 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
     if (await canLaunchUrl(launchUri)) {
       await launchUrl(launchUri);
     }
+  }
+
+  void _openFullMap(Job job) {
+    if (job.lat == null || job.lng == null) return;
+    
+    Navigator.pushNamed(
+      context,
+      AppRouter.map,
+      arguments: {
+        'jobs': [job],
+        'initialLocation': LatLng(job.lat!, job.lng!),
+      },
+    );
   }
 
   void _showApplicationDialog() {
@@ -761,48 +776,196 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
 
                   const SizedBox(height: 35),
 
-                  // LOCATION
+                  // LOCATION WITH MAP
                   const Text('Mahali / Eneo',
                       style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w900,
                           color: Color(0xFF1E293B))),
                   const SizedBox(height: 15),
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(25),
-                      border: Border.all(color: const Color(0xFFF1F5F9)),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                              color: Colors.blue.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(15)),
-                          child: const Icon(Icons.map_rounded,
-                              color: Colors.blue, size: 24),
+                  
+                  // Map Widget showing job location
+                  if (job.lat != null && job.lng != null)
+                    GestureDetector(
+                      onTap: () => _openFullMap(job),
+                      child: Container(
+                        height: 200,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(25),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 15),
-                        Expanded(
-                          child: Text(
-                            job.addressText ?? 'Eneo la kazi halikujulikana',
-                            style: const TextStyle(
-                                fontSize: 15,
-                                color: Color(0xFF475569),
-                                fontWeight: FontWeight.w600),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(25),
+                          child: Stack(
+                            children: [
+                              // OpenStreetMap
+                              FlutterMap(
+                                options: MapOptions(
+                                  initialCenter: LatLng(job.lat!, job.lng!),
+                                  initialZoom: 15,
+                                  interactionOptions: const InteractionOptions(
+                                    flags: InteractiveFlag.none, // Disable interaction for preview
+                                  ),
+                                ),
+                                children: [
+                                  TileLayer(
+                                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                    userAgentPackageName: 'com.tendapoa.app',
+                                  ),
+                                  MarkerLayer(
+                                    markers: [
+                                      Marker(
+                                        point: LatLng(job.lat!, job.lng!),
+                                        width: 50,
+                                        height: 50,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: AppColors.primary,
+                                            shape: BoxShape.circle,
+                                            border: Border.all(color: Colors.white, width: 3),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: AppColors.primary.withOpacity(0.4),
+                                                blurRadius: 10,
+                                                spreadRadius: 2,
+                                              ),
+                                            ],
+                                          ),
+                                          child: const Icon(
+                                            Icons.location_on,
+                                            color: Colors.white,
+                                            size: 24,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              // Gradient overlay at bottom for address text
+                              Positioned(
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.bottomCenter,
+                                      end: Alignment.topCenter,
+                                      colors: [
+                                        Colors.black.withOpacity(0.7),
+                                        Colors.transparent,
+                                      ],
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.location_on_rounded,
+                                        color: Colors.white,
+                                        size: 18,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          job.addressText ?? 'Eneo la kazi',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              // "Tap to expand" indicator
+                              Positioned(
+                                top: 10,
+                                right: 10,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.9),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.open_in_full_rounded,
+                                        size: 14,
+                                        color: AppColors.primary,
+                                      ),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        'Bonyeza kukubwa',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.primary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
+                      ),
+                    )
+                  else
+                    // Fallback to address text only if no coordinates
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(25),
+                        border: Border.all(color: const Color(0xFFF1F5F9)),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                                color: Colors.blue.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(15)),
+                            child: const Icon(Icons.map_rounded,
+                                color: Colors.blue, size: 24),
+                          ),
+                          const SizedBox(width: 15),
+                          Expanded(
+                            child: Text(
+                              job.addressText ?? 'Eneo la kazi halikujulikana',
+                              style: const TextStyle(
+                                  fontSize: 15,
+                                  color: Color(0xFF475569),
+                                  fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
 
                   const SizedBox(height: 40),
 
-                  // APPLICATIONS (For Client View)
-                  if (isOwner && !hasWorkerAssigned) _buildAppsSection(job),
+                  // APPLICATIONS/COMMENTS Section
+                  // Show for owner (to select worker) OR for workers (to see all comments including theirs)
+                  if (isOwner && !hasWorkerAssigned) 
+                    _buildAppsSection(job)
+                  else if (isWorker && !isOwner)
+                    _buildCommentsSection(job),
 
                   const SizedBox(height: 100),
                 ],
@@ -1044,6 +1207,230 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
         else
           ...job.comments!.map((comment) => _buildAppItem(comment)),
       ],
+    );
+  }
+
+  /// Comments section for workers to see all comments including their own
+  Widget _buildCommentsSection(Job job) {
+    final currentUser = context.read<AuthProvider>().user;
+    final myComments = job.comments?.where((c) => c.userId == currentUser?.id).toList() ?? [];
+    final otherComments = job.comments?.where((c) => c.userId != currentUser?.id).toList() ?? [];
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // My Application/Comment
+        if (myComments.isNotEmpty) ...[
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFDCFCE7),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.check_circle_rounded, 
+                  color: Color(0xFF22C55E), size: 20),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Ombi Lako',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            color: Color(0xFF1E293B))),
+                    Text('Umeomba kazi hii',
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF22C55E))),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ...myComments.map((comment) => _buildMyCommentItem(comment)),
+          const SizedBox(height: 30),
+        ],
+        
+        // Other Comments
+        if (otherComments.isNotEmpty) ...[
+          Text('Maombi Mengine (${otherComments.length})',
+              style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFF1E293B))),
+          const SizedBox(height: 16),
+          ...otherComments.map((comment) => _buildOtherCommentItem(comment)),
+        ],
+        
+        // Empty state if no comments at all
+        if (job.comments == null || job.comments!.isEmpty)
+          Center(
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Icon(Icons.chat_bubble_outline_rounded,
+                      size: 50, color: Colors.grey[300]),
+                ),
+                const SizedBox(height: 15),
+                const Text('Bado hakuna maombi',
+                    style: TextStyle(
+                      color: Color(0xFF64748B), 
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    )),
+                const SizedBox(height: 6),
+                const Text('Kuwa wa kwanza kuomba kazi hii!',
+                    style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12)),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  /// My comment item (highlighted)
+  Widget _buildMyCommentItem(JobComment comment) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF0FDF4),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFF22C55E).withOpacity(0.3), width: 2),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF22C55E),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Text('OMBI LAKO',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.5)),
+              ),
+              const Spacer(),
+              Text(
+                timeago.format(comment.createdAt ?? DateTime.now(), locale: 'sw'),
+                style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(comment.message,
+              style: const TextStyle(
+                  fontSize: 14, color: Color(0xFF1E293B), height: 1.5)),
+          if (comment.proposedPrice != null) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.payments_rounded, 
+                    color: Color(0xFF22C55E), size: 16),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Bei uliyopendekeza: TZS ${_formatNumber(comment.proposedPrice!)}',
+                    style: const TextStyle(
+                      color: Color(0xFF22C55E),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// Other workers' comment item
+  Widget _buildOtherCommentItem(JobComment comment) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CircleAvatar(
+            radius: 18,
+            backgroundColor: const Color(0xFFE2E8F0),
+            backgroundImage: comment.userPhoto != null 
+              ? NetworkImage(comment.userPhoto!) 
+              : null,
+            child: comment.userPhoto == null
+              ? Text(
+                  comment.userName?.isNotEmpty == true 
+                    ? comment.userName![0].toUpperCase() 
+                    : 'W',
+                  style: const TextStyle(
+                    color: Color(0xFF64748B),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                )
+              : null,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(comment.userName ?? 'Mfanyakazi',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                            color: Color(0xFF1E293B))),
+                    const Spacer(),
+                    Text(
+                      timeago.format(comment.createdAt ?? DateTime.now(), locale: 'sw'),
+                      style: const TextStyle(fontSize: 10, color: Color(0xFF94A3B8)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(comment.message,
+                    style: const TextStyle(
+                        fontSize: 13, color: Color(0xFF64748B), height: 1.4),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 

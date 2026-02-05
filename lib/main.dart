@@ -7,10 +7,14 @@ import 'core/constants/constants.dart';
 import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
 import 'core/localization/app_localizations.dart';
+import 'data/services/storage_service.dart';
 import 'providers/providers.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize storage service FIRST before anything else
+  await StorageService().init();
 
   // Register Swahili locale for timeago
   timeago.setLocaleMessages(

@@ -1,7 +1,9 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:provider/provider.dart';
 import '../../core/router/app_router.dart';
+import '../../providers/auth_provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -39,8 +41,27 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _navigateNext() async {
-    await Future.delayed(const Duration(seconds: 3));
-    if (mounted) {
+    // Wait for splash animation
+    await Future.delayed(const Duration(seconds: 2));
+    if (!mounted) return;
+    
+    // Wait for AuthProvider to finish initializing
+    final authProvider = context.read<AuthProvider>();
+    await authProvider.waitForInit();
+    
+    if (!mounted) return;
+    
+    // Check if user is already logged in
+    if (authProvider.isAuthenticated) {
+      // User is logged in - go to appropriate home screen
+      final user = authProvider.user!;
+      if (user.isMfanyakazi) {
+        Navigator.pushReplacementNamed(context, AppRouter.workerHome);
+      } else {
+        Navigator.pushReplacementNamed(context, AppRouter.clientHome);
+      }
+    } else {
+      // User not logged in - go to welcome screen
       Navigator.pushReplacementNamed(context, AppRouter.welcome);
     }
   }
