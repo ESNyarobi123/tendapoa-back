@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/constants.dart';
+import '../../../core/router/app_router.dart';
 import '../../../data/models/models.dart';
 import '../../../data/services/services.dart';
 import '../../../providers/providers.dart';
@@ -15,17 +16,26 @@ class PaymentWaitScreen extends StatefulWidget {
   State<PaymentWaitScreen> createState() => _PaymentWaitScreenState();
 }
 
-class _PaymentWaitScreenState extends State<PaymentWaitScreen> {
+class _PaymentWaitScreenState extends State<PaymentWaitScreen>
+    with SingleTickerProviderStateMixin {
   final JobService _jobService = JobService();
   Timer? _pollingTimer;
-  int _secondsRemaining = 60;
+  Timer? _countdownTimer;
+  int _secondsRemaining = 120; // 2 minutes
   bool _isSuccess = false;
-  String _statusMessage =
-      'Tafadhali kagua simu yako na uingize PIN ya M-Pesa...';
+  bool _isFailed = false;
+  bool _isRetrying = false;
+  String _statusMessage = 'Tafadhali kagua simu yako na uingize PIN ya M-Pesa...';
+
+  late AnimationController _pulseController;
 
   @override
   void initState() {
     super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
     _startPolling();
     _startCountdown();
   }
@@ -33,13 +43,21 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen> {
   @override
   void dispose() {
     _pollingTimer?.cancel();
+    _countdownTimer?.cancel();
+    _pulseController.dispose();
     super.dispose();
   }
 
   void _startCountdown() {
-    Timer.periodic(const Duration(seconds: 1), (timer) {
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted || _isSuccess || _secondsRemaining == 0) {
         timer.cancel();
+        if (_secondsRemaining == 0 && !_isSuccess && mounted) {
+          setState(() {
+            _isFailed = true;
+            _statusMessage = 'Muda umeisha. Malipo hayajakamilika.';
+          });
+        }
         return;
       }
       setState(() => _secondsRemaining--);
@@ -47,164 +65,543 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen> {
   }
 
   void _startPolling() {
+    // Poll immediately first
+    _pollPaymentStatus();
+
     _pollingTimer = Timer.periodic(const Duration(seconds: 4), (timer) async {
-      try {
-        final updatedJob = await _jobService.getJobDetails(widget.job.id);
-        if (updatedJob.status != 'pending_payment') {
-          timer.cancel();
+      if (_isSuccess || _isFailed) {
+        timer.cancel();
+        return;
+      }
+      await _pollPaymentStatus();
+    });
+  }
+
+  Future<void> _pollPaymentStatus() async {
+    try {
+      final result = await _jobService.pollPayment(widget.job.id);
+      final done = result['done'] == true;
+
+      if (done) {
+        _pollingTimer?.cancel();
+        _countdownTimer?.cancel();
+
+        if (mounted) {
           setState(() {
             _isSuccess = true;
-            _statusMessage = 'Malipo Yamefanikiwa! Kazi yako sasa ipo hewani.';
+            _statusMessage = 'Malipo Yamefanikiwa!\nKazi yako sasa ipo hewani.';
           });
 
-          // Refresh context providers
-          if (mounted) {
-            context.read<ClientProvider>().loadMyJobs(silent: true);
-          }
+          // Refresh jobs
+          context.read<ClientProvider>().loadMyJobs(silent: true);
 
-          // Navigate back after 3 seconds
+          // Navigate to home after delay
           Future.delayed(const Duration(seconds: 3), () {
-            if (mounted) Navigator.pop(context, true);
+            if (mounted) {
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                AppRouter.clientHome,
+                (route) => false,
+              );
+            }
           });
         }
-      } catch (e) {
-        print('Polling Error: $e');
       }
+    } catch (e) {
+      debugPrint('Polling Error: $e');
+    }
+  }
 
-      if (_secondsRemaining == 0) {
-        timer.cancel();
-        if (mounted) {
-          setState(() => _statusMessage =
-              'Muda umeisha. Tafadhali jaribu tena ikiwa malipo hayajakamilika.');
-        }
-      }
+  Future<void> _retryPayment() async {
+    setState(() {
+      _isRetrying = true;
+      _isFailed = false;
+      _statusMessage = 'Inaanzisha malipo tena...';
     });
+
+    try {
+      await _jobService.retryPayment(widget.job.id);
+
+      if (mounted) {
+        setState(() {
+          _isRetrying = false;
+          _secondsRemaining = 120;
+          _statusMessage = 'Tafadhali kagua simu yako na uingize PIN ya M-Pesa...';
+        });
+        _startPolling();
+        _startCountdown();
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isRetrying = false;
+          _isFailed = true;
+          _statusMessage = 'Imeshindikana kuanzisha malipo. Jaribu tena.';
+        });
+      }
+    }
+  }
+
+  String get _formattedTime {
+    final minutes = (_secondsRemaining ~/ 60).toString().padLeft(2, '0');
+    final seconds = (_secondsRemaining % 60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 30),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // ANIMATED ICON
-            if (!_isSuccess)
-              Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
+      backgroundColor: const Color(0xFFF8FAFC),
+      body: SafeArea(
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 30),
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+
+              // Close button (top right)
+              Align(
+                alignment: Alignment.topRight,
+                child: IconButton(
+                  onPressed: () => _showExitDialog(),
+                  icon: const Icon(Icons.close_rounded, color: Color(0xFF94A3B8)),
                 ),
-                child: Center(
-                  child: const Icon(Icons.phonelink_ring_rounded,
-                          size: 60, color: AppColors.primary)
-                      .animate(onPlay: (c) => c.repeat())
-                      .scale(
-                          duration: 1.seconds,
-                          begin: const Offset(1, 1),
-                          end: const Offset(1.2, 1.2),
-                          curve: Curves.easeInOut)
-                      .then()
-                      .scale(
-                          duration: 1.seconds,
-                          begin: const Offset(1.2, 1.2),
-                          end: const Offset(1, 1),
-                          curve: Curves.easeInOut),
-                ),
-              )
-            else
-              Container(
-                width: 120,
-                height: 120,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF10B981),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.check_rounded,
-                        size: 70, color: Colors.white)
-                    .animate()
-                    .scale(duration: 500.ms, curve: Curves.elasticOut),
               ),
 
-            const SizedBox(height: 50),
+              const Spacer(),
 
-            // STATUS TEXT
-            Text(
-              _isSuccess ? 'MUAMALA UMEKAMILIKA' : 'SUBIRI KIDOGO...',
-              style: TextStyle(
-                fontSize: 14,
-                letterSpacing: 2,
-                fontWeight: FontWeight.w900,
-                color: _isSuccess
-                    ? const Color(0xFF10B981)
-                    : const Color(0xFF94A3B8),
-              ),
+              // Main Content
+              _buildMainContent(),
+
+              const Spacer(),
+
+              // Bottom Actions
+              _buildBottomActions(),
+
+              const SizedBox(height: 40),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMainContent() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Animated Icon
+        _buildAnimatedIcon(),
+
+        const SizedBox(height: 40),
+
+        // Status Label
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: _getStatusColor().withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            _getStatusLabel(),
+            style: TextStyle(
+              fontSize: 12,
+              letterSpacing: 1.5,
+              fontWeight: FontWeight.w800,
+              color: _getStatusColor(),
             ),
-            const SizedBox(height: 15),
-            Text(
-              _statusMessage,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1E293B),
-                height: 1.4,
-              ),
+          ),
+        ),
+
+        const SizedBox(height: 20),
+
+        // Status Message
+        Text(
+          _statusMessage,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF1E293B),
+            height: 1.4,
+          ),
+        ),
+
+        const SizedBox(height: 30),
+
+        // Timer (only when waiting)
+        if (!_isSuccess && !_isFailed) _buildTimer(),
+
+        // Job Info Card
+        const SizedBox(height: 30),
+        _buildJobInfoCard(),
+      ],
+    );
+  }
+
+  Widget _buildAnimatedIcon() {
+    if (_isSuccess) {
+      return Container(
+        width: 140,
+        height: 140,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF10B981), Color(0xFF059669)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF10B981).withValues(alpha: 0.4),
+              blurRadius: 30,
+              offset: const Offset(0, 10),
             ),
-
-            const SizedBox(height: 40),
-
-            // TIMER OR BUTTON
-            if (!_isSuccess && _secondsRemaining > 0)
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Text(
-                  '00:${_secondsRemaining.toString().padLeft(2, '0')}',
-                  style: const TextStyle(
-                      fontSize: 24,
-                      fontFamily: 'Courier',
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF475569)),
-                ),
-              ),
-
-            if (_secondsRemaining == 0 && !_isSuccess)
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1E293B),
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
-                  elevation: 0,
-                ),
-                child: const Text('RUDI NYUMA',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-              ),
-
-            const SizedBox(height: 20),
-
-            if (!_isSuccess)
-              Text(
-                'Usifunge ukurasa huu mpaka utakapopata uthibitisho.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: Colors.black.withValues(alpha: 0.4), fontSize: 13),
-              ),
           ],
         ),
+        child: const Icon(Icons.check_rounded, size: 80, color: Colors.white)
+            .animate()
+            .scale(duration: 600.ms, curve: Curves.elasticOut),
+      ).animate().scale(begin: const Offset(0.5, 0.5), duration: 400.ms);
+    }
+
+    if (_isFailed) {
+      return Container(
+        width: 140,
+        height: 140,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFEF4444).withValues(alpha: 0.4),
+              blurRadius: 30,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: const Icon(Icons.close_rounded, size: 80, color: Colors.white),
+      ).animate().shake(duration: 500.ms);
+    }
+
+    // Waiting state with pulse animation
+    return AnimatedBuilder(
+      animation: _pulseController,
+      builder: (context, child) {
+        return Container(
+          width: 140,
+          height: 140,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withValues(alpha: 0.15 + (_pulseController.value * 0.15)),
+                blurRadius: 30 + (_pulseController.value * 20),
+                spreadRadius: _pulseController.value * 10,
+              ),
+            ],
+          ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Outer ring
+              Container(
+                width: 130,
+                height: 130,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.2),
+                    width: 3,
+                  ),
+                ),
+              ),
+              // Inner content
+              Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.primary.withValues(alpha: 0.1),
+                      AppColors.primary.withValues(alpha: 0.05),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.phone_android_rounded,
+                  size: 50,
+                  color: AppColors.primary,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTimer() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.timer_outlined,
+            color: _secondsRemaining < 30 ? const Color(0xFFEF4444) : const Color(0xFF64748B),
+            size: 24,
+          ),
+          const SizedBox(width: 12),
+          Text(
+            _formattedTime,
+            style: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.w900,
+              fontFamily: 'monospace',
+              color: _secondsRemaining < 30 ? const Color(0xFFEF4444) : const Color(0xFF1E293B),
+              letterSpacing: 2,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildJobInfoCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(Icons.work_outline_rounded, color: AppColors.primary, size: 24),
+          ),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.job.title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Color(0xFF1E293B),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'TZS ${_formatPrice(widget.job.price)}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomActions() {
+    if (_isSuccess) {
+      return const SizedBox.shrink();
+    }
+
+    if (_isFailed) {
+      return Column(
+        children: [
+          // Retry Button
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _isRetrying ? null : _retryPayment,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 18),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 0,
+              ),
+              child: _isRetrying
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2.5,
+                      ),
+                    )
+                  : const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.refresh_rounded, size: 20),
+                        SizedBox(width: 10),
+                        Text(
+                          'JARIBU TENA',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+            ),
+          ),
+          const SizedBox(height: 15),
+          // Cancel Button
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              'Futa na Rudi Nyuma',
+              style: TextStyle(
+                color: Color(0xFF64748B),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    // Waiting state
+    return Column(
+      children: [
+        Text(
+          'Usifunge ukurasa huu mpaka utakapopata uthibitisho.',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.black.withValues(alpha: 0.4),
+            fontSize: 13,
+          ),
+        ),
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            Expanded(
+              child: _buildInfoChip(Icons.phone_android_rounded, 'Angalia simu'),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _buildInfoChip(Icons.lock_outline_rounded, 'Ingiza PIN'),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _buildInfoChip(Icons.check_circle_outline_rounded, 'Thibitisha'),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoChip(IconData icon, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, size: 20, color: AppColors.primary),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF64748B),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getStatusColor() {
+    if (_isSuccess) return const Color(0xFF10B981);
+    if (_isFailed) return const Color(0xFFEF4444);
+    return AppColors.primary;
+  }
+
+  String _getStatusLabel() {
+    if (_isSuccess) return 'MALIPO YAMEKAMILIKA';
+    if (_isFailed) return 'MALIPO YAMESHINDIKANA';
+    return 'INASUBIRI MALIPO';
+  }
+
+  String _formatPrice(int price) {
+    return price.toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]},',
+    );
+  }
+
+  void _showExitDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Unataka Kutoka?'),
+        content: const Text(
+          'Ikiwa malipo bado yanaendelea, kazi yako itachapishwa baada ya malipo kukamilika.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Endelea Kusubiri'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context); // Close dialog
+              Navigator.pop(context); // Close screen
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1E293B),
+            ),
+            child: const Text('Toka'),
+          ),
+        ],
       ),
     );
   }

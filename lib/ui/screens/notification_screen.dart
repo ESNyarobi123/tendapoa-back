@@ -59,16 +59,18 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
     try {
       final result = await _notificationService.getNotifications(
-          page: refresh ? 1 : _currentPage + 1);
+        page: refresh ? 1 : _currentPage + 1,
+      );
       final List<AppNotification> newNotifications =
           List<AppNotification>.from(result['notifications'] ?? []);
 
       if (mounted) {
         setState(() {
-          if (refresh)
+          if (refresh) {
             _notifications = newNotifications;
-          else
+          } else {
             _notifications.addAll(newNotifications);
+          }
           if (!refresh && newNotifications.isNotEmpty) _currentPage++;
           _lastPage = result['last_page'] ?? 1;
           _isLoading = false;
@@ -76,17 +78,17 @@ class _NotificationScreenState extends State<NotificationScreen> {
         });
       }
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           _isLoading = false;
           _isLoadingMore = false;
         });
+      }
     }
   }
 
   Future<void> _markAllRead() async {
     _notificationService.markAllAsRead();
-    // Optimistic update
     setState(() {
       for (var n in _notifications) {
         n.readAt = DateTime.now();
@@ -101,73 +103,121 @@ class _NotificationScreenState extends State<NotificationScreen> {
     }
 
     if (n.jobId != null) {
-      Navigator.pushNamed(context, AppRouter.jobDetails,
-          arguments: {'jobId': n.jobId});
+      Navigator.pushNamed(
+        context,
+        AppRouter.jobDetails,
+        arguments: {'jobId': n.jobId},
+      );
     }
   }
 
   String _getRelativeDate(DateTime date) {
     final now = DateTime.now();
     final diff = now.difference(date).inDays;
-    if (diff == 0) return 'Leo (Today)';
-    if (diff == 1) return 'Jana (Yesterday)';
-    return DateFormat('d MMMM').format(date);
+    if (diff == 0) return 'Leo';
+    if (diff == 1) return 'Jana';
+    return DateFormat('d MMM').format(date);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: false,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded,
-              color: Color(0xFF1E293B), size: 18),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text('Taarifa (Alerts)',
-            style: TextStyle(
-                color: Color(0xFF1E293B),
-                fontWeight: FontWeight.w900,
-                fontSize: 22,
-                letterSpacing: -0.5)),
-        actions: [
-          if (_notifications.any((n) => n.readAt == null))
-            TextButton(
-              onPressed: _markAllRead,
-              child: const Text('Read All',
-                  style: TextStyle(
-                      color: AppColors.primary, fontWeight: FontWeight.bold)),
+      backgroundColor: const Color(0xFFF8FAFC),
+      body: Column(
+        children: [
+          // Blue Header
+          Container(
+            padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
+            decoration: const BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(30),
+                bottomRight: Radius.circular(30),
+              ),
             ),
-          const SizedBox(width: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            shape: BoxShape.circle,
+                          ),
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                        ),
+                        const SizedBox(width: 15),
+                        const Text(
+                          'Taarifa',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (_notifications.any((n) => n.readAt == null))
+                      TextButton(
+                        onPressed: _markAllRead,
+                        child: const Text(
+                          'Soma Zote',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // Content
+          Expanded(
+            child: _isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(color: AppColors.primary))
+                : _notifications.isEmpty
+                    ? _buildEmptyState()
+                    : RefreshIndicator(
+                        onRefresh: () => _loadNotifications(refresh: true),
+                        color: AppColors.primary,
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          padding: const EdgeInsets.all(20),
+                          itemCount:
+                              _notifications.length + (_isLoadingMore ? 1 : 0),
+                          itemBuilder: (context, index) {
+                            if (index == _notifications.length) {
+                              return const Center(
+                                child: Padding(
+                                  padding: EdgeInsets.all(20),
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                            }
+
+                            final n = _notifications[index];
+                            return _buildNotificationItem(n);
+                          },
+                        ),
+                      ),
+          ),
         ],
       ),
-      body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: AppColors.primary))
-          : _notifications.isEmpty
-              ? _buildEmptyState()
-              : RefreshIndicator(
-                  onRefresh: () => _loadNotifications(refresh: true),
-                  color: AppColors.primary,
-                  child: ListView.builder(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    itemCount: _notifications.length + (_isLoadingMore ? 1 : 0),
-                    itemBuilder: (context, index) {
-                      if (index == _notifications.length)
-                        return const Center(
-                            child: Padding(
-                                padding: EdgeInsets.all(20),
-                                child: CircularProgressIndicator()));
-
-                      final n = _notifications[index];
-                      return _buildNotificationItem(n);
-                    },
-                  ),
-                ),
     );
   }
 
@@ -178,20 +228,30 @@ class _NotificationScreenState extends State<NotificationScreen> {
         children: [
           Container(
             padding: const EdgeInsets.all(40),
-            decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC), shape: BoxShape.circle),
-            child: Icon(Icons.notifications_off_rounded,
-                size: 80, color: Colors.blue[50]),
+            decoration: const BoxDecoration(
+              color: Color(0xFFEEF2FF),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.notifications_off_outlined,
+              size: 60,
+              color: Colors.blue[200],
+            ),
           ),
-          const SizedBox(height: 30),
-          const Text('Hakuna Taarifa',
-              style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E293B))),
-          const SizedBox(height: 10),
-          const Text('Taarifa zako mpya zitaonekana hapa.',
-              style: TextStyle(color: Color(0xFF94A3B8))),
+          const SizedBox(height: 20),
+          const Text(
+            'Hakuna Taarifa',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF1E293B),
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Taarifa zako zitaonekana hapa',
+            style: TextStyle(color: Color(0xFF94A3B8)),
+          ),
         ],
       ),
     );
@@ -199,81 +259,103 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   Widget _buildNotificationItem(AppNotification n) {
     final isRead = n.readAt != null;
-    return InkWell(
-      onTap: () => _handleTap(n),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        color: isRead
-            ? Colors.transparent
-            : const Color(0xFFEFF6FF).withValues(alpha: 0.5),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: isRead ? const Color(0xFFF1F5F9) : Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: isRead
-                    ? []
-                    : [
-                        BoxShadow(
-                            color: Colors.blue.withValues(alpha: 0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4))
-                      ],
-              ),
-              child: Icon(_getIcon(n.type),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: isRead ? Colors.white : const Color(0xFFEFF6FF),
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: InkWell(
+        onTap: () => _handleTap(n),
+        borderRadius: BorderRadius.circular(15),
+        child: Padding(
+          padding: const EdgeInsets.all(15),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: isRead ? const Color(0xFFF1F5F9) : Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: isRead
+                      ? []
+                      : [
+                          BoxShadow(
+                            color: Colors.blue.withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                ),
+                child: Icon(
+                  _getIcon(n.type),
                   color: isRead ? const Color(0xFF94A3B8) : AppColors.primary,
-                  size: 22),
-            ),
-            const SizedBox(width: 15),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(n.title,
-                            style: TextStyle(
-                                fontWeight:
-                                    isRead ? FontWeight.bold : FontWeight.w900,
-                                fontSize: 16,
-                                color: const Color(0xFF1E293B))),
-                      ),
-                      if (!isRead)
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: const BoxDecoration(
-                              color: Color(0xFFF97316), shape: BoxShape.circle),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(n.message,
-                      style: TextStyle(
-                          color: isRead
-                              ? const Color(0xFF64748B)
-                              : const Color(0xFF334155),
-                          fontSize: 14,
-                          height: 1.5,
-                          fontWeight:
-                              isRead ? FontWeight.normal : FontWeight.w500)),
-                  const SizedBox(height: 10),
-                  Text(
-                      DateFormat('h:mm a • ').format(n.createdAt) +
-                          _getRelativeDate(n.createdAt),
-                      style: const TextStyle(
-                          color: Color(0xFF94A3B8),
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold)),
-                ],
+                  size: 20,
+                ),
               ),
-            ),
-          ],
+              const SizedBox(width: 15),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            n.title,
+                            style: TextStyle(
+                              fontWeight: isRead
+                                  ? FontWeight.w600
+                                  : FontWeight.bold,
+                              fontSize: 15,
+                              color: const Color(0xFF1E293B),
+                            ),
+                          ),
+                        ),
+                        if (!isRead)
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFF97316),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      n.message,
+                      style: TextStyle(
+                        color: isRead
+                            ? const Color(0xFF64748B)
+                            : const Color(0xFF334155),
+                        fontSize: 13,
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${_getRelativeDate(n.createdAt)} • ${DateFormat('HH:mm').format(n.createdAt)}',
+                      style: const TextStyle(
+                        color: Color(0xFF94A3B8),
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     ).animate().fadeIn().slideY(begin: 0.05, end: 0);
@@ -283,6 +365,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     if (type.contains('JobApplication')) return Icons.person_search_rounded;
     if (type.contains('JobStatus')) return Icons.assignment_turned_in_rounded;
     if (type.contains('Payment')) return Icons.payments_rounded;
+    if (type.contains('Message')) return Icons.chat_bubble_rounded;
     return Icons.notifications_active_rounded;
   }
 }

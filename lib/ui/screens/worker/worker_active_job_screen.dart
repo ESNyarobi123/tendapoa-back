@@ -256,12 +256,12 @@ class _WorkerActiveJobScreenState extends State<WorkerActiveJobScreen> {
                   const SizedBox(height: 35),
 
                   // PROGRESS SECTION
-                  Row(
+                  const Row(
                     children: [
-                      const Icon(Icons.info_outline_rounded,
+                      Icon(Icons.info_outline_rounded,
                           color: Color(0xFFF97316), size: 20),
-                      const SizedBox(width: 10),
-                      const Expanded(
+                      SizedBox(width: 10),
+                      Expanded(
                         child: Text(
                           'Baada ya kumaliza kazi, muombe mteja akupe kodi ya ukamilishaji ili upokee malipo yako.',
                           style: TextStyle(

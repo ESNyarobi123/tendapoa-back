@@ -45,6 +45,8 @@ class AuthProvider extends ChangeNotifier {
     required String password,
     required String role,
     required String phone,
+    double? lat,
+    double? lng,
   }) async {
     _setLoading(true);
     try {
@@ -54,6 +56,8 @@ class AuthProvider extends ChangeNotifier {
         password: password,
         role: role,
         phone: phone,
+        lat: lat,
+        lng: lng,
       );
       _setLoading(false);
       return true;
@@ -98,6 +102,15 @@ class AuthProvider extends ChangeNotifier {
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<void> refreshUser() async {
+    try {
+      _user = await _authService.getProfile();
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error refreshing user: $e');
     }
   }
 

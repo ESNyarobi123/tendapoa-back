@@ -15,12 +15,7 @@ class RoleSelectScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 40),
-              IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-                onPressed: () => Navigator.pop(context),
-              ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 50),
               const Text('Chagua Aina \nya Akaunti',
                   style: TextStyle(
                       fontSize: 34,

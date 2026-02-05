@@ -187,9 +187,9 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             icon: const Icon(Icons.call_outlined,
                 color: Color(0xFF1E293B), size: 22),
             onPressed: () {
-              if (otherUser?.phone != null)
+              if (otherUser?.phone != null) {
                 _makePhoneCall(otherUser!.phone!);
-              else if (widget.conversation.job?.phone != null)
+              } else if (widget.conversation.job?.phone != null)
                 _makePhoneCall(widget.conversation.job!.phone!);
             },
           ),

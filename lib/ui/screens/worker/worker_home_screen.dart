@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import '../../../core/constants/constants.dart';
 import '../../../core/router/app_router.dart';
 import '../../../data/models/models.dart';
 import '../../../providers/providers.dart';
-import '../../widgets/job_card.dart';
-import '../../widgets/filter_modal.dart';
+
 import '../chat/chat_list_screen.dart';
-import '../../widgets/withdrawal_modal.dart';
+import '../common/map_screen.dart';
+import 'worker_jobs_screen.dart';
+import 'worker_dashboard_screen.dart';
 
 class WorkerHomeScreen extends StatefulWidget {
   const WorkerHomeScreen({super.key});
@@ -30,48 +32,79 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       body: IndexedStack(
         index: _currentIndex,
         children: const [
           _HomeFeedTab(),
-          _MyJobsTab(),
+          WorkerJobsScreen(),
           ChatListScreen(),
-          _DashboardTab(),
+          WorkerDashboardScreen(),
         ],
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 20)
-        ]),
-        child: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: (i) => setState(() => _currentIndex = i),
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
-          selectedItemColor: const Color(0xFFF97316),
-          unselectedItemColor: const Color(0xFF94A3B8),
-          showSelectedLabels: true,
-          showUnselectedLabels: true,
-          selectedFontSize: 11,
-          unselectedFontSize: 11,
-          items: const [
-            BottomNavigationBarItem(
-                icon: Icon(Icons.explore_outlined),
-                activeIcon: Icon(Icons.explore_rounded),
-                label: 'Gundua'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.business_center_outlined),
-                activeIcon: Icon(Icons.business_center_rounded),
-                label: 'Kazi Zangu'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.chat_bubble_outline_rounded),
-                activeIcon: Icon(Icons.chat_bubble_rounded),
-                label: 'Meseji'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.dashboard_outlined),
-                activeIcon: Icon(Icons.dashboard_rounded),
-                label: 'Dashibodi'),
+      bottomNavigationBar: _buildBottomNav(),
+    );
+  }
+
+  Widget _buildBottomNav() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 20,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(Icons.home_rounded, 'Nyumbani', 0),
+              _buildNavItem(Icons.work_outline_rounded, 'Kazi Zangu', 1),
+              _buildNavItem(Icons.chat_bubble_outline_rounded, 'Meseji', 2),
+              _buildNavItem(Icons.grid_view_rounded, 'Dashibodi', 3),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(IconData icon, String label, int index) {
+    final isSelected = _currentIndex == index;
+    return GestureDetector(
+      onTap: () => setState(() => _currentIndex = index),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(25),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? Colors.white : const Color(0xFF94A3B8),
+              size: 22,
+            ),
+            if (isSelected) ...[
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -80,610 +113,742 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
 }
 
 // === NYUMBANI (HOME FEED) TAB ===
-class _HomeFeedTab extends StatelessWidget {
+class _HomeFeedTab extends StatefulWidget {
   const _HomeFeedTab();
 
   @override
-  Widget build(BuildContext context) {
-    final user = context.watch<AuthProvider>().user;
-    final worker = context.watch<WorkerProvider>();
+  State<_HomeFeedTab> createState() => _HomeFeedTabState();
+}
 
-    return RefreshIndicator(
-      onRefresh: () => worker.loadJobsFeed(),
-      color: const Color(0xFFF97316),
-      child: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(25, 60, 25, 30),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFFF97316), Color(0xFFEA580C)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+class _HomeFeedTabState extends State<_HomeFeedTab> {
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadData() async {
+    if (!mounted) return;
+    final provider = context.read<WorkerProvider>();
+    provider.refreshAll();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final worker = context.watch<WorkerProvider>();
+    final user = context.watch<AuthProvider>().user;
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: RefreshIndicator(
+        onRefresh: _loadData,
+        color: AppColors.primary,
+        child: CustomScrollView(
+          slivers: [
+            // Blue Header
+            SliverToBoxAdapter(
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(20, 50, 20, 25),
+                decoration: const BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(30),
+                    bottomRight: Radius.circular(30),
+                  ),
                 ),
-                borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(35),
-                    bottomRight: Radius.circular(35)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Top Row - Logo and Icons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: 45,
+                              height: 45,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.white, width: 2),
+                              ),
+                              child: ClipOval(
+                                child: Image.asset(
+                                  'assets/images/tendalogo.jpg',
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => const Icon(
+                                    Icons.handyman,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            const Text(
+                              'Tendapoa',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            // Notification Icon
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(context, AppRouter.notifications);
+                              },
+                              child: Container(
+                                width: 45,
+                                height: 45,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Stack(
+                                  children: [
+                                    const Center(
+                                      child: Icon(
+                                        Icons.notifications_outlined,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: 8,
+                                      right: 8,
+                                      child: Container(
+                                        width: 8,
+                                        height: 8,
+                                        decoration: const BoxDecoration(
+                                          color: Colors.red,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            // Map Icon
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => MapScreen(
+                                      jobs: worker.availableJobs,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                width: 45,
+                                height: 45,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const Icon(
+                                  Icons.map_outlined,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            // Profile
+                            GestureDetector(
+                              onTap: () async {
+                                final result = await Navigator.pushNamed(
+                                  context,
+                                  AppRouter.editProfile,
+                                );
+                                if (result == true && mounted) {
+                                  setState(() {});
+                                }
+                              },
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    width: 45,
+                                    height: 45,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.white, width: 2),
+                                    ),
+                                    child: ClipOval(
+                                      child: user?.profilePhotoUrl != null
+                                          ? Image.network(
+                                              user!.profilePhotoUrl!,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Center(
+                                              child: Text(
+                                                user?.name.isNotEmpty == true
+                                                    ? user!.name[0].toUpperCase()
+                                                    : 'W',
+                                                style: const TextStyle(
+                                                  color: AppColors.primary,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 18,
+                                                ),
+                                              ),
+                                            ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    right: 0,
+                                    bottom: 0,
+                                    child: Container(
+                                      width: 14,
+                                      height: 14,
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFF97316),
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: Colors.white,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      child: const Icon(
+                                        Icons.edit,
+                                        size: 8,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 25),
+                    // Greeting
+                    Text(
+                      'Habari, ${user?.name.split(' ').firstOrNull ?? 'Mfanyakazi'}! 👋',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      'Tafuta kazi karibu nawe',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.8),
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    // Search Bar
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            height: 52,
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.search,
+                                  color: Color(0xFF94A3B8),
+                                  size: 22,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: TextField(
+                                    controller: _searchController,
+                                    decoration: const InputDecoration(
+                                      hintText: 'Tafuta kazi (mf. usafi, bomba...',
+                                      hintStyle: TextStyle(
+                                        color: Color(0xFF94A3B8),
+                                        fontSize: 14,
+                                      ),
+                                      border: InputBorder.none,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        // Filter Button (Orange)
+                        Container(
+                          width: 52,
+                          height: 52,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF97316),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: const Icon(
+                            Icons.tune,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
+            ),
+
+            // Quick Stats Row
+            SliverToBoxAdapter(
+              child: Container(
+                margin: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.03),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildStatItem(
+                      icon: Icons.account_balance_wallet_outlined,
+                      iconColor: AppColors.primary,
+                      iconBgColor: const Color(0xFFDBEAFE),
+                      value: 'TZS ${NumberFormat('#,###').format(worker.wallet?.balance ?? 0)}',
+                      label: 'Salio',
+                    ),
+                    Container(
+                      width: 1,
+                      height: 40,
+                      color: const Color(0xFFE2E8F0),
+                    ),
+                    _buildStatItem(
+                      icon: Icons.check_circle_outline,
+                      iconColor: const Color(0xFF10B981),
+                      iconBgColor: const Color(0xFFD1FAE5),
+                      value: '${worker.dashboard?.doneCount ?? 0}',
+                      label: 'Kazi Zilizomalizika',
+                    ),
+                    Container(
+                      width: 1,
+                      height: 40,
+                      color: const Color(0xFFE2E8F0),
+                    ),
+                    _buildStatItem(
+                      icon: Icons.work_outline,
+                      iconColor: const Color(0xFFF97316),
+                      iconBgColor: const Color(0xFFFFEDD5),
+                      value: '${worker.activeJobs.length}',
+                      label: 'Zina zoendelea',
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Available Jobs Header
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Kazi Zinazopatikana',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1E293B),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => MapScreen(
+                              jobs: worker.availableJobs,
+                              fetchFromApi: true,
+                            ),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(
+                              Icons.map_outlined,
+                              size: 16,
+                              color: AppColors.primary,
+                            ),
+                            SizedBox(width: 6),
+                            Text(
+                              'Ona Ramani',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Jobs List
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 30),
+              sliver: worker.isLoading && worker.availableJobs.isEmpty
+                  ? const SliverToBoxAdapter(
+                      child: Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(40),
+                          child: CircularProgressIndicator(
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ),
+                    )
+                  : worker.availableJobs.isEmpty
+                      ? SliverToBoxAdapter(
+                          child: _buildEmptyJobs(),
+                        )
+                      : SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) => _buildJobCard(worker.availableJobs[index]),
+                            childCount: worker.availableJobs.length,
+                          ),
+                        ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatItem({
+    required IconData icon,
+    required Color iconColor,
+    required Color iconBgColor,
+    required String value,
+    required String label,
+  }) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: iconBgColor,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(
+            icon,
+            color: iconColor,
+            size: 20,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF1E293B),
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 11,
+            color: Color(0xFF64748B),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildJobCard(Job job) {
+    final distanceInfo = job.distanceInfo;
+    final distance = job.distance;
+    final isNearby = distanceInfo?.isNear ?? (distance != null && distance <= 5);
+    final isModerate = distanceInfo?.isModerate ?? (distance != null && distance > 5 && distance <= 15);
+
+    // Distance badge colors
+    Color distanceBgColor;
+    Color distanceTextColor;
+    if (isNearby) {
+      distanceBgColor = const Color(0xFFDCFCE7);
+      distanceTextColor = const Color(0xFF22C55E);
+    } else if (isModerate) {
+      distanceBgColor = const Color(0xFFFEF3C7);
+      distanceTextColor = const Color(0xFFF59E0B);
+    } else {
+      distanceBgColor = const Color(0xFFF1F5F9);
+      distanceTextColor = const Color(0xFF64748B);
+    }
+
+    final distanceLabel = distanceInfo?.label ?? 
+        (distance != null ? '${distance.toStringAsFixed(1)} km' : '');
+
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(
+        context,
+        AppRouter.jobDetails,
+        arguments: {'job': job},
+      ),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Thumbnail
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: job.imageUrl != null && job.imageUrl!.isNotEmpty
+                  ? Image.network(
+                      job.imageUrl!,
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => _buildCompactPlaceholder(),
+                    )
+                  : _buildCompactPlaceholder(),
+            ),
+            const SizedBox(width: 12),
+            // Content
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Title & Category Row
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                              'Habari, ${user?.name.split(' ')[0] ?? 'Mfanyakazi'}!',
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold)),
-                          Text('Tafuta kazi karibu nawe leo',
-                              style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.8),
-                                  fontSize: 14)),
-                        ],
-                      ),
-                      _buildHeaderIcon(
-                          Icons.notifications_none_rounded,
-                          () => Navigator.pushNamed(
-                              context, AppRouter.notifications)),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        child: Container(
-                          height: 55,
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Text(
+                          job.title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF1E293B),
+                            height: 1.3,
+                          ),
+                        ),
+                      ),
+                      if (job.categoryName != null) ...[
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(18)),
+                            color: const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            job.categoryIcon ?? job.categoryName!,
+                            style: const TextStyle(fontSize: 10),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  // Price & Distance Row
+                  Row(
+                    children: [
+                      // Price
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF97316).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          'TZS ${NumberFormat('#,###').format(job.price)}',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFFF97316),
+                          ),
+                        ),
+                      ),
+                      if (distanceLabel.isNotEmpty) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: distanceBgColor,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
                           child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.search_rounded,
-                                  color: Color(0xFF94A3B8), size: 22),
-                              const SizedBox(width: 10),
-                              const Expanded(
-                                child: TextField(
-                                  decoration: InputDecoration(
-                                      hintText: 'Tafuta kazi hapa...',
-                                      border: InputBorder.none,
-                                      hintStyle: TextStyle(
-                                          color: Color(0xFF94A3B8),
-                                          fontSize: 14)),
+                              Icon(
+                                isNearby ? Icons.near_me : Icons.location_on_outlined,
+                                size: 10,
+                                color: distanceTextColor,
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                distanceLabel,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                  color: distanceTextColor,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Stack(
-                        children: [
-                          Container(
-                            height: 55,
-                            width: 55,
-                            decoration: BoxDecoration(
-                                color: Colors.black,
-                                borderRadius: BorderRadius.circular(18)),
-                            child: IconButton(
-                                icon: const Icon(Icons.tune_rounded,
-                                    color: Colors.white),
-                                onPressed: () {
-                                  showModalBottomSheet(
-                                    context: context,
-                                    isScrollControlled: true,
-                                    backgroundColor: Colors.transparent,
-                                    builder: (context) => const FilterModal(),
-                                  );
-                                }),
-                          ),
-                          if (worker.selectedCategory != null ||
-                              worker.selectedDistance != null)
-                            Positioned(
-                              right: 12,
-                              top: 12,
-                              child: Container(
-                                width: 10,
-                                height: 10,
-                                decoration: BoxDecoration(
-                                    color: const Color(0xFFF97316),
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                        color: Colors.black, width: 2)),
-                              ),
-                            ),
-                        ],
-                      ),
+                      ],
                     ],
                   ),
-                ],
-              ),
-            ),
-          ),
-
-          // QUICK STATS STRIP
-          SliverToBoxAdapter(
-            child: Container(
-              margin: const EdgeInsets.fromLTRB(25, 25, 25, 10),
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(25),
-                  border: Border.all(color: const Color(0xFFF1F5F9))),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildMiniStat(
-                      'Salio',
-                      'TZS ${NumberFormat('#,###').format(worker.wallet?.balance ?? 0)}',
-                      Icons.account_balance_wallet_rounded,
-                      const Color(0xFF10B981)),
-                  Container(
-                      width: 1, height: 30, color: const Color(0xFFF1F5F9)),
-                  _buildMiniStat('Kazi', '${worker.dashboard?.doneCount ?? 0}',
-                      Icons.check_circle_rounded, const Color(0xFF3B82F6)),
-                  Container(
-                      width: 1, height: 30, color: const Color(0xFFF1F5F9)),
-                  _buildMiniStat(
-                      'Zilizo Active',
-                      '${worker.currentActiveJob != null ? 1 : 0}',
-                      Icons.bolt_rounded,
-                      const Color(0xFFF97316)),
-                ],
-              ),
-            ),
-          ),
-
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
-            sliver: SliverToBoxAdapter(
-                child: Text('Kazi Zinazopatikana',
-                    style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1E293B)))),
-          ),
-
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(25, 0, 25, 100),
-            sliver: worker.isLoading && worker.availableJobs.isEmpty
-                ? const SliverToBoxAdapter(
-                    child: Center(
-                        child: CircularProgressIndicator(
-                            color: Color(0xFFF97316))))
-                : worker.availableJobs.isEmpty
-                    ? const SliverToBoxAdapter(
-                        child: Center(child: Text('Hakuna kazi kwa sasa.')))
-                    : SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) => JobCard(
-                            job: worker.availableJobs[index],
-                            onTap: () => Navigator.pushNamed(
-                                context, AppRouter.jobDetails, arguments: {
-                              'job': worker.availableJobs[index]
-                            }),
-                          ),
-                          childCount: worker.availableJobs.length,
-                        ),
-                      ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMiniStat(
-      String label, String value, IconData icon, Color color) {
-    return Column(
-      children: [
-        Icon(icon, color: color, size: 16),
-        const SizedBox(height: 6),
-        Text(value,
-            style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 13,
-                color: Color(0xFF1E293B))),
-        Text(label,
-            style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 9)),
-      ],
-    );
-  }
-
-  Widget _buildHeaderIcon(IconData icon, VoidCallback onTap) {
-    return Container(
-      decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.1), shape: BoxShape.circle),
-      child: IconButton(
-          icon: Icon(icon, color: Colors.white, size: 22), onPressed: onTap),
-    );
-  }
-}
-
-// === KAZI ZANGU (MY JOBS) TAB ===
-class _MyJobsTab extends StatefulWidget {
-  const _MyJobsTab();
-
-  @override
-  State<_MyJobsTab> createState() => _MyJobsTabState();
-}
-
-class _MyJobsTabState extends State<_MyJobsTab> {
-  @override
-  void initState() {
-    super.initState();
-    context.read<WorkerProvider>().refreshAll();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final worker = context.watch<WorkerProvider>();
-    final activeJob = worker.currentActiveJob;
-
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text('Kazi Zangu',
-            style: TextStyle(
-                color: Color(0xFF1E293B),
-                fontWeight: FontWeight.w900,
-                fontSize: 24,
-                letterSpacing: -0.5)),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(25),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (activeJob != null) ...[
-              const Text('KAZI YA SASA',
-                  style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFFF97316),
-                      letterSpacing: 1)),
-              const SizedBox(height: 15),
-              Container(
-                padding: const EdgeInsets.all(25),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                      colors: [Color(0xFF1E293B), Color(0xFF334155)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight),
-                  borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10))
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 5),
-                          decoration: BoxDecoration(
-                              color: const Color(0xFF22C55E),
-                              borderRadius: BorderRadius.circular(10)),
-                          child: const Text('INAENDELEA',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold)),
-                        ),
-                        const Icon(Icons.bolt_rounded,
-                            color: Color(0xFFF97316)),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Text(activeJob.title,
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 10),
-                    Text('TZS ${activeJob.price}',
-                        style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 25),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () => Navigator.pushNamed(
-                            context, AppRouter.workerActiveJob),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFF97316),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 18),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18)),
-                          elevation: 0,
-                        ),
-                        child: const Text('THIBITISHA UKAMILISHAJI',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 15)),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 40),
-            ],
-
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Maombi Yangu (Applications)',
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1E293B))),
-                Icon(Icons.filter_list_rounded,
-                    color: Color(0xFF94A3B8), size: 20),
-              ],
-            ),
-            const SizedBox(height: 20),
-
-            // Empty state for applications if none
-            Center(
-              child: Column(
-                children: [
-                  const SizedBox(height: 40),
-                  Container(
-                      padding: const EdgeInsets.all(30),
-                      decoration: const BoxDecoration(
-                          color: Colors.white, shape: BoxShape.circle),
-                      child: Icon(Icons.search_off_rounded,
-                          size: 40, color: Colors.blue[50])),
-                  const SizedBox(height: 20),
-                  const Text('Bado hujaomba kazi yoyote.',
-                      style: TextStyle(color: Color(0xFF94A3B8), fontSize: 14)),
-                ],
-              ),
-            ),
-            const SizedBox(height: 100),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// === DASHBOARD TAB ===
-class _DashboardTab extends StatelessWidget {
-  const _DashboardTab();
-
-  @override
-  Widget build(BuildContext context) {
-    final user = context.watch<AuthProvider>().user;
-    final worker = context.watch<WorkerProvider>();
-
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(25, 60, 25, 40),
-              decoration: const BoxDecoration(
-                color: Color(0xFF1E293B),
-                borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(35),
-                    bottomRight: Radius.circular(35)),
-              ),
-              child: Column(
-                children: [
+                  const SizedBox(height: 8),
+                  // Bottom Row: Client & Time
                   Row(
                     children: [
+                      // Client Avatar
                       Container(
-                        padding: const EdgeInsets.all(3),
-                        decoration: const BoxDecoration(
-                            color: Colors.white24, shape: BoxShape.circle),
-                        child: CircleAvatar(
-                          radius: 35,
-                          backgroundColor: Colors.white,
-                          backgroundImage: user?.profilePhotoUrl != null
-                              ? NetworkImage(user!.profilePhotoUrl!)
+                        width: 22,
+                        height: 22,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFDBEAFE),
+                          shape: BoxShape.circle,
+                          image: job.userPhotoUrl != null
+                              ? DecorationImage(
+                                  image: NetworkImage(job.userPhotoUrl!),
+                                  fit: BoxFit.cover,
+                                )
                               : null,
-                          child: user?.profilePhotoUrl == null
-                              ? Text(
-                                  user?.name.isNotEmpty == true
-                                      ? user!.name[0]
-                                      : 'W',
+                        ),
+                        child: job.userPhotoUrl == null
+                            ? Center(
+                                child: Text(
+                                  job.userName?.isNotEmpty == true
+                                      ? job.userName![0].toUpperCase()
+                                      : 'M',
                                   style: const TextStyle(
-                                      color: Color(0xFF1E293B),
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold))
-                              : null,
-                        ),
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              )
+                            : null,
                       ),
-                      const SizedBox(width: 15),
+                      const SizedBox(width: 6),
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(user?.name ?? 'Mtumiaji',
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold)),
-                            Container(
-                              margin: const EdgeInsets.only(top: 5),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                  color: const Color(0xFFF97316),
-                                  borderRadius: BorderRadius.circular(10)),
-                              child: const Text('FUNDI ALIYEIDHINISHWA',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 9,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 0.5)),
-                            ),
-                          ],
+                        child: Text(
+                          job.userName ?? 'Mteja',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: Color(0xFF64748B),
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      _buildHeaderIcon(Icons.settings_outlined, () {}),
+                      // Time
+                      if (job.createdAt != null) ...[
+                        Icon(Icons.access_time_rounded, size: 11, color: Colors.grey[400]),
+                        const SizedBox(width: 3),
+                        Text(
+                          _getTimeAgo(job.createdAt!),
+                          style: TextStyle(fontSize: 10, color: Colors.grey[500]),
+                        ),
+                      ],
+                      const SizedBox(width: 8),
+                      // Arrow
+                      Icon(Icons.chevron_right_rounded, size: 18, color: Colors.grey[400]),
                     ],
                   ),
                 ],
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompactPlaceholder() {
+    return Container(
+      width: 80,
+      height: 80,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFFF97316).withOpacity(0.15),
+            const Color(0xFFF97316).withOpacity(0.05),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Icon(
+        Icons.work_outline_rounded,
+        size: 30,
+        color: const Color(0xFFF97316).withOpacity(0.5),
+      ),
+    );
+  }
+
+  Widget _buildEmptyJobs() {
+    return Container(
+      padding: const EdgeInsets.all(40),
+      child: Column(
+        children: [
+          Icon(
+            Icons.search_off_outlined,
+            size: 64,
+            color: Colors.grey[300],
           ),
-          SliverPadding(
-            padding: const EdgeInsets.all(25),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate([
-                // WALLET LARGE CARD
-                Container(
-                  padding: const EdgeInsets.all(25),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                        colors: [Color(0xFFF97316), Color(0xFFEA580C)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight),
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                          color: const Color(0xFFF97316).withValues(alpha: 0.3),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10))
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('SALIO LAKO LA SASA',
-                                  style: TextStyle(
-                                      color: Colors.white70,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 1)),
-                              const SizedBox(height: 5),
-                              Text(
-                                  'TZS ${NumberFormat('#,###').format(worker.wallet?.balance ?? 0)}',
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 32,
-                                      fontWeight: FontWeight.bold)),
-                            ],
-                          ),
-                          Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                  color: Colors.white24,
-                                  shape: BoxShape.circle),
-                              child: const Icon(Icons.wallet_rounded,
-                                  color: Colors.white, size: 28)),
-                        ],
-                      ),
-                      const SizedBox(height: 25),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                backgroundColor: Colors.transparent,
-                                builder: (_) => WithdrawalModal(
-                                    currentBalance:
-                                        (worker.wallet?.balance ?? 0)
-                                            .toDouble(),
-                                    onSubmitted: () => context
-                                        .read<WorkerProvider>()
-                                        .refreshAll()));
-                          },
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: const Color(0xFFF97316),
-                              padding: const EdgeInsets.symmetric(vertical: 18),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18))),
-                          child: const Text('TOA PESA (WITHDRAW)',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 14)),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-
-                // STATS GRID
-                Row(
-                  children: [
-                    _buildStatBox(
-                        'Total Income',
-                        'TZS ${NumberFormat('#,###').format(worker.dashboard?.earnTotal ?? 0)}',
-                        Icons.payments_rounded,
-                        const Color(0xFF22C55E)),
-                    const SizedBox(width: 15),
-                    _buildStatBox(
-                        'Works Done',
-                        '${worker.dashboard?.doneCount ?? 0}',
-                        Icons.verified_rounded,
-                        const Color(0xFF3B82F6)),
-                  ],
-                ),
-
-                const SizedBox(height: 40),
-
-                _buildMenuTitle('Mipangilio ya Akaunti'),
-                _buildDashMenuItem(
-                    Icons.person_outline_rounded, 'Hariri Taarifa Zako', () {}),
-                _buildDashMenuItem(
-                    Icons.verified_user_outlined, 'Vigezo vya Uhakiki', () {}),
-                _buildDashMenuItem(Icons.history_rounded, 'Historia ya Muamala',
-                    () => Navigator.pushNamed(context, AppRouter.wallet)),
-
-                const SizedBox(height: 30),
-
-                SizedBox(
-                  width: double.infinity,
-                  child: TextButton.icon(
-                    onPressed: () async {
-                      await context.read<AuthProvider>().logout();
-                      if (context.mounted)
-                        Navigator.pushReplacementNamed(
-                            context, AppRouter.welcome);
-                    },
-                    icon: const Icon(Icons.logout_rounded,
-                        color: Color(0xFFEF4444)),
-                    label: const Text('Toka (Logout)',
-                        style: TextStyle(
-                            color: Color(0xFFEF4444),
-                            fontWeight: FontWeight.bold)),
-                    style: TextButton.styleFrom(
-                        backgroundColor: const Color(0xFFFEF2F2),
-                        padding: const EdgeInsets.symmetric(vertical: 18),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15))),
-                  ),
-                ),
-                const SizedBox(height: 50),
-              ]),
+          const SizedBox(height: 16),
+          Text(
+            'Hakuna kazi kwa sasa',
+            style: TextStyle(
+              color: Colors.grey[500],
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
@@ -691,69 +856,36 @@ class _DashboardTab extends StatelessWidget {
     );
   }
 
-  Widget _buildStatBox(String title, String value, IconData icon, Color color) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(25),
-            border: Border.all(color: const Color(0xFFF1F5F9))),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, color: color, size: 24),
-            const SizedBox(height: 15),
-            Text(value,
-                style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E293B))),
-            Text(title,
-                style: const TextStyle(fontSize: 10, color: Color(0xFF94A3B8))),
-          ],
-        ),
-      ),
-    );
+  IconData _getCategoryIcon(String categoryName) {
+    final name = categoryName.toLowerCase();
+    if (name.contains('usafi') || name.contains('clean')) {
+      return Icons.cleaning_services_outlined;
+    } else if (name.contains('bomba') || name.contains('plumb')) {
+      return Icons.plumbing_outlined;
+    } else if (name.contains('umeme') || name.contains('electr')) {
+      return Icons.electrical_services_outlined;
+    } else if (name.contains('fundi') || name.contains('repair')) {
+      return Icons.handyman_outlined;
+    } else if (name.contains('painting') || name.contains('rangi')) {
+      return Icons.format_paint_outlined;
+    }
+    return Icons.category_outlined;
   }
 
-  Widget _buildMenuTitle(String text) {
-    return Padding(
-        padding: const EdgeInsets.only(left: 10, bottom: 15),
-        child: Text(text,
-            style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF94A3B8),
-                letterSpacing: 1)));
-  }
+  String _getTimeAgo(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
 
-  Widget _buildDashMenuItem(IconData icon, String label, VoidCallback onTap) {
-    return ListTile(
-      onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-      leading: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
-              borderRadius: BorderRadius.circular(12)),
-          child: Icon(icon, color: const Color(0xFF64748B), size: 18)),
-      title: Text(label,
-          style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF1E293B))),
-      trailing: const Icon(Icons.arrow_forward_ios_rounded,
-          size: 14, color: Color(0xFFE2E8F0)),
-    );
-  }
-
-  Widget _buildHeaderIcon(IconData icon, VoidCallback onTap) {
-    return Container(
-      decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.1), shape: BoxShape.circle),
-      child: IconButton(
-          icon: Icon(icon, color: Colors.white, size: 22), onPressed: onTap),
-    );
+    if (difference.inDays > 30) {
+      return '${(difference.inDays / 30).floor()} mwezi${(difference.inDays / 30).floor() > 1 ? 'zi' : ''} zilizopita';
+    } else if (difference.inDays > 0) {
+      return '${difference.inDays} siku zilizopita';
+    } else if (difference.inHours > 0) {
+      return 'Saa ${difference.inHours} zilizopita';
+    } else if (difference.inMinutes > 0) {
+      return 'Dakika ${difference.inMinutes} zilizopita';
+    } else {
+      return 'Sasa hivi';
+    }
   }
 }

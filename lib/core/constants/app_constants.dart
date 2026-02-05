@@ -20,11 +20,15 @@ class AppConstants {
   static const String roleMfanyakazi = 'mfanyakazi';
 
   // ===== JOB STATUS =====
+  // API returns these status values
   static const String statusOpen = 'open';
+  static const String statusPosted = 'posted';
   static const String statusPending = 'pending';
   static const String statusPendingPayment = 'pending_payment';
   static const String statusPaid = 'paid';
   static const String statusAccepted = 'accepted';
+  static const String statusInProgress = 'in_progress';
+  static const String statusAssigned = 'assigned';
   static const String statusCompleted = 'completed';
   static const String statusCancelled = 'cancelled';
 

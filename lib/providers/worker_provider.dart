@@ -64,7 +64,8 @@ class WorkerProvider extends ChangeNotifier {
         category: _selectedCategory,
         distance: _selectedDistance,
       );
-      final List data = response['data'] ?? [];
+      // API returns 'jobs' array directly
+      final List data = response['jobs'] ?? response['data'] ?? [];
       _availableJobs = data.map((j) => Job.fromJson(j)).toList();
 
       _isLoading = false;
@@ -73,6 +74,17 @@ class WorkerProvider extends ChangeNotifier {
       _error = e.toString();
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<List<Job>> loadMapJobs() async {
+    try {
+      final response = await _jobService.getMapFeed();
+      final List data = response['jobs'] ?? [];
+      return data.map((j) => Job.fromJson(j)).toList();
+    } catch (e) {
+      _error = e.toString();
+      return [];
     }
   }
 
@@ -87,5 +99,59 @@ class WorkerProvider extends ChangeNotifier {
     _selectedCategory = null;
     _selectedDistance = null;
     loadJobsFeed();
+  }
+
+  // Assigned Jobs (jobs where worker was selected by muhitaji)
+  List<Job> _assignedJobs = [];
+  List<Job> get assignedJobs => _assignedJobs;
+
+  Future<void> loadAssignedJobs() async {
+    try {
+      _assignedJobs = await _jobService.getAssignedJobs();
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+    }
+  }
+
+  Future<bool> acceptAssignedJob(int jobId) async {
+    try {
+      await _jobService.acceptAssignedJob(jobId);
+      await loadAssignedJobs();
+      await loadDashboard();
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> declineAssignedJob(int jobId) async {
+    try {
+      await _jobService.declineAssignedJob(jobId);
+      await loadAssignedJobs();
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<void> applyForJob(int jobId, String message, {int? bidAmount}) async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      await _jobService.applyForJob(jobId, message, bidAmount: bidAmount);
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      rethrow;
+    }
   }
 }

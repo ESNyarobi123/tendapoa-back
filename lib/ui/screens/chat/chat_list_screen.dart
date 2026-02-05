@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../../../core/constants/constants.dart';
 import '../../../core/router/app_router.dart';
 import '../../../data/models/models.dart';
-import '../../../data/services/services.dart';
-
+import '../../../data/services/chat_service.dart';
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
 
@@ -13,7 +11,6 @@ class ChatListScreen extends StatefulWidget {
 }
 
 class _ChatListScreenState extends State<ChatListScreen> {
-  final ChatService _chatService = ChatService();
   bool _isLoading = true;
   List<ChatConversation> _conversations = [];
 
@@ -25,70 +22,147 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
   Future<void> _loadConversations() async {
     try {
-      final data = await _chatService.getConversations();
+      final chatService = ChatService();
+      final conversations = await chatService.getConversations();
       if (mounted) {
         setState(() {
-          _conversations = data;
+          _conversations = conversations;
           _isLoading = false;
         });
       }
     } catch (e) {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
-  }
-
-  String _formatDate(DateTime? date) {
-    if (date == null) return '';
-    final now = DateTime.now();
-    if (date.year == now.year &&
-        date.month == now.month &&
-        date.day == now.day) {
-      return DateFormat('HH:mm').format(date);
-    }
-    return DateFormat('d MMM').format(date);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.background,
         elevation: 0,
-        centerTitle: false,
-        title: const Padding(
-          padding: EdgeInsets.only(left: 10),
-          child: Text('Mazungumzo',
-              style: TextStyle(
-                  color: Color(0xFF1E293B),
-                  fontWeight: FontWeight.w900,
-                  fontSize: 24,
-                  letterSpacing: -0.5)),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search_rounded, color: Color(0xFF64748B)),
-            onPressed: () {},
+        centerTitle: true,
+        title: const Text(
+          'Meseji',
+          style: TextStyle(
+            color: Color(0xFF1E293B),
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
           ),
-          const SizedBox(width: 10),
-        ],
+        ),
       ),
       body: RefreshIndicator(
         onRefresh: _loadConversations,
         color: AppColors.primary,
         child: _isLoading
             ? const Center(
-                child: CircularProgressIndicator(color: AppColors.primary))
+                child: CircularProgressIndicator(color: AppColors.primary),
+              )
             : _conversations.isEmpty
                 ? _buildEmptyState()
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
+                : ListView.separated(
+                    padding: const EdgeInsets.all(16),
                     itemCount: _conversations.length,
-                    itemBuilder: (ctx, i) {
-                      final c = _conversations[i];
-                      return _buildChatItem(c);
+                    separatorBuilder: (_, __) => const Divider(
+                      height: 1,
+                      indent: 76,
+                      color: Color(0xFFE2E8F0),
+                    ),
+                    itemBuilder: (context, index) {
+                      return _buildConversationItem(_conversations[index]);
                     },
                   ),
+      ),
+    );
+  }
+
+  Widget _buildConversationItem(ChatConversation conversation) {
+    final otherUser = conversation.otherUser;
+    final job = conversation.job;
+    
+    return InkWell(
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          AppRouter.chatRoom,
+          arguments: {'conversation': conversation},
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Row(
+          children: [
+            // Profile Picture
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: const Color(0xFFDBEAFE),
+                shape: BoxShape.circle,
+                image: otherUser?.profilePhotoUrl != null
+                    ? DecorationImage(
+                        image: NetworkImage(otherUser!.profilePhotoUrl!),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
+              ),
+              child: otherUser?.profilePhotoUrl == null
+                  ? Center(
+                      child: Text(
+                        otherUser?.name.isNotEmpty == true
+                            ? otherUser!.name[0].toUpperCase()
+                            : 'U',
+                        style: const TextStyle(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                    )
+                  : null,
+            ),
+            const SizedBox(width: 16),
+            // Content
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    otherUser?.name ?? 'Mtumiaji',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1E293B),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    job?.title ?? conversation.lastMessage ?? 'Hakuna ujumbe',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: conversation.unreadCount > 0
+                          ? const Color(0xFF64748B)
+                          : const Color(0xFF94A3B8),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Time
+            Text(
+              _formatTime(conversation.lastMessageAt),
+              style: const TextStyle(
+                fontSize: 12,
+                color: Color(0xFF94A3B8),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -98,145 +172,46 @@ class _ChatListScreenState extends State<ChatListScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            padding: const EdgeInsets.all(40),
-            decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC), shape: BoxShape.circle),
-            child:
-                Icon(Icons.forum_outlined, size: 80, color: Colors.blue[100]),
+          Icon(
+            Icons.chat_bubble_outline,
+            size: 64,
+            color: Colors.grey[300],
           ),
-          const SizedBox(height: 30),
-          const Text('Hakuna Meseji',
-              style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E293B))),
-          const SizedBox(height: 10),
-          const Text('Mazungumzo yako yataonekana hapa.',
-              style: TextStyle(color: Color(0xFF94A3B8))),
+          const SizedBox(height: 16),
+          Text(
+            'Hakuna meseji',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[500],
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Mazungumzo yako yataonekana hapa',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[400],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildChatItem(ChatConversation c) {
-    return InkWell(
-      onTap: () =>
-          Navigator.pushNamed(context, AppRouter.chatRoom, arguments: c),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        child: Row(
-          children: [
-            Stack(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                        color: c.unreadCount > 0
-                            ? AppColors.primary
-                            : Colors.transparent,
-                        width: 2),
-                  ),
-                  child: CircleAvatar(
-                    radius: 28,
-                    backgroundColor: const Color(0xFFF1F5F9),
-                    backgroundImage: c.otherUser?.profilePhotoUrl != null
-                        ? NetworkImage(c.otherUser!.profilePhotoUrl!)
-                        : null,
-                    child: c.otherUser?.profilePhotoUrl == null
-                        ? Text(
-                            c.otherUser?.name.isNotEmpty == true
-                                ? c.otherUser!.name[0]
-                                : 'U',
-                            style: const TextStyle(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18))
-                        : null,
-                  ),
-                ),
-                if (c.unreadCount > 0)
-                  Positioned(
-                    right: 0,
-                    bottom: 0,
-                    child: Container(
-                      width: 14,
-                      height: 14,
-                      decoration: BoxDecoration(
-                          color: const Color(0xFF22C55E),
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2)),
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(width: 15),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(c.otherUser?.name ?? 'Mtumiaji',
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: Color(0xFF1E293B)),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis),
-                      ),
-                      Text(_formatDate(c.lastMessageAt),
-                          style: const TextStyle(
-                              color: Color(0xFF94A3B8), fontSize: 11)),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          c.lastMessage ??
-                              (c.job?.title != null
-                                  ? 'Kuhusu: ${c.job!.title}'
-                                  : 'Anza mazungumzo...'),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              color: c.unreadCount > 0
-                                  ? const Color(0xFF1E293B)
-                                  : const Color(0xFF64748B),
-                              fontWeight: c.unreadCount > 0
-                                  ? FontWeight.w600
-                                  : FontWeight.normal,
-                              fontSize: 14),
-                        ),
-                      ),
-                      if (c.unreadCount > 0)
-                        Container(
-                          margin: const EdgeInsets.only(left: 8),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              borderRadius: BorderRadius.circular(10)),
-                          child: Text(c.unreadCount.toString(),
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold)),
-                        ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+  String _formatTime(DateTime? dateTime) {
+    if (dateTime == null) return '';
+    
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final messageDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
+    
+    if (messageDate == today) {
+      return '${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
+    } else if (messageDate == today.subtract(const Duration(days: 1))) {
+      return 'Jana';
+    } else {
+      return '${dateTime.day}/${dateTime.month}';
+    }
   }
 }

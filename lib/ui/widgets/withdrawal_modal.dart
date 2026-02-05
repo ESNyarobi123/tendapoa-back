@@ -183,8 +183,13 @@ class _WithdrawalModalState extends State<WithdrawalModal> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
     try {
-      final amount = double.parse(_amountController.text);
-      await _walletService.submitWithdrawal(amount, _phoneController.text);
+      final amount = int.parse(_amountController.text.replaceAll(',', ''));
+      await _walletService.submitWithdrawal(
+        amount: amount,
+        phoneNumber: _phoneController.text,
+        registeredName: _phoneController.text, // Using phone as name fallback
+        networkType: 'vodacom', // Default network
+      );
       if (mounted) {
         Navigator.pop(context);
         widget.onSubmitted();
@@ -195,10 +200,11 @@ class _WithdrawalModalState extends State<WithdrawalModal> {
         );
       }
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('Imeshindikana: $e'),
             backgroundColor: AppColors.error));
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

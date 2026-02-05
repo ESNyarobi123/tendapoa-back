@@ -31,6 +31,8 @@ class AuthService {
     required String password,
     required String role,
     required String phone,
+    double? lat,
+    double? lng,
   }) async {
     final response = await _api.post(
       '/auth/register',
@@ -41,6 +43,8 @@ class AuthService {
         'password_confirmation': password,
         'role': role,
         'phone': phone,
+        if (lat != null) 'lat': lat,
+        if (lng != null) 'lng': lng,
       },
       requiresAuth: false,
     );

@@ -90,6 +90,123 @@ class HomeStats {
   }
 }
 
+/// Client Dashboard Model (for muhitaji)
+class ClientDashboard {
+  final String role;
+  final int posted;
+  final int completed;
+  final double totalPaid;
+  final List<PaymentHistory> paymentHistory;
+
+  ClientDashboard({
+    required this.role,
+    required this.posted,
+    required this.completed,
+    required this.totalPaid,
+    this.paymentHistory = const [],
+  });
+
+  factory ClientDashboard.fromJson(Map<String, dynamic> json) {
+    double parseDouble(dynamic val) {
+      if (val is String) return double.tryParse(val) ?? 0.0;
+      if (val is num) return val.toDouble();
+      return 0.0;
+    }
+
+    int parseInt(dynamic val) {
+      if (val is String) return int.tryParse(val) ?? 0;
+      if (val is num) return val.toInt();
+      return 0;
+    }
+
+    return ClientDashboard(
+      role: json['role'] ?? 'muhitaji',
+      posted: parseInt(json['posted']),
+      completed: parseInt(json['completed']),
+      totalPaid: parseDouble(json['totalPaid']),
+      paymentHistory: json['paymentHistory'] != null
+          ? (json['paymentHistory'] as List)
+              .map((p) => PaymentHistory.fromJson(p))
+              .toList()
+          : [],
+    );
+  }
+}
+
+/// Payment History Model
+class PaymentHistory {
+  final int id;
+  final int? workOrderId;
+  final String? orderId;
+  final double amount;
+  final String status;
+  final String? channel;
+  final String? reference;
+  final DateTime? createdAt;
+  final PaymentJob? job;
+
+  PaymentHistory({
+    required this.id,
+    this.workOrderId,
+    this.orderId,
+    required this.amount,
+    required this.status,
+    this.channel,
+    this.reference,
+    this.createdAt,
+    this.job,
+  });
+
+  factory PaymentHistory.fromJson(Map<String, dynamic> json) {
+    return PaymentHistory(
+      id: json['id'] ?? 0,
+      workOrderId: json['work_order_id'],
+      orderId: json['order_id'],
+      amount: json['amount'] is String
+          ? double.tryParse(json['amount']) ?? 0
+          : (json['amount'] ?? 0).toDouble(),
+      status: json['status'] ?? '',
+      channel: json['channel'],
+      reference: json['reference'],
+      createdAt: json['created_at'] != null
+          ? DateTime.tryParse(json['created_at'].toString())
+          : null,
+      job: json['job'] != null ? PaymentJob.fromJson(json['job']) : null,
+    );
+  }
+
+  bool get isCompleted => status == 'COMPLETED';
+}
+
+/// Payment Job (simplified job info for payment history)
+class PaymentJob {
+  final int id;
+  final String title;
+  final int price;
+  final String status;
+  final String? imageUrl;
+
+  PaymentJob({
+    required this.id,
+    required this.title,
+    required this.price,
+    required this.status,
+    this.imageUrl,
+  });
+
+  factory PaymentJob.fromJson(Map<String, dynamic> json) {
+    return PaymentJob(
+      id: json['id'] ?? 0,
+      title: json['title'] ?? '',
+      price: json['price'] is String
+          ? int.tryParse(json['price']) ?? 0
+          : (json['price'] ?? 0),
+      status: json['status'] ?? '',
+      imageUrl: json['image_url'],
+    );
+  }
+}
+
 /// App Settings Model
 class AppSettings {
   final double commissionRate;

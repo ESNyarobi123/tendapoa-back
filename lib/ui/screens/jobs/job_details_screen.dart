@@ -8,7 +8,6 @@ import '../../../core/router/app_router.dart';
 import '../../../data/models/models.dart';
 import '../../../data/services/services.dart';
 import '../../../providers/providers.dart';
-import '../../widgets/widgets.dart';
 
 class JobDetailsScreen extends StatefulWidget {
   final Job? job;
@@ -27,6 +26,10 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
   bool _isInitialLoading = false;
   final JobService _jobService = JobService();
   final TextEditingController _applicationController = TextEditingController();
+  final TextEditingController _bidAmountController = TextEditingController();
+  
+  // Comment type: 'comment', 'application', 'offer'
+  String _commentType = 'application';
 
   @override
   void initState() {
@@ -73,30 +76,70 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
     }
   }
 
-  Future<void> _applyForJob() async {
+  Future<void> _submitComment() async {
     if (_applicationController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Tafadhali andika ujumbe')));
       return;
     }
 
+    int? bidAmount;
+    if (_commentType == 'offer' && _bidAmountController.text.isNotEmpty) {
+      bidAmount = int.tryParse(_bidAmountController.text.replaceAll(',', ''));
+      if (bidAmount == null || bidAmount < 1000) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Bei lazima iwe angalau TZS 1,000')));
+        return;
+      }
+    }
+
     setState(() => _isLoading = true);
     try {
-      await _jobService.applyForJob(_job!.id, _applicationController.text);
+      await _jobService.postComment(
+        _job!.id, 
+        _applicationController.text,
+        type: _commentType,
+        bidAmount: bidAmount,
+      );
       if (mounted) {
-        Navigator.pop(context); // Close dialog
+        Navigator.pop(context);
+        _applicationController.clear();
+        _bidAmountController.clear();
+        
+        String successMessage;
+        switch (_commentType) {
+          case 'comment':
+            successMessage = '✅ Maoni yako yametumwa!';
+            break;
+          case 'offer':
+            successMessage = '✅ Pendekezo la bei TZS ${_formatNumber(bidAmount!)} limetumwa!';
+            break;
+          default:
+            successMessage = '✅ Ombi lako la kazi limetumwa!';
+        }
+        
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Maombi yako yametumwa!')));
+            SnackBar(
+              content: Text(successMessage),
+              backgroundColor: const Color(0xFF22C55E),
+            ));
         _refreshJobDetails();
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Imeshindikana: $e')));
+            .showSnackBar(SnackBar(content: Text('Imeshindikana: $e'), backgroundColor: Colors.red));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  String _formatNumber(int number) {
+    return number.toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]},',
+    );
   }
 
   Future<void> _acceptWorker(int commentId) async {
@@ -128,86 +171,404 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
   }
 
   void _showApplicationDialog() {
+    _commentType = 'application';
+    _bidAmountController.text = '';
+    _applicationController.clear();
+    
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom + 40,
-            left: 25,
-            right: 25,
-            top: 15),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(35), topRight: Radius.circular(35)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(10)),
-              ),
-            ),
-            const SizedBox(height: 25),
-            const Text('Omba Kazi Hii',
-                style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.5,
-                    color: Color(0xFF1E293B))),
-            const SizedBox(height: 10),
-            Text(
-                'Mteja ataona ujumbe wako na wasifu wako ili kuweza kukuchagua.',
-                style: TextStyle(color: Colors.grey[600], fontSize: 14)),
-            const SizedBox(height: 25),
-            Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFFF1F5F9)),
-              ),
-              child: TextField(
-                controller: _applicationController,
-                decoration: const InputDecoration(
-                  hintText: 'Andika maelezo ya kwanini wewe ni bora kwake...',
-                  hintStyle: TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.all(20),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Container(
+          padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom + 30,
+              left: 25,
+              right: 25,
+              top: 15),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(35), topRight: Radius.circular(35)),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
                 ),
-                maxLines: 5,
-              ),
-            ),
-            const SizedBox(height: 30),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _isLoading ? null : _applyForJob,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF97316),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
-                  elevation: 0,
+                const SizedBox(height: 20),
+                
+                // Header
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: _commentType == 'comment' 
+                            ? [const Color(0xFF3B82F6), const Color(0xFF1D4ED8)]
+                            : _commentType == 'offer'
+                              ? [const Color(0xFF22C55E), const Color(0xFF16A34A)]
+                              : [const Color(0xFFF97316), const Color(0xFFEA580C)],
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Icon(
+                        _commentType == 'comment' 
+                          ? Icons.chat_bubble_outline_rounded
+                          : _commentType == 'offer'
+                            ? Icons.monetization_on_rounded
+                            : Icons.work_outline_rounded, 
+                        color: Colors.white, size: 26),
+                    ),
+                    const SizedBox(width: 15),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _commentType == 'comment' 
+                              ? 'Tuma Maoni'
+                              : _commentType == 'offer'
+                                ? 'Pendekeza Bei'
+                                : 'Omba Kazi Hii',
+                            style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: -0.5,
+                                color: Color(0xFF1E293B))),
+                          const SizedBox(height: 4),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFF7ED),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              'Bei: TZS ${_formatNumber(_job?.price ?? 0)}',
+                              style: const TextStyle(
+                                color: Color(0xFFF97316),
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                child: Text(
-                  _isLoading ? 'INATUMA...' : 'TUMA MAOMBI SASA',
+                
+                const SizedBox(height: 20),
+                
+                // Comment Type Selector
+                const Text('📋 Chagua aina',
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF475569))),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    // Comment Option
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setModalState(() => _commentType = 'comment');
+                          setState(() {});
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: _commentType == 'comment' 
+                              ? const Color(0xFFDBEAFE) 
+                              : const Color(0xFFF8FAFC),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: _commentType == 'comment' 
+                                ? const Color(0xFF3B82F6) 
+                                : const Color(0xFFE2E8F0),
+                              width: _commentType == 'comment' ? 2 : 1,
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              Icon(Icons.chat_bubble_outline_rounded,
+                                color: _commentType == 'comment' 
+                                  ? const Color(0xFF3B82F6) 
+                                  : const Color(0xFF94A3B8),
+                                size: 22),
+                              const SizedBox(height: 4),
+                              Text('Maoni',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: _commentType == 'comment' 
+                                    ? const Color(0xFF3B82F6) 
+                                    : const Color(0xFF64748B),
+                                )),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    // Apply Option
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setModalState(() => _commentType = 'application');
+                          setState(() {});
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: _commentType == 'application' 
+                              ? const Color(0xFFFFF7ED) 
+                              : const Color(0xFFF8FAFC),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: _commentType == 'application' 
+                                ? const Color(0xFFF97316) 
+                                : const Color(0xFFE2E8F0),
+                              width: _commentType == 'application' ? 2 : 1,
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              Icon(Icons.work_outline_rounded,
+                                color: _commentType == 'application' 
+                                  ? const Color(0xFFF97316) 
+                                  : const Color(0xFF94A3B8),
+                                size: 22),
+                              const SizedBox(height: 4),
+                              Text('Omba Kazi',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: _commentType == 'application' 
+                                    ? const Color(0xFFF97316) 
+                                    : const Color(0xFF64748B),
+                                )),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    // Bid Option
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setModalState(() => _commentType = 'offer');
+                          setState(() {});
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: _commentType == 'offer' 
+                              ? const Color(0xFFDCFCE7) 
+                              : const Color(0xFFF8FAFC),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: _commentType == 'offer' 
+                                ? const Color(0xFF22C55E) 
+                                : const Color(0xFFE2E8F0),
+                              width: _commentType == 'offer' ? 2 : 1,
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              Icon(Icons.monetization_on_rounded,
+                                color: _commentType == 'offer' 
+                                  ? const Color(0xFF22C55E) 
+                                  : const Color(0xFF94A3B8),
+                                size: 22),
+                              const SizedBox(height: 4),
+                              Text('Bei Tofauti',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: _commentType == 'offer' 
+                                    ? const Color(0xFF22C55E) 
+                                    : const Color(0xFF64748B),
+                                )),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                
+                const SizedBox(height: 20),
+                
+                // Message Input
+                Text(
+                  _commentType == 'comment' 
+                    ? '💬 Maoni/Swali lako'
+                    : _commentType == 'offer'
+                      ? '💬 Maelezo ya pendekezo'
+                      : '💬 Kwanini wewe ni bora?',
                   style: const TextStyle(
-                      fontWeight: FontWeight.w900,
-                      fontSize: 16,
-                      letterSpacing: 1),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF475569))),
+                const SizedBox(height: 8),
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: TextField(
+                    controller: _applicationController,
+                    decoration: InputDecoration(
+                      hintText: _commentType == 'comment' 
+                        ? 'Andika swali au maoni yako...'
+                        : _commentType == 'offer'
+                          ? 'Eleza kwanini bei hii ni sawa...'
+                          : 'Andika maelezo ya kwanini wewe ni bora...',
+                      hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.all(16),
+                    ),
+                    maxLines: 3,
+                  ),
                 ),
-              ),
+                
+                // Bid Amount Input (shown only for offer type)
+                if (_commentType == 'offer') ...[
+                  const SizedBox(height: 16),
+                  const Text('💰 Bei unayopendekeza',
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF475569))),
+                  const SizedBox(height: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFDCFCE7),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFF22C55E).withOpacity(0.3)),
+                    ),
+                    child: TextField(
+                      controller: _bidAmountController,
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1E293B),
+                      ),
+                      decoration: InputDecoration(
+                        prefixIcon: Container(
+                          padding: const EdgeInsets.all(14),
+                          child: const Text(
+                            'TZS',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF22C55E),
+                            ),
+                          ),
+                        ),
+                        hintText: 'Weka bei yako',
+                        hintStyle: TextStyle(
+                          color: Colors.grey[400], 
+                          fontSize: 16,
+                          fontWeight: FontWeight.normal,
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 18),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.info_outline, size: 14, color: Color(0xFF22C55E)),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          'Bei ya sasa: TZS ${_formatNumber(_job?.price ?? 0)} • Min: TZS 1,000',
+                          style: const TextStyle(fontSize: 11, color: Color(0xFF22C55E)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                
+                const SizedBox(height: 24),
+                
+                // Submit Button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: _isLoading ? null : _submitComment,
+                    icon: _isLoading 
+                      ? const SizedBox(
+                          width: 18, height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white))
+                      : Icon(
+                          _commentType == 'comment' 
+                            ? Icons.send_rounded
+                            : _commentType == 'offer'
+                              ? Icons.local_offer_rounded
+                              : Icons.check_circle_rounded,
+                          size: 20),
+                    label: Text(
+                      _isLoading 
+                        ? 'INATUMA...' 
+                        : _commentType == 'comment'
+                          ? 'TUMA MAONI'
+                          : _commentType == 'offer'
+                            ? 'TUMA PENDEKEZO'
+                            : 'TUMA OMBI LA KAZI',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 15,
+                          letterSpacing: 0.5),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _commentType == 'comment' 
+                        ? const Color(0xFF3B82F6)
+                        : _commentType == 'offer'
+                          ? const Color(0xFF22C55E)
+                          : const Color(0xFFF97316),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
+                      elevation: 0,
+                    ),
+                  ),
+                ),
+                
+                const SizedBox(height: 12),
+                
+                // Cancel Button
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Ghairi',
+                        style: TextStyle(color: Color(0xFF64748B), fontWeight: FontWeight.w600)),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -226,7 +587,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
     final job = _job!;
     final currentUser = context.watch<AuthProvider>().user;
     final isOwner = currentUser?.id == job.userId;
-    final isWorker = currentUser?.role == 'worker';
+    final isWorker = currentUser?.isMfanyakazi ?? false;
     final hasWorkerAssigned = job.workerId != null;
     final statusColor = _getStatusColor(job.status);
 
@@ -765,6 +1126,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
   }
 
   Widget? _buildBottomBar(bool isWorker, bool isOwner, bool hasWorkerAssigned) {
+    // Worker can apply for job
     if (isWorker && !hasWorkerAssigned && !isOwner) {
       return Container(
         padding: const EdgeInsets.fromLTRB(25, 20, 25, 40),
@@ -803,6 +1165,51 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
         ),
       );
     }
+
+    // Owner can edit job if it's posted or assigned
+    if (isOwner && _job != null && (_job!.status == 'posted' || _job!.status == 'assigned')) {
+      return Container(
+        padding: const EdgeInsets.fromLTRB(25, 20, 25, 40),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(35)),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 30,
+                offset: const Offset(0, -10))
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  final result = await Navigator.pushNamed(
+                    context,
+                    AppRouter.editJob,
+                    arguments: _job,
+                  );
+                  if (result == true) {
+                    _refreshJobDetails();
+                  }
+                },
+                icon: const Icon(Icons.edit_rounded),
+                label: const Text('HARIRI KAZI',
+                    style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1)),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                  side: const BorderSide(color: AppColors.primary, width: 2),
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return null;
   }
 

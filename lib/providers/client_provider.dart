@@ -6,23 +6,34 @@ class ClientProvider extends ChangeNotifier {
   final _jobService = JobService();
   final _chatService = ChatService();
   final _notificationService = NotificationService();
+  final _walletService = WalletService();
 
   bool _isLoading = false;
+  bool _isDashboardLoading = false;
+  bool _isWalletLoading = false;
+  bool _isWithdrawing = false;
   String? _error;
 
   List<Job> _myJobs = [];
   List<NearbyWorker> _nearbyWorkers = [];
   int _unreadChatCount = 0;
   int _unreadNotificationCount = 0;
+  ClientDashboard? _dashboard;
+  double _walletBalance = 0;
 
   // Getters
   bool get isLoading => _isLoading;
+  bool get isDashboardLoading => _isDashboardLoading;
+  bool get isWalletLoading => _isWalletLoading;
+  bool get isWithdrawing => _isWithdrawing;
   String? get error => _error;
   List<Job> get myJobs => _myJobs;
   List<NearbyWorker> get nearbyWorkers => _nearbyWorkers;
   int get unreadChatCount => _unreadChatCount;
   int get unreadChats => _unreadChatCount; // Alias
   int get unreadNotificationCount => _unreadNotificationCount;
+  ClientDashboard? get dashboard => _dashboard;
+  double get walletBalance => _walletBalance;
 
   // Load Unread Counts
   Future<void> loadUnreadCounts() async {
@@ -143,5 +154,77 @@ class ClientProvider extends ChangeNotifier {
   Future<void> cancelJob(int jobId) async {
     await _jobService.cancelJob(jobId);
     await loadMyJobs();
+  }
+
+  // Load Dashboard Data
+  Future<void> loadDashboard() async {
+    _isDashboardLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      _dashboard = await _jobService.getClientDashboard();
+      // Also load wallet balance
+      await loadWalletBalance();
+      _isDashboardLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      _isDashboardLoading = false;
+      notifyListeners();
+      debugPrint('Dashboard Error: $e');
+    }
+  }
+
+  // Load Wallet Balance
+  Future<void> loadWalletBalance() async {
+    _isWalletLoading = true;
+    notifyListeners();
+
+    try {
+      final data = await _walletService.getWalletBalance();
+      _walletBalance = data['balance'] ?? 0.0;
+      _isWalletLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _isWalletLoading = false;
+      notifyListeners();
+      debugPrint('Wallet Error: $e');
+    }
+  }
+
+  // Submit Withdrawal Request
+  Future<Map<String, dynamic>> submitWithdrawal({
+    required int amount,
+    required String phoneNumber,
+    required String registeredName,
+    required String networkType,
+    String method = 'mobile_money',
+  }) async {
+    _isWithdrawing = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final result = await _walletService.submitWithdrawal(
+        amount: amount,
+        phoneNumber: phoneNumber,
+        registeredName: registeredName,
+        networkType: networkType,
+        method: method,
+      );
+
+      // Reload wallet balance after withdrawal
+      await loadWalletBalance();
+
+      _isWithdrawing = false;
+      notifyListeners();
+      return result;
+    } catch (e) {
+      _error = e.toString();
+      _isWithdrawing = false;
+      notifyListeners();
+      rethrow;
+    }
   }
 }

@@ -5,6 +5,7 @@ class Job {
   final String? description;
   final int? categoryId;
   final String? categoryName;
+  final String? categoryIcon;
   final int price;
   final String status;
   final String? imageUrl;
@@ -15,11 +16,13 @@ class Job {
   final int? userId;
   final String? userName;
   final String? userPhotoUrl;
+  final String? userPhone;
   final int? workerId;
   final String? workerName;
   final String? completionCode;
   final DateTime? createdAt;
   final double? distance;
+  final DistanceInfo? distanceInfo;
   final List<JobComment>? comments;
 
   Job({
@@ -28,6 +31,7 @@ class Job {
     this.description,
     this.categoryId,
     this.categoryName,
+    this.categoryIcon,
     required this.price,
     required this.status,
     this.imageUrl,
@@ -38,21 +42,34 @@ class Job {
     this.userId,
     this.userName,
     this.userPhotoUrl,
+    this.userPhone,
     this.workerId,
     this.workerName,
     this.completionCode,
     this.createdAt,
     this.distance,
+    this.distanceInfo,
     this.comments,
   });
 
   factory Job.fromJson(Map<String, dynamic> json) {
+    // Parse distance from distance_info if available
+    double? parsedDistance;
+    if (json['distance_info'] != null && json['distance_info']['distance'] != null) {
+      final d = json['distance_info']['distance'];
+      parsedDistance = d is String ? double.tryParse(d) : d?.toDouble();
+    } else if (json['distance'] != null) {
+      final d = json['distance'];
+      parsedDistance = d is String ? double.tryParse(d) : d?.toDouble();
+    }
+
     return Job(
       id: json['id'] ?? 0,
       title: json['title'] ?? '',
       description: json['description'],
       categoryId: json['category_id'],
       categoryName: json['category']?['name'] ?? json['category_name'],
+      categoryIcon: json['category']?['icon'] ?? json['category_icon'],
       price: json['price'] is String
           ? int.tryParse(json['price']) ?? 0
           : (json['price'] ?? 0),
@@ -67,18 +84,20 @@ class Job {
       addressText: json['address_text'],
       phone: json['phone'],
       userId: json['user_id'],
-      userName: json['user']?['name'] ?? json['user_name'],
+      userName: json['muhitaji']?['name'] ?? json['user']?['name'] ?? json['user_name'],
       userPhotoUrl:
-          json['user']?['profile_photo_url'] ?? json['user_photo_url'],
-      workerId: json['worker_id'],
-      workerName: json['worker']?['name'] ?? json['worker_name'],
+          json['muhitaji']?['profile_photo_url'] ?? json['user']?['profile_photo_url'] ?? json['user_photo_url'],
+      userPhone: json['muhitaji']?['phone'] ?? json['user']?['phone'] ?? json['user_phone'],
+      workerId: json['accepted_worker_id'] ?? json['worker_id'],
+      workerName: json['accepted_worker']?['name'] ?? json['worker']?['name'] ?? json['worker_name'],
       completionCode: json['completion_code'],
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'])
           : null,
-      distance: json['distance'] is String
-          ? double.tryParse(json['distance'])
-          : json['distance']?.toDouble(),
+      distance: parsedDistance,
+      distanceInfo: json['distance_info'] != null
+          ? DistanceInfo.fromJson(json['distance_info'])
+          : null,
       comments: json['comments'] != null
           ? (json['comments'] as List)
               .map((c) => JobComment.fromJson(c))
@@ -87,10 +106,11 @@ class Job {
     );
   }
 
-  bool get isOpen => status == 'open';
+  // API returns: posted, in_progress, assigned, completed, cancelled
+  bool get isOpen => status == 'open' || status == 'posted';
   bool get isPending => status == 'pending';
   bool get isPaid => status == 'paid';
-  bool get isAccepted => status == 'accepted';
+  bool get isAccepted => status == 'accepted' || status == 'in_progress' || status == 'assigned';
   bool get isCompleted => status == 'completed';
   bool get isCancelled => status == 'cancelled';
 }
@@ -184,4 +204,41 @@ class NearbyWorker {
           : json['distance']?.toDouble(),
     );
   }
+}
+
+/// Distance Info from API
+class DistanceInfo {
+  final double? distance;
+  final String category; // near, moderate, far, unknown
+  final String color;
+  final String bgColor;
+  final String textColor;
+  final String label;
+
+  DistanceInfo({
+    this.distance,
+    required this.category,
+    required this.color,
+    required this.bgColor,
+    required this.textColor,
+    required this.label,
+  });
+
+  factory DistanceInfo.fromJson(Map<String, dynamic> json) {
+    return DistanceInfo(
+      distance: json['distance'] is String
+          ? double.tryParse(json['distance'])
+          : json['distance']?.toDouble(),
+      category: json['category'] ?? 'unknown',
+      color: json['color'] ?? '#6b7280',
+      bgColor: json['bg_color'] ?? '#f3f4f6',
+      textColor: json['text_color'] ?? '#6b7280',
+      label: json['label'] ?? 'Umbali haujulikani',
+    );
+  }
+
+  bool get isNear => category == 'near';
+  bool get isModerate => category == 'moderate';
+  bool get isFar => category == 'far';
+  bool get isUnknown => category == 'unknown';
 }

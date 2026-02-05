@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../../core/constants/constants.dart';
 import '../../../data/models/models.dart';
 import '../../../data/services/services.dart';
 import '../../widgets/withdrawal_modal.dart';
-import '../../../providers/providers.dart';
 
 class WalletScreen extends StatefulWidget {
   const WalletScreen({super.key});

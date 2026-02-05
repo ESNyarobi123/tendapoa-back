@@ -64,17 +64,12 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 30),
-                IconButton(
-                  icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-                  onPressed: () => Navigator.pop(context),
-                ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 50),
                 Center(
                   child: Container(
                     padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                        color: const Color(0xFFEFF6FF), shape: BoxShape.circle),
+                    decoration: const BoxDecoration(
+                        color: Color(0xFFEFF6FF), shape: BoxShape.circle),
                     child: Image.asset('assets/images/tendalogo.jpg',
                         width: 60,
                         height: 60,
@@ -171,9 +166,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () async {
                                   final url =
-                                      Uri.parse('https://tendapoa.com/terms');
-                                  if (await canLaunchUrl(url))
-                                    await launchUrl(url);
+                                      Uri.parse('https://tendapoa.com/terms-and-conditions');
+                                  if (await canLaunchUrl(url)) {
+                                    await launchUrl(url, mode: LaunchMode.externalApplication);
+                                  }
                                 },
                             ),
                           ],

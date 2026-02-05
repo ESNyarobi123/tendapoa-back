@@ -22,6 +22,8 @@ class AppRouter {
   static const String workerActiveJob = '/worker-active-job';
   static const String settingsPage = '/settings';
   static const String paymentWait = '/payment-wait';
+  static const String editJob = '/edit-job';
+  static const String editProfile = '/edit-profile';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -94,6 +96,20 @@ class AppRouter {
           ),
           settings,
         );
+      case editJob:
+        final job = settings.arguments as Job?;
+        if (job == null) {
+          return _buildRoute(
+            const Scaffold(body: Center(child: Text('Invalid job data'))),
+            settings,
+          );
+        }
+        return _buildRoute(
+          EditJobScreen(job: job),
+          settings,
+        );
+      case editProfile:
+        return _buildRoute(const EditProfileScreen(), settings);
       default:
         return _buildRoute(
             const Scaffold(body: Center(child: Text('Route not found'))),

@@ -228,29 +228,29 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   Widget _buildPage(int index) {
     final page = _pages[index];
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(40),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.all(40),
+            padding: const EdgeInsets.all(30),
             decoration: BoxDecoration(
               color: page['color'].withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(page['icon'] as IconData,
-                size: 100, color: page['color'] as Color),
+                size: 80, color: page['color'] as Color),
           )
               .animate(key: ValueKey(index))
               .scale(duration: 600.ms, curve: Curves.easeOutBack)
               .fadeIn(),
-          const SizedBox(height: 50),
+          const SizedBox(height: 30),
           Text(
             page['title']!,
             textAlign: TextAlign.center,
             style: const TextStyle(
-                fontSize: 32,
+                fontSize: 26,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF1E293B),
                 letterSpacing: -1),
@@ -258,12 +258,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               .animate(key: ValueKey('t$index'))
               .fadeIn(delay: 200.ms)
               .slideY(begin: 0.2, end: 0),
-          const SizedBox(height: 20),
+          const SizedBox(height: 15),
           Text(
             page['subtitle']!,
             textAlign: TextAlign.center,
             style: const TextStyle(
-                fontSize: 16, color: Color(0xFF64748B), height: 1.6),
+                fontSize: 14, color: Color(0xFF64748B), height: 1.5),
           )
               .animate(key: ValueKey('s$index'))
               .fadeIn(delay: 400.ms)

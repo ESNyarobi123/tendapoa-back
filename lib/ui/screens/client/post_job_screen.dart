@@ -9,6 +9,7 @@ import '../../../core/constants/constants.dart';
 import '../../../core/router/app_router.dart';
 import '../../../providers/providers.dart';
 import '../../../data/models/category_model.dart' as models;
+import '../../../data/services/services.dart';
 
 class PostJobScreen extends StatefulWidget {
   const PostJobScreen({super.key});
@@ -31,6 +32,12 @@ class _PostJobScreenState extends State<PostJobScreen> {
   double? _lat;
   double? _lng;
   String? _addressText;
+
+  // Nearby workers state
+  bool _isCheckingWorkers = false;
+  int _nearbyWorkerCount = 0;
+  String? _nearbyWorkersMessage;
+  Map<String, int>? _workersByDistance;
 
   @override
   void initState() {
@@ -60,9 +67,43 @@ class _PostJobScreenState extends State<PostJobScreen> {
           _addressText =
               "Eneo Limetambuliwa (${position.latitude.toStringAsFixed(4)})";
         });
+        // Check nearby workers after getting location
+        _checkNearbyWorkers();
       }
     } catch (e) {
       debugPrint('Location error: $e');
+    }
+  }
+
+  Future<void> _checkNearbyWorkers() async {
+    if (_lat == null || _lng == null) return;
+
+    setState(() => _isCheckingWorkers = true);
+
+    try {
+      final result = await JobService().checkNearbyWorkers(
+        lat: _lat!,
+        lng: _lng!,
+        radius: 15,
+      );
+
+      if (mounted) {
+        setState(() {
+          _nearbyWorkerCount = result['worker_count'] ?? 0;
+          _nearbyWorkersMessage = result['message'];
+          _workersByDistance = {
+            'within_1km': result['by_distance']?['within_1km'] ?? 0,
+            'within_3km': result['by_distance']?['within_3km'] ?? 0,
+            'within_5km': result['by_distance']?['within_5km'] ?? 0,
+          };
+          _isCheckingWorkers = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Nearby workers error: $e');
+      if (mounted) {
+        setState(() => _isCheckingWorkers = false);
+      }
     }
   }
 
@@ -87,9 +128,10 @@ class _PostJobScreenState extends State<PostJobScreen> {
     if (_lat == null || _lng == null) {
       await _detectLocation();
       if (_lat == null || _lng == null) {
-        if (mounted)
+        if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Tafadhali washa GPS yako kwanza')));
+        }
         return;
       }
     }
@@ -121,48 +163,73 @@ class _PostJobScreenState extends State<PostJobScreen> {
             arguments: {'job': newJob});
       }
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('Hitilafu: $e'), backgroundColor: AppColors.error));
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.primary,
         elevation: 0,
-        centerTitle: false,
+        centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.close_rounded, color: Color(0xFF1E293B)),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text('Post Kazi Mpya',
             style: TextStyle(
-                color: Color(0xFF1E293B),
-                fontWeight: FontWeight.w900,
-                fontSize: 22,
-                letterSpacing: -0.5)),
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 20)),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(30),
+            bottomRight: Radius.circular(30),
+          ),
+        ),
       ),
       body: Column(
         children: [
           // Step Progress
           Padding(
-            padding: const EdgeInsets.fromLTRB(25, 10, 25, 20),
-            child: Row(
-              children: [
-                _buildStep(0, 'Maelezo'),
-                Expanded(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.03),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  _buildStep(0, 'Maelezo'),
+                  Expanded(
                     child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 10),
-                        height: 2,
+                      margin: const EdgeInsets.symmetric(horizontal: 10),
+                      height: 3,
+                      decoration: BoxDecoration(
                         color: _currentStep >= 1
                             ? AppColors.primary
-                            : const Color(0xFFF1F5F9))),
-                _buildStep(1, 'Eneo & Post'),
-              ],
+                            : const Color(0xFFE2E8F0),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  _buildStep(1, 'Eneo & Post'),
+                ],
+              ),
             ),
           ),
           Expanded(
@@ -186,33 +253,48 @@ class _PostJobScreenState extends State<PostJobScreen> {
     return Row(
       children: [
         Container(
-          width: 28,
-          height: 28,
+          width: 32,
+          height: 32,
           decoration: BoxDecoration(
             color: isActive || isDone
                 ? AppColors.primary
-                : const Color(0xFFF1F5F9),
+                : const Color(0xFFEEF2FF),
             shape: BoxShape.circle,
+            border: isActive
+                ? Border.all(color: Colors.white, width: 2)
+                : null,
+            boxShadow: isActive
+                ? [
+                    BoxShadow(
+                      color: AppColors.primary.withOpacity(0.4),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
           ),
           child: Center(
             child: isDone
-                ? const Icon(Icons.check, color: Colors.white, size: 14)
-                : Text('${step + 1}',
+                ? const Icon(Icons.check, color: Colors.white, size: 16)
+                : Text(
+                    '${step + 1}',
                     style: TextStyle(
-                        color:
-                            isActive ? Colors.white : const Color(0xFF94A3B8),
-                        fontWeight: FontWeight.w900,
-                        fontSize: 12)),
+                      color: isActive ? Colors.white : const Color(0xFF64748B),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
           ),
         ),
         const SizedBox(width: 10),
-        Text(label,
-            style: TextStyle(
-                fontSize: 13,
-                color: isActive
-                    ? const Color(0xFF1E293B)
-                    : const Color(0xFF94A3B8),
-                fontWeight: isActive ? FontWeight.w900 : FontWeight.bold)),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            color: isActive ? AppColors.primary : const Color(0xFF64748B),
+            fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+          ),
+        ),
       ],
     );
   }
@@ -377,13 +459,15 @@ class _PostJobScreenState extends State<PostJobScreen> {
         const Text(
             'Tunatumia GPS yako kutambua eneo ili mafundi wa karibu zaidi waone kazi yako.',
             style: TextStyle(color: Color(0xFF64748B), fontSize: 14)),
-        const SizedBox(height: 40),
+        const SizedBox(height: 30),
+
+        // Location Card
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(30),
+          padding: const EdgeInsets.all(25),
           decoration: BoxDecoration(
             color: const Color(0xFF1E293B),
-            borderRadius: BorderRadius.circular(35),
+            borderRadius: BorderRadius.circular(30),
             boxShadow: [
               BoxShadow(
                   color: Colors.black.withValues(alpha: 0.1),
@@ -394,47 +478,52 @@ class _PostJobScreenState extends State<PostJobScreen> {
           child: Column(
             children: [
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.05),
                     shape: BoxShape.circle),
                 child: Icon(Icons.location_on_rounded,
-                    size: 60,
+                    size: 50,
                     color: _lat != null
                         ? const Color(0xFF22C55E)
                         : const Color(0xFFF97316)),
               ),
-              const SizedBox(height: 25),
+              const SizedBox(height: 20),
               Text(_lat != null ? 'ENEO LIMETAMBULIWA' : 'INATAFUTA ENEO...',
                   style: const TextStyle(
                       fontWeight: FontWeight.w900,
                       color: Colors.white,
-                      fontSize: 16,
+                      fontSize: 14,
                       letterSpacing: 1)),
-              const SizedBox(height: 10),
+              const SizedBox(height: 8),
               Text(_addressText ?? 'Tafadhali ruhusu GPS kwanza',
                   style: const TextStyle(color: Colors.white60, fontSize: 13),
                   textAlign: TextAlign.center),
-              const SizedBox(height: 30),
-              ElevatedButton.icon(
+              const SizedBox(height: 20),
+              OutlinedButton.icon(
                 onPressed: _detectLocation,
-                icon: const Icon(Icons.refresh_rounded, size: 18),
-                label: const Text('RUDIA KUTAFUTA ENEO',
+                icon: const Icon(Icons.refresh_rounded, size: 16),
+                label: const Text('RUDIA KUTAFUTA',
                     style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white.withValues(alpha: 0.1),
-                    foregroundColor: Colors.white,
-                    elevation: 0,
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
+                style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white70,
+                    side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 25, vertical: 15),
+                        horizontal: 20, vertical: 12),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15))),
+                        borderRadius: BorderRadius.circular(12))),
               ),
             ],
           ),
         ).animate().fadeIn().slideY(begin: 0.1, end: 0),
-        const SizedBox(height: 40),
+
+        const SizedBox(height: 25),
+
+        // Nearby Workers Card
+        _buildNearbyWorkersCard(),
+
+        const SizedBox(height: 30),
         _buildInputLabel('Namba ya Mawasiliano'),
         _buildTextField(
           controller: _phoneController,
@@ -443,7 +532,212 @@ class _PostJobScreenState extends State<PostJobScreen> {
           keyboardType: TextInputType.phone,
           validator: (v) => v!.isEmpty ? 'Weka namba ya simu' : null,
         ),
+        const SizedBox(height: 30),
       ],
+    );
+  }
+
+  Widget _buildNearbyWorkersCard() {
+    if (_isCheckingWorkers) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(25),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(25),
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+        ),
+        child: const Row(
+          children: [
+            SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.5,
+                color: AppColors.primary,
+              ),
+            ),
+            SizedBox(width: 15),
+            Expanded(
+              child: Text(
+                'Inatafuta wafanyakazi karibu nawe...',
+                style: TextStyle(
+                  color: Color(0xFF64748B),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ).animate().fadeIn();
+    }
+
+    if (_nearbyWorkerCount == 0 && _lat != null) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(25),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              const Color(0xFFF97316).withValues(alpha: 0.1),
+              const Color(0xFFFED7AA).withValues(alpha: 0.3),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(25),
+          border: Border.all(color: const Color(0xFFF97316).withValues(alpha: 0.2)),
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF97316).withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: const Icon(Icons.warning_amber_rounded,
+                      color: Color(0xFFF97316), size: 28),
+                ),
+                const SizedBox(width: 15),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Hakuna Wafanyakazi Karibu',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Color(0xFF1E293B),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _nearbyWorkersMessage ?? 'Unaweza kuendelea lakini muda wa kupata mfanyakazi unaweza kuwa mrefu.',
+                        style: const TextStyle(
+                          color: Color(0xFF64748B),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ).animate().fadeIn().shake(delay: 300.ms, duration: 500.ms);
+    }
+
+    if (_nearbyWorkerCount > 0) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(25),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              const Color(0xFF10B981).withValues(alpha: 0.08),
+              const Color(0xFF34D399).withValues(alpha: 0.15),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(25),
+          border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.2)),
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: const Icon(Icons.people_alt_rounded,
+                      color: Color(0xFF10B981), size: 28),
+                ),
+                const SizedBox(width: 15),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Wafanyakazi $_nearbyWorkerCount Wamepatikana!',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Color(0xFF1E293B),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _nearbyWorkersMessage ?? 'Kazi yako itaonekana haraka!',
+                        style: const TextStyle(
+                          color: Color(0xFF64748B),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            if (_workersByDistance != null) ...[
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  _buildDistanceBadge('1km', _workersByDistance!['within_1km'] ?? 0, const Color(0xFF10B981)),
+                  const SizedBox(width: 10),
+                  _buildDistanceBadge('3km', _workersByDistance!['within_3km'] ?? 0, const Color(0xFF3B82F6)),
+                  const SizedBox(width: 10),
+                  _buildDistanceBadge('5km', _workersByDistance!['within_5km'] ?? 0, const Color(0xFF8B5CF6)),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ).animate().fadeIn().scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1));
+    }
+
+    return const SizedBox.shrink();
+  }
+
+  Widget _buildDistanceBadge(String label, int count, Color color) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          children: [
+            Text(
+              '$count',
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+                fontSize: 20,
+                color: color,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              'ndani $label',
+              style: TextStyle(
+                fontSize: 10,
+                color: color.withValues(alpha: 0.8),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -491,22 +785,33 @@ class _PostJobScreenState extends State<PostJobScreen> {
   Widget _buildBottomBar() {
     final isLoading = context.watch<ClientProvider>().isLoading;
     return Container(
-      padding: const EdgeInsets.fromLTRB(25, 20, 25, 40),
-      decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Color(0xFFF1F5F9)))),
+      padding: const EdgeInsets.fromLTRB(20, 15, 20, 30),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 20,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
       child: Row(
         children: [
           if (_currentStep == 1) ...[
-            IconButton.filled(
-              onPressed: () => setState(() => _currentStep = 0),
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-              style: IconButton.styleFrom(
-                backgroundColor: const Color(0xFFF1F5F9),
-                foregroundColor: const Color(0xFF1E293B),
-                padding: const EdgeInsets.all(18),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20)),
+            GestureDetector(
+              onTap: () => setState(() => _currentStep = 0),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: const Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  size: 20,
+                  color: Color(0xFF1E293B),
+                ),
               ),
             ),
             const SizedBox(width: 15),
@@ -521,22 +826,28 @@ class _PostJobScreenState extends State<PostJobScreen> {
                     ? AppColors.primary
                     : const Color(0xFF22C55E),
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 20),
+                padding: const EdgeInsets.symmetric(vertical: 18),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20)),
+                  borderRadius: BorderRadius.circular(15),
+                ),
                 elevation: 0,
               ),
               child: isLoading
                   ? const SizedBox(
-                      width: 25,
-                      height: 25,
+                      width: 24,
+                      height: 24,
                       child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 3))
-                  : Text(_currentStep == 0 ? 'ENDELEA' : 'POST KAZI SASA',
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : Text(
+                      _currentStep == 0 ? 'ENDELEA' : 'POST KAZI SASA',
                       style: const TextStyle(
-                          fontWeight: FontWeight.w900,
-                          fontSize: 16,
-                          letterSpacing: 1)),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
             ),
           ),
         ],

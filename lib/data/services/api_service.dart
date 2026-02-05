@@ -207,6 +207,52 @@ class ApiService {
     }
   }
 
+  Future<ApiResponse<Map<String, dynamic>>> putMultipart(
+    String endpoint, {
+    Map<String, String>? fields,
+    Map<String, dynamic>? files,
+    bool requiresAuth = true,
+  }) async {
+    try {
+      final uri = Uri.parse('${AppConstants.baseUrl}$endpoint');
+      final request = http.MultipartRequest('PUT', uri);
+      final headers = await _getHeaders(requiresAuth: requiresAuth);
+      headers.remove('Content-Type');
+      request.headers.addAll(headers);
+      if (fields != null) request.fields.addAll(fields);
+      if (files != null) {
+        for (final entry in files.entries) {
+          if (entry.value is XFile) {
+            final file = entry.value as XFile;
+            final bytes = await file.readAsBytes();
+            request.files.add(
+              http.MultipartFile.fromBytes(entry.key, bytes,
+                  filename: file.name),
+            );
+          } else if (entry.value is File) {
+            request.files.add(
+              await http.MultipartFile.fromPath(entry.key, entry.value.path),
+            );
+          }
+        }
+      }
+      final streamedResponse = await request.send().timeout(
+            AppConstants.uploadTimeout,
+          );
+      final response = await http.Response.fromStream(streamedResponse);
+      return _handleResponse(response);
+    } on SocketException catch (e) {
+      print('SocketException: $e');
+      throw ApiException('Hakuna mtandao. Tafadhali angalia internet yako.');
+    } on TimeoutException catch (e) {
+      print('TimeoutException: $e');
+      throw ApiException('Muda umekwisha. Tafadhali jaribu tena.');
+    } catch (e) {
+      print('Upload Error: $e');
+      throw ApiException('Imeshindwa kupakia: ${e.toString()}');
+    }
+  }
+
   ApiResponse<Map<String, dynamic>> _handleResponse(http.Response response) {
     try {
       final dynamic body = jsonDecode(response.body);
