@@ -199,7 +199,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         );
         Navigator.pop(context, true);
       } else {
-        throw Exception(response.message ?? 'Imeshindikana kusasisha');
+        throw Exception(response.message ?? context.tr('update_failed'));
       }
     } catch (e) {
       if (mounted) {
@@ -525,7 +525,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             controller: controller,
             readOnly: readOnly,
             keyboardType: keyboardType,
-            validator: (v) => v!.isEmpty ? 'Tafadhali jaza hapa' : null,
+            validator: (v) => v!.isEmpty ? context.tr('please_fill_here') : null,
             style: TextStyle(
               fontSize: 15,
               color: readOnly ? AppColors.textLight : AppColors.textPrimary,

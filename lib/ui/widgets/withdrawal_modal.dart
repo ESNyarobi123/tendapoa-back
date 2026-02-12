@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/constants.dart';
+import '../../core/localization/app_localizations.dart';
 import '../../data/services/wallet_service.dart';
 
 class WithdrawalModal extends StatefulWidget {
@@ -53,8 +54,8 @@ class _WithdrawalModalState extends State<WithdrawalModal> {
               ),
             ),
             const SizedBox(height: 25),
-            const Text('Ombi la Uchukuliaji',
-                style: TextStyle(
+            Text(context.tr('withdrawal_request_title'),
+                style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary)),
@@ -71,7 +72,7 @@ class _WithdrawalModalState extends State<WithdrawalModal> {
                   const Icon(Icons.account_balance_wallet_rounded,
                       color: AppColors.walletAccent, size: 20),
                   const SizedBox(width: 12),
-                  Text('Salio Lako: ',
+                  Text('${context.tr('balance_label')} ',
                       style:
                           TextStyle(color: Colors.orange[900], fontSize: 13)),
                   Text('${AppConstants.currency} ${widget.currentBalance}',
@@ -83,31 +84,31 @@ class _WithdrawalModalState extends State<WithdrawalModal> {
               ),
             ),
             const SizedBox(height: 30),
-            _buildLabel('Kiasi unachotaka kutoa'),
+            _buildLabel(context.tr('amount_to_withdraw_label')),
             _buildInput(
               controller: _amountController,
               hint: '0.00',
               icon: Icons.payments_rounded,
               keyboardType: TextInputType.number,
               validator: (val) {
-                if (val == null || val.isEmpty) return 'Weka kiasi';
+                if (val == null || val.isEmpty) return context.tr('enter_amount_required');
                 final amount = double.tryParse(val);
-                if (amount == null) return 'Namba si sahihi';
-                if (amount < 2000) return 'Kiwango cha chini ni 2,000';
-                if (amount > widget.currentBalance) return 'Salio halitoshi';
+                if (amount == null) return context.tr('invalid_number_error');
+                if (amount < 2000) return context.tr('min_2000_error');
+                if (amount > widget.currentBalance) return context.tr('insufficient_balance_error');
                 return null;
               },
             ),
             const SizedBox(height: 20),
-            _buildLabel('Namba ya Simu ya Malipo'),
+            _buildLabel(context.tr('payment_phone_label')),
             _buildInput(
               controller: _phoneController,
               hint: '07XXXXXXXX',
               icon: Icons.phone_android_rounded,
               keyboardType: TextInputType.phone,
               validator: (val) {
-                if (val == null || val.isEmpty) return 'Weka namba';
-                if (val.length < 10) return 'Namba si sahihi';
+                if (val == null || val.isEmpty) return context.tr('enter_phone_required');
+                if (val.length < 10) return context.tr('invalid_number_error');
                 return null;
               },
             ),
@@ -130,8 +131,8 @@ class _WithdrawalModalState extends State<WithdrawalModal> {
                         height: 24,
                         child: CircularProgressIndicator(
                             color: Colors.white, strokeWidth: 2))
-                    : const Text('TUMA OMBI SASA',
-                        style: TextStyle(
+                    : Text(context.tr('submit_request_btn').toUpperCase(),
+                        style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 0.5)),
@@ -194,15 +195,15 @@ class _WithdrawalModalState extends State<WithdrawalModal> {
         Navigator.pop(context);
         widget.onSubmitted();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Ombi lako limetumwa mafanikio!'),
-              backgroundColor: Color(0xFF22C55E)),
+          SnackBar(
+              content: Text(context.tr('withdrawal_success_msg')),
+              backgroundColor: const Color(0xFF22C55E)),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Imeshindikana: $e'),
+            content: Text('${context.tr('error_prefix')}: $e'),
             backgroundColor: AppColors.error));
       }
     } finally {

@@ -172,62 +172,73 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              children: [
-                                Container(
-                                  width: 48,
-                                  height: 48,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.surface,
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  child: ClipOval(
-                                    child: Image.asset(
-                                      'assets/images/tendalogo.jpg',
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) => Container(
-                                        color: AppColors.surface,
-                                        child: const Icon(
-                                          Icons.handyman_rounded,
-                                          color: AppColors.primary,
-                                          size: 26,
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 48,
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.surface,
+                                      shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.1),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: ClipOval(
+                                      child: Image.asset(
+                                        'assets/images/tendalogo.jpg',
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => Container(
+                                          color: AppColors.surface,
+                                          child: const Icon(
+                                            Icons.handyman_rounded,
+                                            color: AppColors.primary,
+                                            size: 26,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                const SizedBox(width: 12),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Tendapoa',
-                                      style: TextStyle(
-                                        color: AppColors.surface,
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: -0.5,
-                                      ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          'Tendapoa',
+                                          style: const TextStyle(
+                                            color: AppColors.surface,
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: -0.5,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        ),
+                                        Text(
+                                          'Pata Mfanyakazi Karibu Nawe',
+                                          style: TextStyle(
+                                            color: AppColors.surface.withOpacity(0.8),
+                                            fontSize: 12,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        ),
+                                      ],
                                     ),
-                                    Text(
-                                      'Pata Mfanyakazi Karibu Nawe',
-                                      style: TextStyle(
-                                        color: AppColors.surface.withOpacity(0.8),
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                  ),
+                                ],
+                              ),
                             ),
+                            const SizedBox(width: 8),
                             Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Container(
                                   decoration: BoxDecoration(
@@ -243,9 +254,14 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                                       context,
                                       AppRouter.notifications,
                                     ),
+                                    padding: const EdgeInsets.all(8),
+                                    constraints: const BoxConstraints(
+                                      minWidth: 40,
+                                      minHeight: 40,
+                                    ),
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                const SizedBox(width: 4),
                                 GestureDetector(
                                   onTap: () async {
                                     final result = await Navigator.pushNamed(
@@ -257,6 +273,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                                     }
                                   },
                                   child: Stack(
+                                    clipBehavior: Clip.none,
                                     children: [
                                       CircleAvatar(
                                         radius: 20,
@@ -315,6 +332,8 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
                         const SizedBox(height: 5),
                         Text(
@@ -323,6 +342,8 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                             color: AppColors.surface.withOpacity(0.8),
                             fontSize: 14,
                           ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
                         const SizedBox(height: 20),
                         // Post Job Button
@@ -334,9 +355,9 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                               AppRouter.postJob,
                             ),
                             icon: const Icon(Icons.add_circle_outline),
-                            label: const Text(
-                              'POST KAZI MPYA',
-                              style: TextStyle(
+                            label: Text(
+                              context.tr('post_job_new').toUpperCase(),
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
@@ -367,7 +388,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                     _buildStatCard(
                       icon: Icons.work_outline,
                       value: '${clientProvider.myJobs.length}',
-                      label: 'Kazi Zangu',
+                      label: context.tr('myJobs'),
                       iconColor: AppColors.primary,
                       bgColor: const Color(0xFFEEF2FF),
                     ),
@@ -376,7 +397,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                       icon: Icons.check_circle_outline,
                       value:
                           '${clientProvider.myJobs.where((j) => j.status == 'completed').length}',
-                      label: 'Zilizokamilika',
+                      label: context.tr('completed_tab'),
                       iconColor: const Color(0xFF22C55E),
                       bgColor: const Color(0xFFDCFCE7),
                     ),
@@ -400,9 +421,9 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Kazi za Hivi Karibuni',
-                      style: TextStyle(
+                    Text(
+                      context.tr('recent_jobs_title'),
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
@@ -410,9 +431,9 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                     ),
                     TextButton(
                       onPressed: () {},
-                      child: const Text(
-                        'Ona Zote',
-                        style: TextStyle(
+                      child: Text(
+                        context.tr('view_all'),
+                        style: const TextStyle(
                           color: AppColors.primary,
                           fontWeight: FontWeight.w600,
                         ),
@@ -462,9 +483,9 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                           ),
                         ),
                         const SizedBox(width: 10),
-                        const Text(
-                          'Kategoria za Huduma',
-                          style: TextStyle(
+                        Text(
+                          context.tr('categories_title'),
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: AppColors.textPrimary,
@@ -527,7 +548,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Ona Kategoria Zote (${categories.length})',
+                          '${context.tr('view_all_categories')} (${categories.length})',
                           style: const TextStyle(
                             color: AppColors.primary,
                             fontWeight: FontWeight.w600,
@@ -672,7 +693,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        _getStatusText(job.status),
+                        _getStatusText(context, job.status),
                         style: const TextStyle(
                           color: AppColors.surface,
                           fontSize: 10,
@@ -825,7 +846,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
           ),
           const SizedBox(height: 10),
           Text(
-            'Bado huna kazi',
+            context.tr('no_jobs_posted_yet'),
             style: TextStyle(
               color: Colors.grey[400],
               fontSize: 14,
@@ -857,22 +878,22 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
     }
   }
 
-  String _getStatusText(String status) {
+  String _getStatusText(BuildContext context, String status) {
     switch (status) {
       case 'open':
       case 'posted':
-        return 'Imeposti';
+        return context.tr('status_open');
       case 'pending':
       case 'pending_payment':
-        return 'Inasubiri';
+        return context.tr('status_pending_payment');
       case 'accepted':
       case 'in_progress':
       case 'assigned':
-        return 'Inaendelea';
+        return context.tr('status_in_progress');
       case 'completed':
-        return 'Kamili';
+        return context.tr('status_completed');
       case 'cancelled':
-        return 'Imefutwa';
+        return context.tr('status_cancelled');
       default:
         return status;
     }
@@ -978,9 +999,9 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Kazi Zangu',
-                                style: TextStyle(
+                              Text(
+                                context.tr('myJobs'),
+                                style: const TextStyle(
                                   color: AppColors.surface,
                                   fontSize: 26,
                                   fontWeight: FontWeight.bold,
@@ -989,7 +1010,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'Jumla: ${allJobs.length} kazi',
+                                '${context.tr('all_tab')}: ${allJobs.length}',
                                 style: TextStyle(
                                   color: AppColors.surface.withOpacity(0.8),
                                   fontSize: 14,
@@ -1029,21 +1050,21 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                           _buildStatCard(
                             icon: Icons.hourglass_empty_rounded,
                             count: postedJobs.length,
-                            label: 'Zimeposti',
+                            label: context.tr('status_open'),
                             color: const Color(0xFFF97316),
                           ),
                           const SizedBox(width: 10),
                           _buildStatCard(
                             icon: Icons.sync_rounded,
                             count: inProgressJobs.length,
-                            label: 'Zinaendelea',
+                            label: context.tr('status_in_progress'),
                             color: const Color(0xFF3B82F6),
                           ),
                           const SizedBox(width: 10),
                           _buildStatCard(
                             icon: Icons.check_circle_rounded,
                             count: completedJobs.length,
-                            label: 'Kamili',
+                            label: context.tr('status_completed'),
                             color: const Color(0xFF22C55E),
                           ),
                         ],
@@ -1070,12 +1091,12 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                         ),
                         labelPadding: const EdgeInsets.symmetric(horizontal: 4),
                         tabs: [
-                          _buildTabChip('Zote', allJobs.length, _tabController.index == 0),
-                          _buildTabChip('Pending', pendingPaymentJobs.length, _tabController.index == 1),
-                          _buildTabChip('Zimeposti', postedJobs.length, _tabController.index == 2),
-                          _buildTabChip('Zinaendelea', inProgressJobs.length, _tabController.index == 3),
-                          _buildTabChip('Kamili', completedJobs.length, _tabController.index == 4),
-                          _buildTabChip('Zimefutwa', cancelledJobs.length, _tabController.index == 5),
+                          _buildTabChip(context.tr('all_tab'), allJobs.length, _tabController.index == 0),
+                          _buildTabChip(context.tr('status_pending_payment'), pendingPaymentJobs.length, _tabController.index == 1),
+                          _buildTabChip(context.tr('status_open'), postedJobs.length, _tabController.index == 2),
+                          _buildTabChip(context.tr('status_in_progress'), inProgressJobs.length, _tabController.index == 3),
+                          _buildTabChip(context.tr('status_completed'), completedJobs.length, _tabController.index == 4),
+                          _buildTabChip(context.tr('status_cancelled'), cancelledJobs.length, _tabController.index == 5),
                         ],
                       ),
                     ),
@@ -1204,9 +1225,9 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Hakuna kazi zinazosubiri malipo',
-              style: TextStyle(
+            Text(
+              context.tr('status_pending_payment'),
+              style: const TextStyle(
                 color: Color(0xFF22C55E),
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -1214,7 +1235,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
             ),
             const SizedBox(height: 8),
             Text(
-              'Kazi zote zimelipwa vizuri!',
+              context.tr('all_paid_msg'),
               style: TextStyle(
                 color: Colors.grey[400],
                 fontSize: 13,
@@ -1271,10 +1292,10 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                     color: Color(0xFFEF4444), size: 18),
                 ),
                 const SizedBox(width: 10),
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'Malipo hayajakamilika',
-                    style: TextStyle(
+                    context.tr('payment_status_waiting'),
+                    style: const TextStyle(
                       color: Color(0xFFEF4444),
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
@@ -1391,9 +1412,9 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Kiasi cha kulipa:',
-                        style: TextStyle(
+                      Text(
+                        context.tr('amount_to_pay_label'),
+                        style: const TextStyle(
                           color: AppColors.textSecondary,
                           fontSize: 13,
                         ),
@@ -1505,9 +1526,9 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
         await jobService.cancelJob(job.id);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('✅ Kazi imefutwa'),
-              backgroundColor: Color(0xFF22C55E),
+            SnackBar(
+              content: Text('✅ ${context.tr('job_deleted')}'),
+              backgroundColor: const Color(0xFF22C55E),
             ),
           );
           context.read<ClientProvider>().loadMyJobs();
@@ -1516,7 +1537,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('❌ Imeshindikana: $e'),
+              content: Text('❌ ${context.tr('error_prefix')}: $e'),
               backgroundColor: const Color(0xFFEF4444),
             ),
           );
@@ -1538,13 +1559,13 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
             children: [
               const CircularProgressIndicator(color: Color(0xFF22C55E)),
               const SizedBox(height: 20),
-              const Text(
-                'Inaanzisha malipo...',
-                style: TextStyle(fontWeight: FontWeight.w600),
+              Text(
+                context.tr('initiating_payment'),
+                style: const TextStyle(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
               Text(
-                'Tafadhali subiri',
+                context.tr('wait'),
                 style: TextStyle(color: Colors.grey[500], fontSize: 13),
               ),
             ],
@@ -1559,10 +1580,10 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
 
       if (result['success'] == true && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('📱 Thibitisha malipo kwenye simu yako!'),
-            backgroundColor: Color(0xFF22C55E),
-            duration: Duration(seconds: 5),
+          SnackBar(
+            content: Text('📱 ${context.tr('confirm_payment_phone')}'),
+            backgroundColor: const Color(0xFF22C55E),
+            duration: const Duration(seconds: 5),
           ),
         );
         
@@ -1574,7 +1595,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('❌ Imeshindikana: $e'),
+            content: Text('❌ ${context.tr('error_prefix')}: $e'),
             backgroundColor: const Color(0xFFEF4444),
           ),
         );
@@ -1596,9 +1617,9 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
         if (status['done'] == true) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('✅ Malipo yamekamilika! Kazi imeposti.'),
-                backgroundColor: Color(0xFF22C55E),
+              SnackBar(
+                content: Text('✅ ${context.tr('payment_success_msg')}'),
+                backgroundColor: const Color(0xFF22C55E),
               ),
             );
             context.read<ClientProvider>().loadMyJobs();
@@ -1631,7 +1652,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
             ),
             const SizedBox(height: 20),
             Text(
-              'Hakuna kazi hapa',
+              context.tr('no_jobs_here'),
               style: TextStyle(
                 color: Colors.grey[600],
                 fontSize: 16,
@@ -1640,7 +1661,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
             ),
             const SizedBox(height: 8),
             Text(
-              'Kazi zitaonekana hapa ukiziposti',
+              context.tr('jobs_will_appear_here'),
               style: TextStyle(
                 color: Colors.grey[400],
                 fontSize: 13,
@@ -1730,7 +1751,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          _getStatusText(job.status),
+                          _getStatusText(context, job.status),
                           style: TextStyle(
                             color: statusColor,
                             fontSize: 9,
@@ -1790,7 +1811,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            job.workerName ?? 'Mfanyakazi',
+                            job.workerName ?? context.tr('worker_role'),
                             style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -1800,7 +1821,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            _formatDate(job.createdAt!),
+                            _formatDate(context, job.createdAt!),
                             style: TextStyle(fontSize: 11, color: Colors.grey[500]),
                           ),
                         ),
@@ -1866,42 +1887,24 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
     );
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDate(BuildContext context, DateTime date) {
     final now = DateTime.now();
     final diff = now.difference(date);
-    
+    final locale = Localizations.localeOf(context).languageCode;
+    final isSw = locale == 'sw';
+    final ago = context.tr('time_ago_suffix');
+
     if (diff.inDays == 0) {
       if (diff.inHours == 0) {
-        return '${diff.inMinutes} dakika zilizopita';
+        return isSw ? '${context.tr('time_minutes')} ${diff.inMinutes} $ago' : '${diff.inMinutes} ${context.tr('time_minutes')} $ago';
       }
-      return '${diff.inHours} saa zilizopita';
+      return isSw ? '${context.tr('time_hours')} ${diff.inHours} $ago' : '${diff.inHours} ${context.tr('time_hours')} $ago';
     } else if (diff.inDays == 1) {
-      return 'Jana';
+      return context.tr('yesterday');
     } else if (diff.inDays < 7) {
-      return '${diff.inDays} siku zilizopita';
+      return '${diff.inDays} ${context.tr('time_days')} $ago';
     } else {
       return '${date.day}/${date.month}/${date.year}';
-    }
-  }
-
-  IconData _getStatusIcon(String status) {
-    switch (status) {
-      case 'open':
-      case 'posted':
-        return Icons.hourglass_empty_rounded;
-      case 'pending':
-      case 'pending_payment':
-        return Icons.payment_rounded;
-      case 'accepted':
-      case 'in_progress':
-      case 'assigned':
-        return Icons.sync_rounded;
-      case 'completed':
-        return Icons.check_circle_rounded;
-      case 'cancelled':
-        return Icons.cancel_rounded;
-      default:
-        return Icons.info_outline_rounded;
     }
   }
 
@@ -1926,22 +1929,22 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
     }
   }
 
-  String _getStatusText(String status) {
+  String _getStatusText(BuildContext context, String status) {
     switch (status) {
       case 'open':
       case 'posted':
-        return 'Imeposti';
+        return context.tr('status_open');
       case 'pending':
       case 'pending_payment':
-        return 'Inasubiri';
+        return context.tr('status_pending_payment');
       case 'accepted':
       case 'in_progress':
       case 'assigned':
-        return 'Inaendelea';
+        return context.tr('status_in_progress');
       case 'completed':
-        return 'Kamili';
+        return context.tr('status_completed');
       case 'cancelled':
-        return 'Imefutwa';
+        return context.tr('status_cancelled');
       default:
         return status;
     }
@@ -2025,9 +2028,9 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
-                              'Dashibodi',
-                              style: TextStyle(
+                            Text(
+                              context.tr('dash_nav'),
+                              style: const TextStyle(
                                 color: AppColors.surface,
                                 fontSize: 26,
                                 fontWeight: FontWeight.bold,
@@ -2218,9 +2221,9 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                                 child: const Icon(Icons.account_balance_wallet_rounded, color: AppColors.surface, size: 24),
                               ),
                               const SizedBox(width: 12),
-                              const Text(
-                                'Salio la Wallet',
-                                style: TextStyle(
+                              Text(
+                                context.tr('wallet_balance'),
+                                style: const TextStyle(
                                   color: AppColors.surface,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
@@ -2295,9 +2298,9 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                             color: AppColors.surface.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Text(
-                            'Pesa hii ni refund kutoka kazi zilizofutwa',
-                            style: TextStyle(color: Colors.white70, fontSize: 11),
+                          child: Text(
+                            context.tr('refund_from_cancelled'),
+                            style: const TextStyle(color: Colors.white70, fontSize: 11),
                           ),
                         ),
                       ],
@@ -2343,9 +2346,9 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Jumla Umelipa',
-                              style: TextStyle(
+                            Text(
+                              context.tr('client_budget'),
+                              style: const TextStyle(
                                 color: Colors.white70,
                                 fontSize: 13,
                               ),
@@ -2390,7 +2393,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                         _buildStatCard(
                           icon: Icons.post_add_rounded,
                           value: '${dashboard?.posted ?? 0}',
-                          label: 'Kazi Zilizoposti',
+                          label: context.tr('posted_jobs_label'),
                           color: const Color(0xFF3B82F6),
                         ),
                         const SizedBox(width: 12),
@@ -2414,9 +2417,9 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Historia ya Malipo',
-                      style: TextStyle(
+                    Text(
+                      context.tr('dash_earnings_history'),
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
@@ -2425,9 +2428,9 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                     if (dashboard?.paymentHistory.isNotEmpty == true)
                       TextButton(
                         onPressed: () {},
-                        child: const Text(
-                          'Ona Zote',
-                          style: TextStyle(
+                        child: Text(
+                          context.tr('view_all'),
+                          style: const TextStyle(
                             color: AppColors.primary,
                             fontWeight: FontWeight.w600,
                           ),
@@ -2454,7 +2457,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                         Icon(Icons.receipt_long_outlined, size: 48, color: Colors.grey[300]),
                         const SizedBox(height: 12),
                         Text(
-                          'Hakuna malipo bado',
+                          context.tr('no_transactions'),
                           style: TextStyle(color: Colors.grey[500], fontSize: 14),
                         ),
                       ],
@@ -2488,9 +2491,9 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                     }
                   },
                   icon: const Icon(Icons.logout_rounded, color: Color(0xFFEF4444)),
-                  label: const Text(
-                    'Toka kwenye Akaunti',
-                    style: TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.w600),
+                  label: Text(
+                    context.tr('logout'),
+                    style: const TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.w600),
                   ),
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: Color(0xFFEF4444)),
@@ -2637,7 +2640,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                     ],
                     if (payment.createdAt != null)
                       Text(
-                        _formatPaymentDate(payment.createdAt!),
+                        _formatPaymentDate(context, payment.createdAt!),
                         style: const TextStyle(fontSize: 11, color: AppColors.textLight),
                       ),
                   ],
@@ -2667,7 +2670,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  isCompleted ? 'Imekamilika' : 'Inasubiri',
+                  isCompleted ? context.tr('status_completed') : context.tr('status_pending_payment'),
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
@@ -2682,16 +2685,17 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
     );
   }
 
-  String _formatPaymentDate(DateTime date) {
+  String _formatPaymentDate(BuildContext context, DateTime date) {
     final now = DateTime.now();
     final diff = now.difference(date);
-    
+    final ago = context.tr('time_ago_suffix');
+
     if (diff.inDays == 0) {
-      return 'Leo';
+      return context.tr('today');
     } else if (diff.inDays == 1) {
-      return 'Jana';
+      return context.tr('yesterday');
     } else if (diff.inDays < 7) {
-      return '${diff.inDays} siku zilizopita';
+      return '${diff.inDays} ${context.tr('time_days')} $ago';
     } else {
       return '${date.day}/${date.month}/${date.year}';
     }
@@ -2765,7 +2769,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Salio lako: TZS ${_formatCurrency(clientProvider.walletBalance)}',
+                    '${context.tr('balance_label')} TZS ${_formatCurrency(clientProvider.walletBalance)}',
                     style: const TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 14,
@@ -2787,7 +2791,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                     controller: amountController,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      hintText: 'Mfano: 5000',
+                      hintText: context.tr('amount_hint'),
                       prefixIcon: const Icon(Icons.payments_outlined, color: AppColors.textLight),
                       filled: true,
                       fillColor: AppColors.background,
@@ -2808,9 +2812,9 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                   const SizedBox(height: 20),
 
                   // Phone Field
-                  const Text(
-                    'Namba ya Simu',
-                    style: TextStyle(
+                  Text(
+                    context.tr('phone_number'),
+                    style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                       fontSize: 14,
@@ -2842,9 +2846,9 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                   const SizedBox(height: 20),
 
                   // Registered Name Field
-                  const Text(
-                    'Jina la M-Pesa',
-                    style: TextStyle(
+                  Text(
+                    context.tr('mpesa_name_label'),
+                    style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                       fontSize: 14,
@@ -2854,7 +2858,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                   TextField(
                     controller: nameController,
                     decoration: InputDecoration(
-                      hintText: 'Jina lililosajiliwa kwenye simu',
+                      hintText: context.tr('mpesa_name_hint'),
                       prefixIcon: const Icon(Icons.person_outline_rounded, color: AppColors.textLight),
                       filled: true,
                       fillColor: AppColors.background,

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../core/constants/constants.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/router/app_router.dart';
 import '../../../data/models/models.dart';
 import '../../../data/services/chat_service.dart';
@@ -82,9 +83,9 @@ class _ChatListScreenState extends State<ChatListScreen> with WidgetsBindingObse
         elevation: 0,
         centerTitle: true,
         automaticallyImplyLeading: false,
-        title: const Text(
-          'Meseji',
-          style: TextStyle(
+        title: Text(
+          context.tr('chat'),
+          style: const TextStyle(
             color: AppColors.textPrimary,
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -237,7 +238,7 @@ class _ChatListScreenState extends State<ChatListScreen> with WidgetsBindingObse
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    conversation.lastMessage ?? job?.title ?? 'Hakuna ujumbe',
+                    conversation.lastMessage ?? job?.title ?? context.tr('no_messages_found_sub'),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -257,7 +258,7 @@ class _ChatListScreenState extends State<ChatListScreen> with WidgetsBindingObse
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  _formatTime(conversation.lastMessageAt),
+                  _formatTime(context, conversation.lastMessageAt),
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: hasUnread ? FontWeight.bold : FontWeight.normal,
@@ -284,7 +285,7 @@ class _ChatListScreenState extends State<ChatListScreen> with WidgetsBindingObse
           ),
           const SizedBox(height: 16),
           Text(
-            'Hakuna meseji',
+            context.tr('no_messages_found'),
             style: TextStyle(
               fontSize: 16,
               color: Colors.grey[500],
@@ -293,7 +294,7 @@ class _ChatListScreenState extends State<ChatListScreen> with WidgetsBindingObse
           ),
           const SizedBox(height: 8),
           Text(
-            'Mazungumzo yako yataonekana hapa',
+            context.tr('no_messages_found_sub'),
             style: TextStyle(
               fontSize: 14,
               color: Colors.grey[400],
@@ -304,17 +305,17 @@ class _ChatListScreenState extends State<ChatListScreen> with WidgetsBindingObse
     );
   }
 
-  String _formatTime(DateTime? dateTime) {
+  String _formatTime(BuildContext context, DateTime? dateTime) {
     if (dateTime == null) return '';
-    
+
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final messageDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
-    
+
     if (messageDate == today) {
       return '${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
     } else if (messageDate == today.subtract(const Duration(days: 1))) {
-      return 'Jana';
+      return context.tr('yesterday');
     } else {
       return '${dateTime.day}/${dateTime.month}';
     }

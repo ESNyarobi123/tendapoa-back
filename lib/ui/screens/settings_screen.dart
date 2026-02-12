@@ -20,7 +20,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final authProvider = context.watch<AuthProvider>();
     final settingsProvider = context.watch<SettingsProvider>();
     final user = authProvider.user;
-    final isClient = user?.isMuhitaji ?? true;
     final currentLang = settingsProvider.locale.languageCode;
     final langSubtitle = currentLang == 'sw' ? context.tr('swahili') : context.tr('english');
 
@@ -142,8 +141,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const Divider(height: 1),
                     _buildSettingItem(
                       icon: Icons.lock_outline_rounded,
-                      title: currentLang == 'sw' ? 'Badili Password' : 'Change Password',
-                      subtitle: currentLang == 'sw' ? 'Imarisha usalama wa akaunti' : 'Strengthen account security',
+                      title: context.tr('change_password'),
+                      subtitle: context.tr('strengthen_security_subtitle'),
                       onTap: () => _showChangePasswordDialog(context),
                     ),
                   ]),
@@ -156,7 +155,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _buildToggleItem(
                       icon: Icons.notifications_none_rounded,
                       title: context.tr('notifications'),
-                      subtitle: currentLang == 'sw' ? 'Pata arifa za kazi na meseji' : 'Get job and message notifications',
+                      subtitle: context.tr('notifications_subtitle'),
                       value: _notificationsEnabled,
                       onChanged: (v) => setState(() => _notificationsEnabled = v),
                     ),
@@ -172,27 +171,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 25),
 
                   // SUPPORT SECTION
-                  _buildSectionHeader(settingsProvider.locale.languageCode == 'sw' ? 'MSAADA NA TAARIFA' : 'HELP & INFO'),
+                  _buildSectionHeader(context.tr('help_section_header')),
                   _buildSettingsCard([
                     _buildSettingItem(
                       icon: Icons.support_agent_rounded,
-                      title: 'Wasiliana Nasi (WhatsApp)',
-                      subtitle: 'Pata msaada haraka',
+                      title: context.tr('contact_us_whatsapp'),
+                      subtitle: context.tr('get_help_fast'),
                       iconColor: const Color(0xFF25D366),
                       onTap: () => _openWhatsApp(),
                     ),
                     const Divider(height: 1),
                     _buildSettingItem(
                       icon: Icons.payments_outlined,
-                      title: 'Sera ya Malipo na Ada',
-                      subtitle: 'Fees & Payments Policy',
+                      title: context.tr('fees_payments_policy'),
+                      subtitle: context.tr('fees_payments_policy'),
                       onTap: () => _openUrl('https://tendapoa.com/fees-payments-policy'),
                     ),
                     const Divider(height: 1),
                     _buildSettingItem(
                       icon: Icons.description_outlined,
-                      title: 'Vigezo na Masharti',
-                      subtitle: 'Terms & Conditions',
+                      title: context.tr('termsOfService'),
+                      subtitle: context.tr('termsOfService'),
                       onTap: () => _openUrl('https://tendapoa.com/terms-and-conditions'),
                     ),
                   ]),
@@ -393,19 +392,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Hariri Wasifu',
-                style: TextStyle(
+              Text(
+                context.tr('edit_profile'),
+                style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 25),
-              _buildField('Jina Kamili', nameController, Icons.person_rounded),
+              _buildField(context.tr('full_name'), nameController, Icons.person_rounded),
               const SizedBox(height: 20),
               _buildField(
-                'Namba ya Simu',
+                context.tr('phone_number'),
                 phoneController,
                 Icons.phone_android_rounded,
               ),
@@ -423,7 +422,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               phone: phoneController.text.trim(),
                             );
                             if (ctx.mounted) Navigator.pop(ctx);
-                            _showSnackbar('Wasifu umesasishwa!');
+                            _showSnackbar(context.tr('profile_updated_success'));
                           } catch (e) {
                             _showSnackbar(e.toString(), isError: true);
                           } finally {
@@ -447,8 +446,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             strokeWidth: 2,
                           ),
                         )
-                      : const Text(
-                          'HIFADHI MABADILIKO',
+                      : Text(
+                          context.tr('save_changes').toUpperCase(),
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                 ),
@@ -485,9 +484,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Badili Password',
-                style: TextStyle(
+              Text(
+                context.tr('change_password'),
+                style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
@@ -495,14 +494,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               const SizedBox(height: 25),
               _buildField(
-                'Password ya Sasa',
+                context.tr('current_password'),
                 currentPass,
                 Icons.lock_open_rounded,
                 isPassword: true,
               ),
               const SizedBox(height: 20),
               _buildField(
-                'Password Mpya',
+                context.tr('new_password'),
                 newPass,
                 Icons.lock_outline_rounded,
                 isPassword: true,
@@ -516,7 +515,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       : () async {
                           if (newPass.text.length < 6) {
                             _showSnackbar(
-                              'Password lazima iwe na angalau herufi 6',
+                              context.tr('register_password_min'),
                               isError: true,
                             );
                             return;
@@ -528,7 +527,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               newPassword: newPass.text,
                             );
                             if (ctx.mounted) Navigator.pop(ctx);
-                            _showSnackbar('Password imebadilishwa!');
+                            _showSnackbar(context.tr('password_changed_success'));
                           } catch (e) {
                             _showSnackbar(e.toString(), isError: true);
                           } finally {
@@ -671,14 +670,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         await context.read<WorkerProvider>().refreshAll();
       }
       if (mounted) {
-        _showSnackbar(
-          context.tr('language') == 'Language'
-              ? 'Language changed. Content updated.'
-              : 'Lugha imebadilishwa. Maudhui yamesasishwa.',
-        );
+        _showSnackbar(context.tr('language_updated_msg'));
       }
     } catch (_) {
-      if (mounted) _showSnackbar(context.tr('language') == 'Language' ? 'Language updated.' : 'Lugha imesasishwa.');
+      if (mounted) _showSnackbar(context.tr('language_updated_msg'));
     }
   }
 
@@ -699,10 +694,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
-        _showSnackbar('Imeshindikana kufungua link', isError: true);
+        _showSnackbar(context.tr('failed_open_link'), isError: true);
       }
     } catch (e) {
-      _showSnackbar('Hitilafu: $e', isError: true);
+      _showSnackbar('${context.tr('error_prefix')}: $e', isError: true);
     }
   }
 

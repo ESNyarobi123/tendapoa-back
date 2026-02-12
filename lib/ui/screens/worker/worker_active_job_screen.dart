@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/constants.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/router/app_router.dart';
 import '../../../data/models/models.dart';
 import '../../../data/services/services.dart';
@@ -22,7 +23,7 @@ class _WorkerActiveJobScreenState extends State<WorkerActiveJobScreen> {
   Future<void> _completeJob(int jobId) async {
     if (_codeController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Tafadhali ingiza kodi ya ukamilishaji')),
+        SnackBar(content: Text(context.tr('enter_code_error'))),
       );
       return;
     }
@@ -36,8 +37,7 @@ class _WorkerActiveJobScreenState extends State<WorkerActiveJobScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Kazi imekamilika! Hongera kwa malipo yako.')),
+        SnackBar(content: Text(context.tr('job_completed_success'))),
       );
       Navigator.pop(context);
     } catch (e) {
@@ -67,9 +67,9 @@ class _WorkerActiveJobScreenState extends State<WorkerActiveJobScreen> {
     if (job == null) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Kazi ya Sasa',
+          title: Text(context.tr('active_job_title'),
               style:
-                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                  const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
           backgroundColor: Colors.white,
           elevation: 0,
           leading: IconButton(
@@ -90,8 +90,8 @@ class _WorkerActiveJobScreenState extends State<WorkerActiveJobScreen> {
                     size: 50, color: Color(0xFFF97316)),
               ),
               const SizedBox(height: 20),
-              const Text('Hakuna kazi inayofanyika sasa',
-                  style: TextStyle(color: AppColors.textSecondary, fontSize: 16)),
+              Text(context.tr('no_active_job_msg'),
+                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 16)),
             ],
           ),
         ),
@@ -220,12 +220,12 @@ class _WorkerActiveJobScreenState extends State<WorkerActiveJobScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(job.userName ?? 'Mteja Tendapoa',
+                              Text(job.userName ?? context.tr('client_label'),
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 17,
                                       color: AppColors.textPrimary)),
-                              Text(job.addressText ?? 'Eneo halijatajwa',
+                              Text(job.addressText ?? context.tr('no_location'),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
@@ -256,15 +256,15 @@ class _WorkerActiveJobScreenState extends State<WorkerActiveJobScreen> {
                   const SizedBox(height: 35),
 
                   // PROGRESS SECTION
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.info_outline_rounded,
+                      const Icon(Icons.info_outline_rounded,
                           color: Color(0xFFF97316), size: 20),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          'Baada ya kumaliza kazi, muombe mteja akupe kodi ya ukamilishaji ili upokee malipo yako.',
-                          style: TextStyle(
+                          context.tr('give_code_instruction'),
+                          style: const TextStyle(
                               color: Color(0xFF475569),
                               fontSize: 13,
                               height: 1.4),
@@ -291,14 +291,14 @@ class _WorkerActiveJobScreenState extends State<WorkerActiveJobScreen> {
                     ),
                     child: Column(
                       children: [
-                        const Text('Ukamilishaji wa Kazi',
-                            style: TextStyle(
+                        Text(context.tr('complete_job_title'),
+                            style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textPrimary)),
                         const SizedBox(height: 10),
-                        const Text('Ingiza kodi uliyopewa na mteja',
-                            style: TextStyle(
+                        Text(context.tr('enter_completion_code_title'),
+                            style: const TextStyle(
                                 color: Color(0xFF94A3B8), fontSize: 14)),
                         const SizedBox(height: 30),
                         Container(

@@ -143,8 +143,62 @@ extension AppLocalizationsExtension on BuildContext {
         return loc.recent_jobs_title;
       case 'view_all':
         return loc.view_all;
+      case 'view_all_categories':
+        return loc.view_all_categories;
+      case 'all_paid_msg':
+        return loc.all_paid_msg;
+      case 'amount_to_pay_label':
+        return loc.amount_to_pay_label;
+      case 'initiating_payment':
+        return loc.initiating_payment;
+      case 'confirm_payment_phone':
+        return loc.confirm_payment_phone;
+      case 'refund_from_cancelled':
+        return loc.refund_from_cancelled;
+      case 'posted_jobs_label':
+        return loc.posted_jobs_label;
+      case 'balance_label':
+        return loc.balance_label;
+      case 'mpesa_name_label':
+        return loc.mpesa_name_label;
+      case 'mpesa_name_hint':
+        return loc.mpesa_name_hint;
       case 'no_jobs_here':
         return loc.no_jobs_here;
+      case 'change_password':
+        return loc.change_password;
+      case 'strengthen_security_subtitle':
+        return loc.strengthen_security_subtitle;
+      case 'notifications_subtitle':
+        return loc.notifications_subtitle;
+      case 'help_section_header':
+        return loc.help_section_header;
+      case 'contact_us_whatsapp':
+        return loc.contact_us_whatsapp;
+      case 'get_help_fast':
+        return loc.get_help_fast;
+      case 'fees_payments_policy':
+        return loc.fees_payments_policy;
+      case 'current_password':
+        return loc.current_password;
+      case 'new_password':
+        return loc.new_password;
+      case 'password_changed_success':
+        return loc.password_changed_success;
+      case 'language_updated_msg':
+        return loc.language_updated_msg;
+      case 'failed_open_link':
+        return loc.failed_open_link;
+      case 'please_fill_here':
+        return loc.please_fill_here;
+      case 'update_failed':
+        return loc.update_failed;
+      case 'location_service_disabled':
+        return loc.location_service_disabled;
+      case 'location_permission_denied':
+        return loc.location_permission_denied;
+      case 'location_permission_denied_forever':
+        return loc.location_permission_denied_forever;
       case 'jobs_will_appear_here':
         return loc.jobs_will_appear_here;
       case 'pending_tab':
@@ -327,6 +381,24 @@ extension AppLocalizationsExtension on BuildContext {
         return loc.hello;
       case 'loading':
         return loc.loading;
+      case 'now':
+        return loc.now;
+      case 'time_minutes':
+        return loc.time_minutes;
+      case 'time_hours':
+        return loc.time_hours;
+      case 'time_days':
+        return loc.time_days;
+      case 'time_weeks':
+        return loc.time_weeks;
+      case 'time_ago_suffix':
+        return loc.time_ago_suffix;
+      case 'time_month':
+        return loc.time_month;
+      case 'time_months':
+        return loc.time_months;
+      case 'distance_radius':
+        return loc.distance_radius;
       case 'job_details':
         return loc.job_details;
       case 'congratulations':
@@ -459,6 +531,12 @@ extension AppLocalizationsExtension on BuildContext {
         return loc.view_your_job_btn;
       case 'job_market_label':
         return loc.job_market_label;
+      case 'selected_jobs_title':
+        return loc.selected_jobs_title;
+      case 'selected_jobs_subtitle':
+        return loc.selected_jobs_subtitle;
+      case 'assigned_jobs_appear_here':
+        return loc.assigned_jobs_appear_here;
       case 'no_jobs_available':
         return loc.no_jobs_available;
       case 'try_again_later_msg':
@@ -485,6 +563,26 @@ extension AppLocalizationsExtension on BuildContext {
         return loc.no_desc;
       case 'no_location':
         return loc.no_location;
+      case 'tap_to_expand':
+        return loc.tap_to_expand;
+      case 'verified_client':
+        return loc.verified_client;
+      case 'your_application':
+        return loc.your_application;
+      case 'you_applied':
+        return loc.you_applied;
+      case 'other_applications':
+        return loc.other_applications;
+      case 'be_first_to_apply':
+        return loc.be_first_to_apply;
+      case 'your_proposed_price':
+        return loc.your_proposed_price;
+      case 'current_price_min_prefix':
+        return loc.current_price_min_prefix;
+      case 'current_price_min_suffix':
+        return loc.current_price_min_suffix;
+      case 'price_label_short':
+        return loc.price_label_short;
       case 'applications_tab':
         return loc.applications_tab;
       case 'wallet_title':
@@ -533,6 +631,24 @@ extension AppLocalizationsExtension on BuildContext {
         return loc.submit_request_btn;
       case 'withdrawal_success_msg':
         return loc.withdrawal_success_msg;
+      case 'withdrawal_request_title':
+        return loc.withdrawal_request_title;
+      case 'amount_to_withdraw_label':
+        return loc.amount_to_withdraw_label;
+      case 'enter_amount_required':
+        return loc.enter_amount_required;
+      case 'invalid_number_error':
+        return loc.invalid_number_error;
+      case 'min_2000_error':
+        return loc.min_2000_error;
+      case 'payment_phone_label':
+        return loc.payment_phone_label;
+      case 'enter_phone_required':
+        return loc.enter_phone_required;
+      case 'error_occurred':
+        return loc.error_occurred;
+      case 'try_again_btn':
+        return loc.try_again_btn;
       case 'status_open':
         return loc.status_open;
       case 'status_pending_applications':

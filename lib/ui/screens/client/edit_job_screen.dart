@@ -90,19 +90,19 @@ class _EditJobScreenState extends State<EditJobScreen> {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        throw Exception('Huduma ya eneo haijawashwa');
+        throw Exception(context.tr('location_service_disabled'));
       }
 
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          throw Exception('Ruhusa ya eneo imekataliwa');
+          throw Exception(context.tr('location_permission_denied'));
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
-        throw Exception('Ruhusa ya eneo imekataliwa kabisa');
+        throw Exception(context.tr('location_permission_denied_forever'));
       }
 
       Position position = await Geolocator.getCurrentPosition(

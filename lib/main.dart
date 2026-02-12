@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'core/constants/constants.dart';
 import 'core/theme/app_theme.dart';
@@ -16,10 +17,17 @@ void main() async {
   // Initialize storage service FIRST before anything else
   await StorageService().init();
 
+  // Load saved language so app shows correct locale from first frame
+  final prefs = await SharedPreferences.getInstance();
+  final savedLang = prefs.getString(AppConstants.languageKey);
+  final initialLocale = (savedLang != null && (savedLang == 'en' || savedLang == 'sw'))
+      ? Locale(savedLang)
+      : const Locale('sw');
+
   // Register Swahili locale for timeago
   timeago.setLocaleMessages(
       'sw', timeago.EnMessages()); // Using English as Swahili not available
-  timeago.setDefaultLocale('sw');
+  timeago.setDefaultLocale(initialLocale.languageCode);
 
   // Set preferred orientations
   await SystemChrome.setPreferredOrientations([
@@ -37,11 +45,13 @@ void main() async {
     ),
   );
 
-  runApp(const TendapoaApp());
+  runApp(TendapoaApp(initialLocale: initialLocale));
 }
 
 class TendapoaApp extends StatelessWidget {
-  const TendapoaApp({super.key});
+  final Locale? initialLocale;
+
+  const TendapoaApp({super.key, this.initialLocale});
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +61,7 @@ class TendapoaApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AppProvider()),
         ChangeNotifierProvider(create: (_) => WorkerProvider()),
         ChangeNotifierProvider(create: (_) => ClientProvider()),
-        ChangeNotifierProvider(create: (_) => SettingsProvider()),
+        ChangeNotifierProvider(create: (_) => SettingsProvider(initialLocale: initialLocale)),
       ],
       child: Consumer<SettingsProvider>(
         builder: (context, settings, child) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/constants.dart';
+import '../../core/localization/app_localizations.dart';
 import '../../providers/providers.dart';
 
 class FilterModal extends StatefulWidget {
@@ -39,8 +40,8 @@ class _FilterModalState extends State<FilterModal> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Chuja Kazi (Filters)',
-                  style: TextStyle(
+              Text(context.tr('categories_title'),
+                  style: const TextStyle(
                       fontWeight: FontWeight.w900,
                       fontSize: 20,
                       color: AppColors.textPrimary)),
@@ -49,15 +50,15 @@ class _FilterModalState extends State<FilterModal> {
                   context.read<WorkerProvider>().clearFilters();
                   Navigator.pop(context);
                 },
-                child: const Text('Clear All',
-                    style: TextStyle(
+                child: Text(context.tr('cancel').toUpperCase(),
+                    style: const TextStyle(
                         color: AppColors.error, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
           const SizedBox(height: 30),
-          const Text('Kategoria',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          Text(context.tr('categories_title'),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 15),
           SizedBox(
             height: 45,
@@ -97,8 +98,8 @@ class _FilterModalState extends State<FilterModal> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Umbali (Radius)',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              Text(context.tr('distance_radius'),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               Text('${_distance.toInt()} KM',
                   style: const TextStyle(
                       fontWeight: FontWeight.w900, color: AppColors.primary)),

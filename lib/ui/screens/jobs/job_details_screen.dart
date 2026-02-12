@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../core/constants/constants.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/router/app_router.dart';
 import '../../../data/models/models.dart';
 import '../../../data/services/services.dart';
@@ -58,7 +59,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
       if (mounted) {
         setState(() => _isInitialLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Imeshindwa kupata maelezo: $e')),
+          SnackBar(content: Text('${context.tr('failed_fetch_job_details')}: $e')),
         );
       }
     }
@@ -80,8 +81,8 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
 
   Future<void> _submitComment() async {
     if (_applicationController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Tafadhali andika ujumbe')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.tr('enter_message_hint'))));
       return;
     }
 
@@ -90,7 +91,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
       bidAmount = int.tryParse(_bidAmountController.text.replaceAll(',', ''));
       if (bidAmount == null || bidAmount < 1000) {
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Bei lazima iwe angalau TZS 1,000')));
+            SnackBar(content: Text(context.tr('min_amount_error'))));
         return;
       }
     }
@@ -111,13 +112,13 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
         String successMessage;
         switch (_commentType) {
           case 'comment':
-            successMessage = '✅ Maoni yako yametumwa!';
+            successMessage = '✅ ${context.tr('success_message_sent')}';
             break;
           case 'offer':
-            successMessage = '✅ Pendekezo la bei TZS ${_formatNumber(bidAmount!)} limetumwa!';
+            successMessage = '✅ ${context.tr('success_application_sent')}';
             break;
           default:
-            successMessage = '✅ Ombi lako la kazi limetumwa!';
+            successMessage = '✅ ${context.tr('success_application_sent')}';
         }
         
         ScaffoldMessenger.of(context).showSnackBar(
@@ -130,7 +131,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Imeshindikana: $e'), backgroundColor: Colors.red));
+            .showSnackBar(SnackBar(content: Text('${context.tr('error_prefix')}: $e'), backgroundColor: Colors.red));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -153,12 +154,12 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
           _job = updatedJob;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Mfanyakazi ameteuliwa!')));
+            SnackBar(content: Text(context.tr('worker_selected_success'))));
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Imeshindikana: $e')));
+            .showSnackBar(SnackBar(content: Text('${context.tr('error_prefix')}: $e')));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -250,12 +251,12 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            _commentType == 'comment' 
-                              ? 'Tuma Maoni'
+                                          Text(
+                            _commentType == 'comment'
+                              ? context.tr('ask_question_btn')
                               : _commentType == 'offer'
-                                ? 'Pendekeza Bei'
-                                : 'Omba Kazi Hii',
+                                ? context.tr('send_offer_btn')
+                                : context.tr('apply_btn'),
                             style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w900,
@@ -269,7 +270,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
-                              'Bei: TZS ${_formatNumber(_job?.price ?? 0)}',
+                              '${context.tr('price_label_short')} ${_formatNumber(_job?.price ?? 0)}',
                               style: const TextStyle(
                                 color: AppColors.walletAccent,
                                 fontSize: 13,
@@ -286,8 +287,8 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                 const SizedBox(height: 20),
                 
                 // Comment Type Selector
-                const Text('📋 Chagua aina',
-                    style: TextStyle(
+                Text('📋 ${context.tr('select_category')}',
+                    style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF475569))),
@@ -323,7 +324,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                                   : AppColors.textLight,
                                 size: 22),
                               const SizedBox(height: 4),
-                              Text('Maoni',
+                              Text(context.tr('ask_question_title'),
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
@@ -366,7 +367,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                                   : AppColors.textLight,
                                 size: 22),
                               const SizedBox(height: 4),
-                              Text('Omba Kazi',
+                              Text(context.tr('apply_btn'),
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
@@ -409,7 +410,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                                   : AppColors.textLight,
                                 size: 22),
                               const SizedBox(height: 4),
-                              Text('Bei Tofauti',
+                              Text(context.tr('your_price_label'),
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
@@ -429,11 +430,11 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                 
                 // Message Input
                 Text(
-                  _commentType == 'comment' 
-                    ? '💬 Maoni/Swali lako'
+                  _commentType == 'comment'
+                    ? '💬 ${context.tr('ask_question_title')}'
                     : _commentType == 'offer'
-                      ? '💬 Maelezo ya pendekezo'
-                      : '💬 Kwanini wewe ni bora?',
+                      ? '💬 ${context.tr('message_to_client_label')}'
+                      : '💬 ${context.tr('why_choose_you_hint')}',
                   style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -448,11 +449,11 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                   child: TextField(
                     controller: _applicationController,
                     decoration: InputDecoration(
-                      hintText: _commentType == 'comment' 
-                        ? 'Andika swali au maoni yako...'
+                      hintText: _commentType == 'comment'
+                        ? context.tr('enter_message_hint')
                         : _commentType == 'offer'
-                          ? 'Eleza kwanini bei hii ni sawa...'
-                          : 'Andika maelezo ya kwanini wewe ni bora...',
+                          ? context.tr('message_to_client_label')
+                          : context.tr('why_choose_you_hint'),
                       hintStyle: const TextStyle(color: AppColors.textLight, fontSize: 14),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(16),
@@ -464,7 +465,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                 // Bid Amount Input (shown only for offer type)
                 if (_commentType == 'offer') ...[
                   const SizedBox(height: 16),
-                  const Text('💰 Bei unayopendekeza',
+                  Text('💰 ${context.tr('your_price_label')}',
                       style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
@@ -496,7 +497,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                             ),
                           ),
                         ),
-                        hintText: 'Weka bei yako',
+                        hintText: context.tr('bid_hint'),
                         hintStyle: TextStyle(
                           color: Colors.grey[400], 
                           fontSize: 16,
@@ -515,7 +516,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
-                          'Bei ya sasa: TZS ${_formatNumber(_job?.price ?? 0)} • Min: TZS 1,000',
+                          '${context.tr('current_price_min_prefix')} ${_formatNumber(_job?.price ?? 0)} • ${context.tr('current_price_min_suffix')}',
                           style: const TextStyle(fontSize: 11, color: Color(0xFF22C55E)),
                         ),
                       ),
@@ -543,13 +544,13 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                               : Icons.check_circle_rounded,
                           size: 20),
                     label: Text(
-                      _isLoading 
-                        ? 'INATUMA...' 
+                      _isLoading
+                        ? context.tr('loading').toUpperCase()
                         : _commentType == 'comment'
-                          ? 'TUMA MAONI'
+                          ? context.tr('send_message_btn').toUpperCase()
                           : _commentType == 'offer'
-                            ? 'TUMA PENDEKEZO'
-                            : 'TUMA OMBI LA KAZI',
+                            ? context.tr('send_offer_btn').toUpperCase()
+                            : context.tr('submit_application_btn').toUpperCase(),
                       style: const TextStyle(
                           fontWeight: FontWeight.w900,
                           fontSize: 15,
@@ -577,7 +578,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                   width: double.infinity,
                   child: TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text('Ghairi',
+                    child: Text(context.tr('cancel'),
                         style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
                   ),
                 ),
@@ -731,7 +732,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('DAU LA KAZI',
+                          Text(context.tr('job_details').toUpperCase(),
                               style: TextStyle(
                                   color: AppColors.textLight,
                                   fontSize: 11,
@@ -748,7 +749,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                         ],
                       ),
                       _buildMetaTag(
-                          Icons.category_rounded, job.categoryName ?? 'Huduma'),
+                          Icons.category_rounded, job.categoryName ?? context.tr('services_label')),
                     ],
                   ),
 
@@ -762,14 +763,14 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
 
                   const SizedBox(height: 40),
 
-                  const Text('Maelezo ya Kazi',
+                  Text(context.tr('job_description_title'),
                       style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w900,
                           color: AppColors.textPrimary)),
                   const SizedBox(height: 15),
                   Text(
-                    job.description ?? 'Hakuna maelezo ya ziada.',
+                    job.description ?? context.tr('no_desc'),
                     style: const TextStyle(
                         fontSize: 16, color: Color(0xFF475569), height: 1.7),
                   ).animate().fadeIn(delay: 400.ms),
@@ -777,7 +778,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                   const SizedBox(height: 35),
 
                   // LOCATION WITH MAP
-                  const Text('Mahali / Eneo',
+                  Text(context.tr('location_title'),
                       style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w900,
@@ -875,7 +876,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                                       const SizedBox(width: 8),
                                       Expanded(
                                         child: Text(
-                                          job.addressText ?? 'Eneo la kazi',
+                                          job.addressText ?? context.tr('no_location'),
                                           style: const TextStyle(
                                             color: Colors.white,
                                             fontSize: 13,
@@ -899,18 +900,18 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                                     color: Colors.white.withOpacity(0.9),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
-                                  child: const Row(
+                                  child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Icon(
+                                      const Icon(
                                         Icons.open_in_full_rounded,
                                         size: 14,
                                         color: AppColors.primary,
                                       ),
-                                      SizedBox(width: 4),
+                                      const SizedBox(width: 4),
                                       Text(
-                                        'Bonyeza kukubwa',
-                                        style: TextStyle(
+                                        context.tr('tap_to_expand'),
+                                        style: const TextStyle(
                                           fontSize: 11,
                                           fontWeight: FontWeight.w600,
                                           color: AppColors.primary,
@@ -947,7 +948,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                           const SizedBox(width: 15),
                           Expanded(
                             child: Text(
-                              job.addressText ?? 'Eneo la kazi halikujulikana',
+                              job.addressText ?? context.tr('no_location'),
                               style: const TextStyle(
                                   fontSize: 15,
                                   color: Color(0xFF475569),
@@ -1028,8 +1029,8 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                 child: const Icon(Icons.check, color: Colors.white, size: 14),
               ),
               const SizedBox(width: 12),
-              const Text('FUNDI AMESHATEULIWA',
-                  style: TextStyle(
+              Text(context.tr('assigned_worker').toUpperCase(),
+                  style: const TextStyle(
                       fontWeight: FontWeight.w900,
                       color: Colors.white,
                       letterSpacing: 1,
@@ -1053,13 +1054,13 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(job.workerName ?? 'Fundi Specialist',
+                    Text(job.workerName ?? context.tr('worker_role'),
                         style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: Colors.white)),
-                    const Text('Mafundi wa Tendapoa',
-                        style: TextStyle(color: Colors.white60, fontSize: 13)),
+                    Text(context.tr('appTitle'),
+                        style: const TextStyle(color: Colors.white60, fontSize: 13)),
                   ],
                 ),
               ),
@@ -1129,13 +1130,13 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(job.userName ?? 'Mteja Tendapoa',
+                Text(job.userName ?? context.tr('client_label'),
                     style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
                         color: AppColors.textPrimary)),
-                const Text('Mteja Aliyethibitishwa',
-                    style: TextStyle(
+                Text(context.tr('verified_client'),
+                    style: const TextStyle(
                         fontSize: 13,
                         color: AppColors.textLight,
                         fontWeight: FontWeight.w500)),
@@ -1149,7 +1150,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                       job: job,
                       otherUser: ChatUser(
                           id: job.userId ?? 0,
-                          name: job.userName ?? 'Mteja',
+                          name: job.userName ?? context.tr('client_label'),
                           profilePhotoUrl: job.userPhotoUrl,
                           phone: job.phone)));
             }),
@@ -1183,7 +1184,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Maombi ya Kazi (${job.comments?.length ?? 0})',
+            Text('${context.tr('applications_tab')} (${job.comments?.length ?? 0})',
                 style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
@@ -1199,8 +1200,8 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                 Icon(Icons.hourglass_empty_rounded,
                     size: 60, color: Colors.blue[50]),
                 const SizedBox(height: 15),
-                const Text('Bado hakuna mafundi walioomba.',
-                    style: TextStyle(color: AppColors.textLight, fontSize: 13)),
+                Text(context.tr('no_applications_yet'),
+                    style: const TextStyle(color: AppColors.textLight, fontSize: 13)),
               ],
             ),
           )
@@ -1233,17 +1234,17 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                   color: Color(0xFF22C55E), size: 20),
               ),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Ombi Lako',
-                        style: TextStyle(
+                    Text(context.tr('your_application'),
+                        style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w900,
                             color: AppColors.textPrimary)),
-                    Text('Umeomba kazi hii',
-                        style: TextStyle(
+                    Text(context.tr('you_applied'),
+                        style: const TextStyle(
                             fontSize: 12,
                             color: Color(0xFF22C55E))),
                   ],
@@ -1258,7 +1259,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
         
         // Other Comments
         if (otherComments.isNotEmpty) ...[
-          Text('Maombi Mengine (${otherComments.length})',
+          Text('${context.tr('other_applications')} (${otherComments.length})',
               style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w900,
@@ -1283,15 +1284,15 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                       size: 50, color: Colors.grey[300]),
                 ),
                 const SizedBox(height: 15),
-                const Text('Bado hakuna maombi',
-                    style: TextStyle(
-                      color: AppColors.textSecondary, 
+                Text(context.tr('no_applications_yet'),
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     )),
                 const SizedBox(height: 6),
-                const Text('Kuwa wa kwanza kuomba kazi hii!',
-                    style: TextStyle(color: AppColors.textLight, fontSize: 12)),
+                Text(context.tr('be_first_to_apply'),
+                    style: const TextStyle(color: AppColors.textLight, fontSize: 12)),
               ],
             ),
           ),
@@ -1329,7 +1330,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
               ),
               const Spacer(),
               Text(
-                timeago.format(comment.createdAt ?? DateTime.now(), locale: 'sw'),
+                timeago.format(comment.createdAt ?? DateTime.now(), locale: Localizations.localeOf(context).languageCode),
                 style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
               ),
             ],
@@ -1353,7 +1354,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                     color: Color(0xFF22C55E), size: 16),
                   const SizedBox(width: 6),
                   Text(
-                    'Bei uliyopendekeza: TZS ${_formatNumber(comment.proposedPrice!)}',
+                    '${context.tr('your_proposed_price')}: TZS ${_formatNumber(comment.proposedPrice!)}',
                     style: const TextStyle(
                       color: Color(0xFF22C55E),
                       fontWeight: FontWeight.bold,
@@ -1408,14 +1409,14 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
               children: [
                 Row(
                   children: [
-                    Text(comment.userName ?? 'Mfanyakazi',
+                    Text(comment.userName ?? context.tr('worker_role'),
                         style: const TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 13,
                             color: AppColors.textPrimary)),
                     const Spacer(),
                     Text(
-                      timeago.format(comment.createdAt ?? DateTime.now(), locale: 'sw'),
+                      timeago.format(comment.createdAt ?? DateTime.now(), locale: Localizations.localeOf(context).languageCode),
                       style: const TextStyle(fontSize: 10, color: AppColors.textLight),
                     ),
                   ],
@@ -1468,14 +1469,14 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(comment.userName ?? 'Fundi',
+                    Text(comment.userName ?? context.tr('worker_role'),
                         style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                             color: AppColors.textPrimary)),
                     Text(
                         timeago.format(comment.createdAt ?? DateTime.now(),
-                            locale: 'sw'),
+                            locale: Localizations.localeOf(context).languageCode),
                         style: const TextStyle(
                             fontSize: 12, color: AppColors.textLight)),
                   ],

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 import '../../../core/constants/constants.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../data/models/models.dart';
 import '../../../data/services/services.dart';
 import '../../../providers/providers.dart';
@@ -101,7 +102,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
       if (mounted) {
         setState(() => _isSending = false);
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Imeshindwa kutuma ujumbe')));
+            SnackBar(content: Text(context.tr('failed_send_message'))));
       }
     }
   }
@@ -314,8 +315,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                 controller: _msgController,
                 maxLines: 4,
                 minLines: 1,
-                decoration: const InputDecoration(
-                  hintText: 'Andika ujumbe...',
+                decoration: InputDecoration(
+                  hintText: context.tr('enter_message_hint'),
                   border: InputBorder.none,
                   hintStyle: TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
                 ),

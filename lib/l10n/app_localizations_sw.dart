@@ -217,7 +217,90 @@ class AppLocalizationsSw extends AppLocalizations {
   String get view_all => 'Ona Zote';
 
   @override
+  String get view_all_categories => 'Ona Kategoria Zote';
+
+  @override
+  String get all_paid_msg => 'Kazi zote zimelipwa vizuri!';
+
+  @override
+  String get amount_to_pay_label => 'Kiasi cha kulipa:';
+
+  @override
+  String get initiating_payment => 'Inaanzisha malipo...';
+
+  @override
+  String get confirm_payment_phone => 'Thibitisha malipo kwenye simu yako!';
+
+  @override
+  String get refund_from_cancelled =>
+      'Pesa hii ni refund kutoka kazi zilizofutwa';
+
+  @override
+  String get posted_jobs_label => 'Kazi Zilizoposti';
+
+  @override
+  String get balance_label => 'Salio lako:';
+
+  @override
+  String get mpesa_name_label => 'Jina la M-Pesa';
+
+  @override
+  String get mpesa_name_hint => 'Jina lililosajiliwa kwenye simu';
+
+  @override
   String get no_jobs_here => 'Hakuna kazi hapa';
+
+  @override
+  String get change_password => 'Badili Password';
+
+  @override
+  String get strengthen_security_subtitle => 'Imarisha usalama wa akaunti';
+
+  @override
+  String get notifications_subtitle => 'Pata arifa za kazi na meseji';
+
+  @override
+  String get help_section_header => 'MSAADA NA TAARIFA';
+
+  @override
+  String get contact_us_whatsapp => 'Wasiliana Nasi (WhatsApp)';
+
+  @override
+  String get get_help_fast => 'Pata msaada haraka';
+
+  @override
+  String get fees_payments_policy => 'Sera ya Malipo na Ada';
+
+  @override
+  String get current_password => 'Password ya Sasa';
+
+  @override
+  String get new_password => 'Password Mpya';
+
+  @override
+  String get password_changed_success => 'Password imebadilishwa!';
+
+  @override
+  String get language_updated_msg => 'Lugha imesasishwa.';
+
+  @override
+  String get failed_open_link => 'Imeshindikana kufungua link';
+
+  @override
+  String get please_fill_here => 'Tafadhali jaza hapa';
+
+  @override
+  String get update_failed => 'Imeshindikana kusasisha';
+
+  @override
+  String get location_service_disabled => 'Huduma ya eneo haijawashwa';
+
+  @override
+  String get location_permission_denied => 'Ruhusa ya eneo imekataliwa';
+
+  @override
+  String get location_permission_denied_forever =>
+      'Ruhusa ya eneo imekataliwa kabisa';
 
   @override
   String get jobs_will_appear_here => 'Kazi zitakazopostiwa zitaonekana hapa.';
@@ -491,6 +574,33 @@ class AppLocalizationsSw extends AppLocalizations {
   String get hello => 'Habari';
 
   @override
+  String get now => 'Sasa hivi';
+
+  @override
+  String get time_minutes => 'Dakika';
+
+  @override
+  String get time_hours => 'Saa';
+
+  @override
+  String get time_days => 'Siku';
+
+  @override
+  String get time_weeks => 'wiki';
+
+  @override
+  String get time_ago_suffix => 'zilizopita';
+
+  @override
+  String get time_month => 'mwezi';
+
+  @override
+  String get time_months => 'miezi';
+
+  @override
+  String get distance_radius => 'Umbali (Radius)';
+
+  @override
   String get loading => 'Inapakia...';
 
   @override
@@ -742,6 +852,15 @@ class AppLocalizationsSw extends AppLocalizations {
   String get job_market_label => 'Soko la Kazi';
 
   @override
+  String get selected_jobs_title => 'Kazi Zilizokuchagua';
+
+  @override
+  String get selected_jobs_subtitle => 'Wateja wamekuchagua - kubali au kataa';
+
+  @override
+  String get assigned_jobs_appear_here => 'Kazi ulizopewa zitaonekana hapa';
+
+  @override
   String get no_jobs_available => 'Hakuna Kazi Sasa';
 
   @override
@@ -779,6 +898,36 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get no_location => 'Mahali haijatajwa';
+
+  @override
+  String get tap_to_expand => 'Bonyeza kukubwa';
+
+  @override
+  String get verified_client => 'Mteja Aliyethibitishwa';
+
+  @override
+  String get your_application => 'Ombi Lako';
+
+  @override
+  String get you_applied => 'Umeomba kazi hii';
+
+  @override
+  String get other_applications => 'Maombi Mengine';
+
+  @override
+  String get be_first_to_apply => 'Kuwa wa kwanza kuomba kazi hii!';
+
+  @override
+  String get your_proposed_price => 'Bei uliyopendekeza';
+
+  @override
+  String get current_price_min_prefix => 'Bei ya sasa: TZS';
+
+  @override
+  String get current_price_min_suffix => 'Min: TZS 1,000';
+
+  @override
+  String get price_label_short => 'Bei: TZS';
 
   @override
   String get wallet_title => 'Mkoba Wangu';
@@ -850,6 +999,33 @@ class AppLocalizationsSw extends AppLocalizations {
   @override
   String get withdrawal_success_msg =>
       'Maombi yako yametumwa kwa ajili ya uhakiki.';
+
+  @override
+  String get withdrawal_request_title => 'Ombi la Uchukuliaji';
+
+  @override
+  String get amount_to_withdraw_label => 'Kiasi unachotaka kutoa';
+
+  @override
+  String get enter_amount_required => 'Weka kiasi';
+
+  @override
+  String get invalid_number_error => 'Namba si sahihi';
+
+  @override
+  String get min_2000_error => 'Kiwango cha chini ni 2,000';
+
+  @override
+  String get payment_phone_label => 'Namba ya Simu ya Malipo';
+
+  @override
+  String get enter_phone_required => 'Weka namba';
+
+  @override
+  String get error_occurred => 'Hitilafu ilitokea';
+
+  @override
+  String get try_again_btn => 'Jaribu Tena';
 
   @override
   String get status_open => 'Ipo Wazi';

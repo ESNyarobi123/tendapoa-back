@@ -344,7 +344,7 @@ class _HomeFeedTabState extends State<_HomeFeedTab> {
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      'Tafuta kazi karibu nawe',
+                      context.tr('search_jobs_hint'),
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.8),
                         fontSize: 14,
@@ -373,9 +373,9 @@ class _HomeFeedTabState extends State<_HomeFeedTab> {
                                 Expanded(
                                   child: TextField(
                                     controller: _searchController,
-                                    decoration: const InputDecoration(
-                                      hintText: 'Tafuta kazi (mf. usafi, bomba...',
-                                      hintStyle: TextStyle(
+                                    decoration: InputDecoration(
+                                      hintText: context.tr('search_jobs_hint'),
+                                      hintStyle: const TextStyle(
                                         color: AppColors.textLight,
                                         fontSize: 14,
                                       ),
@@ -432,7 +432,7 @@ class _HomeFeedTabState extends State<_HomeFeedTab> {
                       iconColor: AppColors.primary,
                       iconBgColor: const Color(0xFFDBEAFE),
                       value: 'TZS ${NumberFormat('#,###').format(worker.wallet?.balance ?? 0)}',
-                      label: 'Salio',
+                      label: context.tr('wallet_balance'),
                     ),
                     Container(
                       width: 1,
@@ -444,7 +444,7 @@ class _HomeFeedTabState extends State<_HomeFeedTab> {
                       iconColor: const Color(0xFF10B981),
                       iconBgColor: const Color(0xFFD1FAE5),
                       value: '${worker.dashboard?.doneCount ?? 0}',
-                      label: 'Kazi Zilizomalizika',
+                      label: context.tr('jobs_done'),
                     ),
                     Container(
                       width: 1,
@@ -456,7 +456,7 @@ class _HomeFeedTabState extends State<_HomeFeedTab> {
                       iconColor: const Color(0xFFF97316),
                       iconBgColor: const Color(0xFFFFEDD5),
                       value: '${worker.activeJobs.length}',
-                      label: 'Zina zoendelea',
+                      label: context.tr('active_tab'),
                     ),
                   ],
                 ),
@@ -470,9 +470,9 @@ class _HomeFeedTabState extends State<_HomeFeedTab> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Kazi Zinazopatikana',
-                      style: TextStyle(
+                    Text(
+                      context.tr('job_market_label'),
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
@@ -792,7 +792,7 @@ class _HomeFeedTabState extends State<_HomeFeedTab> {
                         Icon(Icons.access_time_rounded, size: 11, color: Colors.grey[400]),
                         const SizedBox(width: 3),
                         Text(
-                          _getTimeAgo(job.createdAt!),
+                          _getTimeAgo(context, job.createdAt!),
                           style: TextStyle(fontSize: 10, color: Colors.grey[500]),
                         ),
                       ],
@@ -845,7 +845,7 @@ class _HomeFeedTabState extends State<_HomeFeedTab> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Hakuna kazi kwa sasa',
+            context.tr('no_jobs_available'),
             style: TextStyle(
               color: Colors.grey[500],
               fontSize: 16,
@@ -857,36 +857,25 @@ class _HomeFeedTabState extends State<_HomeFeedTab> {
     );
   }
 
-  IconData _getCategoryIcon(String categoryName) {
-    final name = categoryName.toLowerCase();
-    if (name.contains('usafi') || name.contains('clean')) {
-      return Icons.cleaning_services_outlined;
-    } else if (name.contains('bomba') || name.contains('plumb')) {
-      return Icons.plumbing_outlined;
-    } else if (name.contains('umeme') || name.contains('electr')) {
-      return Icons.electrical_services_outlined;
-    } else if (name.contains('fundi') || name.contains('repair')) {
-      return Icons.handyman_outlined;
-    } else if (name.contains('painting') || name.contains('rangi')) {
-      return Icons.format_paint_outlined;
-    }
-    return Icons.category_outlined;
-  }
-
-  String _getTimeAgo(DateTime dateTime) {
+  String _getTimeAgo(BuildContext context, DateTime dateTime) {
     final now = DateTime.now();
     final difference = now.difference(dateTime);
+    final locale = Localizations.localeOf(context).languageCode;
+    final isSw = locale == 'sw';
+    final ago = context.tr('time_ago_suffix');
 
     if (difference.inDays > 30) {
-      return '${(difference.inDays / 30).floor()} mwezi${(difference.inDays / 30).floor() > 1 ? 'zi' : ''} zilizopita';
+      final months = (difference.inDays / 30).floor();
+      final unit = months > 1 ? context.tr('time_months') : context.tr('time_month');
+      return '$months $unit $ago';
     } else if (difference.inDays > 0) {
-      return '${difference.inDays} siku zilizopita';
+      return '${difference.inDays} ${context.tr('time_days')} $ago';
     } else if (difference.inHours > 0) {
-      return 'Saa ${difference.inHours} zilizopita';
+      return isSw ? '${context.tr('time_hours')} ${difference.inHours} $ago' : '${difference.inHours} ${context.tr('time_hours')} $ago';
     } else if (difference.inMinutes > 0) {
-      return 'Dakika ${difference.inMinutes} zilizopita';
+      return isSw ? '${context.tr('time_minutes')} ${difference.inMinutes} $ago' : '${difference.inMinutes} ${context.tr('time_minutes')} $ago';
     } else {
-      return 'Sasa hivi';
+      return context.tr('now');
     }
   }
 }

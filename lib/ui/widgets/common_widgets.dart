@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/constants.dart';
+import '../../core/localization/app_localizations.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -157,7 +158,7 @@ class ErrorState extends StatelessWidget {
             const Icon(Icons.error_outline, size: 64, color: AppColors.error),
             const SizedBox(height: 16),
             Text(
-              'Hitilafu ilitokea',
+              context.tr('error_occurred'),
               style: AppTextStyles.h5.copyWith(color: AppColors.error),
             ),
             const SizedBox(height: 8),
@@ -169,7 +170,7 @@ class ErrorState extends StatelessWidget {
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: onRetry,
-              child: const Text('Jaribu Tena'),
+              child: Text(context.tr('try_again_btn')),
             ),
           ],
         ),

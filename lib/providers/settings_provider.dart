@@ -6,27 +6,25 @@ class SettingsProvider with ChangeNotifier {
   static const String keyLanguage = AppConstants.languageKey;
   static const String keyTheme = 'app_theme';
 
-  Locale _locale = const Locale('sw'); // Default to Swahili
+  Locale _locale;
   ThemeMode _themeMode = ThemeMode.system;
 
   Locale get locale => _locale;
   ThemeMode get themeMode => _themeMode;
 
-  SettingsProvider() {
+  SettingsProvider({Locale? initialLocale}) : _locale = initialLocale ?? const Locale('sw') {
     _loadSettings();
   }
 
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Load Language
+    // Load Language (overwrite with saved so Settings screen stays in sync)
     final langCode = prefs.getString(keyLanguage);
-    if (langCode != null) {
+    if (langCode != null && (langCode == 'en' || langCode == 'sw')) {
       _locale = Locale(langCode);
-    } else {
-      // If no language set, we keep 'sw' as default
-      _locale = const Locale('sw');
     }
+    // else keep _locale from initialLocale / default
 
     // Load Theme
     final themeStr = prefs.getString(keyTheme);

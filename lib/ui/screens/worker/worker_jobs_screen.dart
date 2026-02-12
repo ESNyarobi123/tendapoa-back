@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../../core/constants/constants.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/router/app_router.dart';
 import '../../../data/models/models.dart';
 import '../../../providers/providers.dart';
@@ -68,7 +69,7 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
       setState(() => _isProcessing = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(success ? '✅ Umekubali kazi!' : '❌ Imeshindikana'),
+          content: Text(success ? '✅ ${context.tr('job_accepted_success')}' : '❌ ${context.tr('job_accept_failed')}'),
           backgroundColor: success ? const Color(0xFF22C55E) : Colors.red,
         ),
       );
@@ -80,17 +81,17 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Kataa Kazi?', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: Text('Una uhakika unataka kukataa kazi "${job.title}"?'),
+        title: Text('${context.tr('decline_btn')}?', style: const TextStyle(fontWeight: FontWeight.bold)),
+        content: Text('${context.tr('decline_btn')} "${job.title}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('HAPANA'),
+            child: Text(context.tr('no').toUpperCase()),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('NDIYO, KATAA', style: TextStyle(color: Colors.white)),
+            child: Text(context.tr('decline_btn').toUpperCase(), style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -103,7 +104,7 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
         setState(() => _isProcessing = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(success ? 'Umekataa kazi' : '❌ Imeshindikana'),
+            content: Text(success ? context.tr('decline_btn') : '❌ ${context.tr('job_accept_failed')}'),
             backgroundColor: success ? Colors.orange : Colors.red,
           ),
         );
@@ -150,9 +151,9 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'Kazi Zangu',
-                          style: TextStyle(
+                        Text(
+                          context.tr('kazi_zangu_nav'),
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
@@ -202,7 +203,7 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Dhibiti kazi ulizopewa na wateja hapa',
+                      context.tr('no_active_jobs_sub'),
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.8),
                         fontSize: 14,
@@ -239,21 +240,21 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
                           color: AppColors.primary, size: 20),
                       ),
                       const SizedBox(width: 12),
-                      const Expanded(
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Kazi Zilizokuchagua',
-                              style: TextStyle(
+                              context.tr('selected_jobs_title'),
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textPrimary,
                               ),
                             ),
                             Text(
-                              'Wateja wamekuchagua - kubali au kataa',
-                              style: TextStyle(
+                              context.tr('selected_jobs_subtitle'),
+                              style: const TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textSecondary,
                               ),
@@ -342,7 +343,7 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
               const Spacer(),
               if (job.createdAt != null)
                 Text(
-                  _getTimeAgo(job.createdAt!),
+                  _getTimeAgo(context, job.createdAt!),
                   style: TextStyle(fontSize: 11, color: Colors.grey[500]),
                 ),
             ],
@@ -547,13 +548,16 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
     );
   }
 
-  String _getTimeAgo(DateTime date) {
+  String _getTimeAgo(BuildContext context, DateTime date) {
     final diff = DateTime.now().difference(date);
-    if (diff.inMinutes < 1) return 'Sasa hivi';
-    if (diff.inMinutes < 60) return 'Dakika ${diff.inMinutes}';
-    if (diff.inHours < 24) return 'Saa ${diff.inHours}';
-    if (diff.inDays < 7) return 'Siku ${diff.inDays}';
-    return '${diff.inDays ~/ 7} wiki';
+    final locale = Localizations.localeOf(context).languageCode;
+    final isSw = locale == 'sw';
+    if (diff.inMinutes < 1) return context.tr('now');
+    if (diff.inMinutes < 60) return isSw ? '${context.tr('time_minutes')} ${diff.inMinutes}' : '${diff.inMinutes} ${context.tr('time_minutes')}';
+    if (diff.inHours < 24) return isSw ? '${context.tr('time_hours')} ${diff.inHours}' : '${diff.inHours} ${context.tr('time_hours')}';
+    if (diff.inDays < 7) return isSw ? '${context.tr('time_days')} ${diff.inDays}' : '${diff.inDays} ${context.tr('time_days')}';
+    final weeks = diff.inDays ~/ 7;
+    return isSw ? '$weeks ${context.tr('time_weeks')}' : '$weeks ${context.tr('time_weeks')}';
   }
 
   Widget _buildActiveJobCard(BuildContext context, Job job) {
@@ -596,9 +600,9 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Kazi Inayoendelea',
-                        style: TextStyle(
+                      Text(
+                        context.tr('active_job_title'),
+                        style: const TextStyle(
                           fontSize: 12,
                           color: AppColors.textSecondary,
                         ),
@@ -704,7 +708,7 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
         ),
         const SizedBox(height: 20),
         Text(
-          'Hakuna Kazi Mpya',
+          context.tr('no_jobs_found'),
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -713,7 +717,7 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
         ),
         const SizedBox(height: 8),
         Text(
-          'Kazi ulizopewa zitaonekana hapa',
+          context.tr('assigned_jobs_appear_here'),
           style: TextStyle(
             fontSize: 14,
             color: Colors.grey[500],

@@ -506,11 +506,173 @@ abstract class AppLocalizations {
   /// **'Ona Zote'**
   String get view_all;
 
+  /// No description provided for @view_all_categories.
+  ///
+  /// In sw, this message translates to:
+  /// **'Ona Kategoria Zote'**
+  String get view_all_categories;
+
+  /// No description provided for @all_paid_msg.
+  ///
+  /// In sw, this message translates to:
+  /// **'Kazi zote zimelipwa vizuri!'**
+  String get all_paid_msg;
+
+  /// No description provided for @amount_to_pay_label.
+  ///
+  /// In sw, this message translates to:
+  /// **'Kiasi cha kulipa:'**
+  String get amount_to_pay_label;
+
+  /// No description provided for @initiating_payment.
+  ///
+  /// In sw, this message translates to:
+  /// **'Inaanzisha malipo...'**
+  String get initiating_payment;
+
+  /// No description provided for @confirm_payment_phone.
+  ///
+  /// In sw, this message translates to:
+  /// **'Thibitisha malipo kwenye simu yako!'**
+  String get confirm_payment_phone;
+
+  /// No description provided for @refund_from_cancelled.
+  ///
+  /// In sw, this message translates to:
+  /// **'Pesa hii ni refund kutoka kazi zilizofutwa'**
+  String get refund_from_cancelled;
+
+  /// No description provided for @posted_jobs_label.
+  ///
+  /// In sw, this message translates to:
+  /// **'Kazi Zilizoposti'**
+  String get posted_jobs_label;
+
+  /// No description provided for @balance_label.
+  ///
+  /// In sw, this message translates to:
+  /// **'Salio lako:'**
+  String get balance_label;
+
+  /// No description provided for @mpesa_name_label.
+  ///
+  /// In sw, this message translates to:
+  /// **'Jina la M-Pesa'**
+  String get mpesa_name_label;
+
+  /// No description provided for @mpesa_name_hint.
+  ///
+  /// In sw, this message translates to:
+  /// **'Jina lililosajiliwa kwenye simu'**
+  String get mpesa_name_hint;
+
   /// No description provided for @no_jobs_here.
   ///
   /// In sw, this message translates to:
   /// **'Hakuna kazi hapa'**
   String get no_jobs_here;
+
+  /// No description provided for @change_password.
+  ///
+  /// In sw, this message translates to:
+  /// **'Badili Password'**
+  String get change_password;
+
+  /// No description provided for @strengthen_security_subtitle.
+  ///
+  /// In sw, this message translates to:
+  /// **'Imarisha usalama wa akaunti'**
+  String get strengthen_security_subtitle;
+
+  /// No description provided for @notifications_subtitle.
+  ///
+  /// In sw, this message translates to:
+  /// **'Pata arifa za kazi na meseji'**
+  String get notifications_subtitle;
+
+  /// No description provided for @help_section_header.
+  ///
+  /// In sw, this message translates to:
+  /// **'MSAADA NA TAARIFA'**
+  String get help_section_header;
+
+  /// No description provided for @contact_us_whatsapp.
+  ///
+  /// In sw, this message translates to:
+  /// **'Wasiliana Nasi (WhatsApp)'**
+  String get contact_us_whatsapp;
+
+  /// No description provided for @get_help_fast.
+  ///
+  /// In sw, this message translates to:
+  /// **'Pata msaada haraka'**
+  String get get_help_fast;
+
+  /// No description provided for @fees_payments_policy.
+  ///
+  /// In sw, this message translates to:
+  /// **'Sera ya Malipo na Ada'**
+  String get fees_payments_policy;
+
+  /// No description provided for @current_password.
+  ///
+  /// In sw, this message translates to:
+  /// **'Password ya Sasa'**
+  String get current_password;
+
+  /// No description provided for @new_password.
+  ///
+  /// In sw, this message translates to:
+  /// **'Password Mpya'**
+  String get new_password;
+
+  /// No description provided for @password_changed_success.
+  ///
+  /// In sw, this message translates to:
+  /// **'Password imebadilishwa!'**
+  String get password_changed_success;
+
+  /// No description provided for @language_updated_msg.
+  ///
+  /// In sw, this message translates to:
+  /// **'Lugha imesasishwa.'**
+  String get language_updated_msg;
+
+  /// No description provided for @failed_open_link.
+  ///
+  /// In sw, this message translates to:
+  /// **'Imeshindikana kufungua link'**
+  String get failed_open_link;
+
+  /// No description provided for @please_fill_here.
+  ///
+  /// In sw, this message translates to:
+  /// **'Tafadhali jaza hapa'**
+  String get please_fill_here;
+
+  /// No description provided for @update_failed.
+  ///
+  /// In sw, this message translates to:
+  /// **'Imeshindikana kusasisha'**
+  String get update_failed;
+
+  /// No description provided for @location_service_disabled.
+  ///
+  /// In sw, this message translates to:
+  /// **'Huduma ya eneo haijawashwa'**
+  String get location_service_disabled;
+
+  /// No description provided for @location_permission_denied.
+  ///
+  /// In sw, this message translates to:
+  /// **'Ruhusa ya eneo imekataliwa'**
+  String get location_permission_denied;
+
+  /// No description provided for @location_permission_denied_forever.
+  ///
+  /// In sw, this message translates to:
+  /// **'Ruhusa ya eneo imekataliwa kabisa'**
+  String get location_permission_denied_forever;
 
   /// No description provided for @jobs_will_appear_here.
   ///
@@ -1052,6 +1214,60 @@ abstract class AppLocalizations {
   /// **'Habari'**
   String get hello;
 
+  /// No description provided for @now.
+  ///
+  /// In sw, this message translates to:
+  /// **'Sasa hivi'**
+  String get now;
+
+  /// No description provided for @time_minutes.
+  ///
+  /// In sw, this message translates to:
+  /// **'Dakika'**
+  String get time_minutes;
+
+  /// No description provided for @time_hours.
+  ///
+  /// In sw, this message translates to:
+  /// **'Saa'**
+  String get time_hours;
+
+  /// No description provided for @time_days.
+  ///
+  /// In sw, this message translates to:
+  /// **'Siku'**
+  String get time_days;
+
+  /// No description provided for @time_weeks.
+  ///
+  /// In sw, this message translates to:
+  /// **'wiki'**
+  String get time_weeks;
+
+  /// No description provided for @time_ago_suffix.
+  ///
+  /// In sw, this message translates to:
+  /// **'zilizopita'**
+  String get time_ago_suffix;
+
+  /// No description provided for @time_month.
+  ///
+  /// In sw, this message translates to:
+  /// **'mwezi'**
+  String get time_month;
+
+  /// No description provided for @time_months.
+  ///
+  /// In sw, this message translates to:
+  /// **'miezi'**
+  String get time_months;
+
+  /// No description provided for @distance_radius.
+  ///
+  /// In sw, this message translates to:
+  /// **'Umbali (Radius)'**
+  String get distance_radius;
+
   /// No description provided for @loading.
   ///
   /// In sw, this message translates to:
@@ -1544,6 +1760,24 @@ abstract class AppLocalizations {
   /// **'Soko la Kazi'**
   String get job_market_label;
 
+  /// No description provided for @selected_jobs_title.
+  ///
+  /// In sw, this message translates to:
+  /// **'Kazi Zilizokuchagua'**
+  String get selected_jobs_title;
+
+  /// No description provided for @selected_jobs_subtitle.
+  ///
+  /// In sw, this message translates to:
+  /// **'Wateja wamekuchagua - kubali au kataa'**
+  String get selected_jobs_subtitle;
+
+  /// No description provided for @assigned_jobs_appear_here.
+  ///
+  /// In sw, this message translates to:
+  /// **'Kazi ulizopewa zitaonekana hapa'**
+  String get assigned_jobs_appear_here;
+
   /// No description provided for @no_jobs_available.
   ///
   /// In sw, this message translates to:
@@ -1621,6 +1855,66 @@ abstract class AppLocalizations {
   /// In sw, this message translates to:
   /// **'Mahali haijatajwa'**
   String get no_location;
+
+  /// No description provided for @tap_to_expand.
+  ///
+  /// In sw, this message translates to:
+  /// **'Bonyeza kukubwa'**
+  String get tap_to_expand;
+
+  /// No description provided for @verified_client.
+  ///
+  /// In sw, this message translates to:
+  /// **'Mteja Aliyethibitishwa'**
+  String get verified_client;
+
+  /// No description provided for @your_application.
+  ///
+  /// In sw, this message translates to:
+  /// **'Ombi Lako'**
+  String get your_application;
+
+  /// No description provided for @you_applied.
+  ///
+  /// In sw, this message translates to:
+  /// **'Umeomba kazi hii'**
+  String get you_applied;
+
+  /// No description provided for @other_applications.
+  ///
+  /// In sw, this message translates to:
+  /// **'Maombi Mengine'**
+  String get other_applications;
+
+  /// No description provided for @be_first_to_apply.
+  ///
+  /// In sw, this message translates to:
+  /// **'Kuwa wa kwanza kuomba kazi hii!'**
+  String get be_first_to_apply;
+
+  /// No description provided for @your_proposed_price.
+  ///
+  /// In sw, this message translates to:
+  /// **'Bei uliyopendekeza'**
+  String get your_proposed_price;
+
+  /// No description provided for @current_price_min_prefix.
+  ///
+  /// In sw, this message translates to:
+  /// **'Bei ya sasa: TZS'**
+  String get current_price_min_prefix;
+
+  /// No description provided for @current_price_min_suffix.
+  ///
+  /// In sw, this message translates to:
+  /// **'Min: TZS 1,000'**
+  String get current_price_min_suffix;
+
+  /// No description provided for @price_label_short.
+  ///
+  /// In sw, this message translates to:
+  /// **'Bei: TZS'**
+  String get price_label_short;
 
   /// No description provided for @wallet_title.
   ///
@@ -1759,6 +2053,60 @@ abstract class AppLocalizations {
   /// In sw, this message translates to:
   /// **'Maombi yako yametumwa kwa ajili ya uhakiki.'**
   String get withdrawal_success_msg;
+
+  /// No description provided for @withdrawal_request_title.
+  ///
+  /// In sw, this message translates to:
+  /// **'Ombi la Uchukuliaji'**
+  String get withdrawal_request_title;
+
+  /// No description provided for @amount_to_withdraw_label.
+  ///
+  /// In sw, this message translates to:
+  /// **'Kiasi unachotaka kutoa'**
+  String get amount_to_withdraw_label;
+
+  /// No description provided for @enter_amount_required.
+  ///
+  /// In sw, this message translates to:
+  /// **'Weka kiasi'**
+  String get enter_amount_required;
+
+  /// No description provided for @invalid_number_error.
+  ///
+  /// In sw, this message translates to:
+  /// **'Namba si sahihi'**
+  String get invalid_number_error;
+
+  /// No description provided for @min_2000_error.
+  ///
+  /// In sw, this message translates to:
+  /// **'Kiwango cha chini ni 2,000'**
+  String get min_2000_error;
+
+  /// No description provided for @payment_phone_label.
+  ///
+  /// In sw, this message translates to:
+  /// **'Namba ya Simu ya Malipo'**
+  String get payment_phone_label;
+
+  /// No description provided for @enter_phone_required.
+  ///
+  /// In sw, this message translates to:
+  /// **'Weka namba'**
+  String get enter_phone_required;
+
+  /// No description provided for @error_occurred.
+  ///
+  /// In sw, this message translates to:
+  /// **'Hitilafu ilitokea'**
+  String get error_occurred;
+
+  /// No description provided for @try_again_btn.
+  ///
+  /// In sw, this message translates to:
+  /// **'Jaribu Tena'**
+  String get try_again_btn;
 
   /// No description provided for @status_open.
   ///

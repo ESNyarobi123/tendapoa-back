@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../core/constants/constants.dart';
+import '../../core/localization/app_localizations.dart';
 import '../../data/models/models.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -151,8 +152,8 @@ class JobCard extends StatelessWidget {
                           const SizedBox(width: 4),
                           Text(
                               job.createdAt != null
-                                  ? timeago.format(job.createdAt!, locale: 'sw')
-                                  : 'Sasa hivi',
+                                  ? timeago.format(job.createdAt!, locale: Localizations.localeOf(context).languageCode)
+                                  : context.tr('now'),
                               style: const TextStyle(
                                   color: Color(0xFF94A3B8), fontSize: 11)),
                         ],

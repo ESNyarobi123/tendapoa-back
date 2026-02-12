@@ -216,7 +216,89 @@ class AppLocalizationsEn extends AppLocalizations {
   String get view_all => 'View All';
 
   @override
+  String get view_all_categories => 'View all categories';
+
+  @override
+  String get all_paid_msg => 'All jobs paid successfully!';
+
+  @override
+  String get amount_to_pay_label => 'Amount to pay:';
+
+  @override
+  String get initiating_payment => 'Initiating payment...';
+
+  @override
+  String get confirm_payment_phone => 'Confirm payment on your phone';
+
+  @override
+  String get refund_from_cancelled => 'This is a refund from cancelled jobs';
+
+  @override
+  String get posted_jobs_label => 'Posted Jobs';
+
+  @override
+  String get balance_label => 'Your balance:';
+
+  @override
+  String get mpesa_name_label => 'M-Pesa Name';
+
+  @override
+  String get mpesa_name_hint => 'Name as registered on phone';
+
+  @override
   String get no_jobs_here => 'No jobs here';
+
+  @override
+  String get change_password => 'Change Password';
+
+  @override
+  String get strengthen_security_subtitle => 'Strengthen account security';
+
+  @override
+  String get notifications_subtitle => 'Get job and message notifications';
+
+  @override
+  String get help_section_header => 'HELP & INFO';
+
+  @override
+  String get contact_us_whatsapp => 'Contact Us (WhatsApp)';
+
+  @override
+  String get get_help_fast => 'Get help quickly';
+
+  @override
+  String get fees_payments_policy => 'Fees & Payments Policy';
+
+  @override
+  String get current_password => 'Current Password';
+
+  @override
+  String get new_password => 'New Password';
+
+  @override
+  String get password_changed_success => 'Password changed!';
+
+  @override
+  String get language_updated_msg => 'Language updated.';
+
+  @override
+  String get failed_open_link => 'Failed to open link';
+
+  @override
+  String get please_fill_here => 'Please fill this field';
+
+  @override
+  String get update_failed => 'Update failed';
+
+  @override
+  String get location_service_disabled => 'Location service is disabled';
+
+  @override
+  String get location_permission_denied => 'Location permission denied';
+
+  @override
+  String get location_permission_denied_forever =>
+      'Location permission permanently denied';
 
   @override
   String get jobs_will_appear_here => 'Posted jobs will appear here.';
@@ -491,6 +573,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hello => 'Hello';
 
   @override
+  String get now => 'Just now';
+
+  @override
+  String get time_minutes => 'minutes';
+
+  @override
+  String get time_hours => 'hours';
+
+  @override
+  String get time_days => 'days';
+
+  @override
+  String get time_weeks => 'weeks';
+
+  @override
+  String get time_ago_suffix => 'ago';
+
+  @override
+  String get time_month => 'month';
+
+  @override
+  String get time_months => 'months';
+
+  @override
+  String get distance_radius => 'Distance (Radius)';
+
+  @override
   String get loading => 'Loading...';
 
   @override
@@ -743,6 +852,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get job_market_label => 'Job Market';
 
   @override
+  String get selected_jobs_title => 'Jobs You Were Selected For';
+
+  @override
+  String get selected_jobs_subtitle =>
+      'Clients have selected you - accept or decline';
+
+  @override
+  String get assigned_jobs_appear_here =>
+      'Jobs assigned to you will appear here';
+
+  @override
   String get no_jobs_available => 'No Jobs Now';
 
   @override
@@ -780,6 +900,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get no_location => 'Location not specified';
+
+  @override
+  String get tap_to_expand => 'Tap to expand';
+
+  @override
+  String get verified_client => 'Verified Client';
+
+  @override
+  String get your_application => 'Your Application';
+
+  @override
+  String get you_applied => 'You applied for this job';
+
+  @override
+  String get other_applications => 'Other Applications';
+
+  @override
+  String get be_first_to_apply => 'Be the first to apply for this job!';
+
+  @override
+  String get your_proposed_price => 'Your offer';
+
+  @override
+  String get current_price_min_prefix => 'Current: TZS';
+
+  @override
+  String get current_price_min_suffix => 'Min: TZS 1,000';
+
+  @override
+  String get price_label_short => 'Price: TZS';
 
   @override
   String get wallet_title => 'My Wallet';
@@ -851,6 +1001,33 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get withdrawal_success_msg =>
       'Your request has been sent for verification.';
+
+  @override
+  String get withdrawal_request_title => 'Withdrawal Request';
+
+  @override
+  String get amount_to_withdraw_label => 'Amount you want to withdraw';
+
+  @override
+  String get enter_amount_required => 'Enter amount';
+
+  @override
+  String get invalid_number_error => 'Invalid number';
+
+  @override
+  String get min_2000_error => 'Minimum is 2,000';
+
+  @override
+  String get payment_phone_label => 'Payment phone number';
+
+  @override
+  String get enter_phone_required => 'Enter phone number';
+
+  @override
+  String get error_occurred => 'An error occurred';
+
+  @override
+  String get try_again_btn => 'Try Again';
 
   @override
   String get status_open => 'Open';
