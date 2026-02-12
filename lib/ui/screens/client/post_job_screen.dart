@@ -562,7 +562,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
             Expanded(
               child: Text(
                 context.tr('post_searching_workers'),
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppColors.textSecondary,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,

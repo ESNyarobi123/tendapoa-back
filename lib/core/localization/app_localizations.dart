@@ -135,6 +135,12 @@ extension AppLocalizationsExtension on BuildContext {
         return loc.enable_gps;
       case 'how_to_find_worker':
         return loc.how_to_find_worker;
+      case 'client_tagline':
+        return loc.client_tagline;
+      case 'what_help_today':
+        return loc.what_help_today;
+      case 'view_map':
+        return loc.view_map;
       case 'tips_description':
         return loc.tips_description;
       case 'categories_title':

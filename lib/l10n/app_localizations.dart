@@ -383,7 +383,7 @@ abstract class AppLocalizations {
   /// No description provided for @searching_workers.
   ///
   /// In sw, this message translates to:
-  /// **'Tunatafuta mafundi karibu...'**
+  /// **'Tunatafuta maMfanyakazi karibu...'**
   String get searching_workers;
 
   /// No description provided for @go_back.
@@ -407,13 +407,13 @@ abstract class AppLocalizations {
   /// No description provided for @job_posted_message.
   ///
   /// In sw, this message translates to:
-  /// **'Kazi yako imepostiwa kwa mafanikio. Mafundi wataanza kuomba hivi punde.'**
+  /// **'Kazi yako imepostiwa kwa mafanikio. MaMfanyakazi wataanza kuomba hivi punde.'**
   String get job_posted_message;
 
   /// No description provided for @workers_found_title.
   ///
   /// In sw, this message translates to:
-  /// **'Mafundi Wamepatikana'**
+  /// **'MaMfanyakazi Wamepatikana'**
   String get workers_found_title;
 
   /// No description provided for @wait.
@@ -431,13 +431,13 @@ abstract class AppLocalizations {
   /// No description provided for @no_workers_title.
   ///
   /// In sw, this message translates to:
-  /// **'Hakuna Mafundi?'**
+  /// **'Hakuna MaMfanyakazi?'**
   String get no_workers_title;
 
   /// No description provided for @no_workers_message.
   ///
   /// In sw, this message translates to:
-  /// **'Hatujapata mafundi karibu kwa sasa lakini tutaendelea kutafuta.'**
+  /// **'Hatujapata maMfanyakazi karibu kwa sasa lakini tutaendelea kutafuta.'**
   String get no_workers_message;
 
   /// No description provided for @network_error_title.
@@ -479,8 +479,26 @@ abstract class AppLocalizations {
   /// No description provided for @how_to_find_worker.
   ///
   /// In sw, this message translates to:
-  /// **'Jinsi ya kupata fundi'**
+  /// **'Jinsi ya kupata Mfanyakazi'**
   String get how_to_find_worker;
+
+  /// No description provided for @client_tagline.
+  ///
+  /// In sw, this message translates to:
+  /// **'Pata Mfanyakazi Karibu Nawe'**
+  String get client_tagline;
+
+  /// No description provided for @what_help_today.
+  ///
+  /// In sw, this message translates to:
+  /// **'Je, unahitaji msaada gani leo?'**
+  String get what_help_today;
+
+  /// No description provided for @view_map.
+  ///
+  /// In sw, this message translates to:
+  /// **'Ona Ramani'**
+  String get view_map;
 
   /// No description provided for @tips_description.
   ///
@@ -761,7 +779,7 @@ abstract class AppLocalizations {
   /// No description provided for @conversations_subtitle.
   ///
   /// In sw, this message translates to:
-  /// **'Anza kuongea na mafundi hapa.'**
+  /// **'Anza kuongea na maMfanyakazi hapa.'**
   String get conversations_subtitle;
 
   /// No description provided for @edit_profile.
@@ -809,7 +827,7 @@ abstract class AppLocalizations {
   /// No description provided for @status_assigned.
   ///
   /// In sw, this message translates to:
-  /// **'Imepewa Fundi'**
+  /// **'Imepewa Mfanyakazi'**
   String get status_assigned;
 
   /// No description provided for @status_in_progress.
@@ -827,7 +845,7 @@ abstract class AppLocalizations {
   /// No description provided for @status_offered.
   ///
   /// In sw, this message translates to:
-  /// **'Inasubiri Fundi'**
+  /// **'Inasubiri Mfanyakazi'**
   String get status_offered;
 
   /// No description provided for @status_cancelled.
@@ -857,7 +875,7 @@ abstract class AppLocalizations {
   /// No description provided for @worker_applications.
   ///
   /// In sw, this message translates to:
-  /// **'Maombi ya Mafundi'**
+  /// **'Maombi ya MaMfanyakazi'**
   String get worker_applications;
 
   /// No description provided for @no_applications_yet.
@@ -869,13 +887,13 @@ abstract class AppLocalizations {
   /// No description provided for @wait_for_workers.
   ///
   /// In sw, this message translates to:
-  /// **'Subiri mafundi waone kazi yako.'**
+  /// **'Subiri maMfanyakazi waone kazi yako.'**
   String get wait_for_workers;
 
   /// No description provided for @assigned_worker.
   ///
   /// In sw, this message translates to:
-  /// **'Fundi Aliyechaguliwa'**
+  /// **'Mfanyakazi Aliyechaguliwa'**
   String get assigned_worker;
 
   /// No description provided for @completion_code_title.
@@ -887,7 +905,7 @@ abstract class AppLocalizations {
   /// No description provided for @give_code_instruction.
   ///
   /// In sw, this message translates to:
-  /// **'Mpe fundi code hii akimaliza kazi.'**
+  /// **'Mpe Mfanyakazi code hii akimaliza kazi.'**
   String get give_code_instruction;
 
   /// No description provided for @delete_job_btn.
@@ -911,13 +929,13 @@ abstract class AppLocalizations {
   /// No description provided for @chat_with_worker.
   ///
   /// In sw, this message translates to:
-  /// **'Chat na Fundi'**
+  /// **'Chat na Mfanyakazi'**
   String get chat_with_worker;
 
   /// No description provided for @select_worker.
   ///
   /// In sw, this message translates to:
-  /// **'Chagua Fundi'**
+  /// **'Chagua Mfanyakazi'**
   String get select_worker;
 
   /// No description provided for @offer_price.
@@ -1037,7 +1055,7 @@ abstract class AppLocalizations {
   /// No description provided for @worker_role.
   ///
   /// In sw, this message translates to:
-  /// **'Fundi'**
+  /// **'Mfanyakazi'**
   String get worker_role;
 
   /// No description provided for @my_profile_menu.
@@ -1643,13 +1661,13 @@ abstract class AppLocalizations {
   /// No description provided for @ask_worker_query.
   ///
   /// In sw, this message translates to:
-  /// **'Unatafuta fundi gani leo?'**
+  /// **'Unatafuta Mfanyakazi gani leo?'**
   String get ask_worker_query;
 
   /// No description provided for @search_hint.
   ///
   /// In sw, this message translates to:
-  /// **'Tafuta fundi, huduma...'**
+  /// **'Tafuta Mfanyakazi, huduma...'**
   String get search_hint;
 
   /// No description provided for @services_label.
@@ -1661,13 +1679,13 @@ abstract class AppLocalizations {
   /// No description provided for @nearby_workers_label.
   ///
   /// In sw, this message translates to:
-  /// **'Mafundi Karibu'**
+  /// **'MaMfanyakazi Karibu'**
   String get nearby_workers_label;
 
   /// No description provided for @no_workers_nearby.
   ///
   /// In sw, this message translates to:
-  /// **'Hakuna mafundi karibu kwa sasa.'**
+  /// **'Hakuna maMfanyakazi karibu kwa sasa.'**
   String get no_workers_nearby;
 
   /// No description provided for @failed_to_delete.
@@ -1811,7 +1829,7 @@ abstract class AppLocalizations {
   /// No description provided for @worker_selected_success.
   ///
   /// In sw, this message translates to:
-  /// **'Fundi amechaguliwa!'**
+  /// **'Mfanyakazi amechaguliwa!'**
   String get worker_selected_success;
 
   /// No description provided for @failed_fetch_job_details.
@@ -1991,7 +2009,7 @@ abstract class AppLocalizations {
   /// No description provided for @role_muhitaji_desc.
   ///
   /// In sw, this message translates to:
-  /// **'Ninatafuta mfanyakazi/fundi'**
+  /// **'Ninatafuta mfanyakazi/Mfanyakazi'**
   String get role_muhitaji_desc;
 
   /// No description provided for @role_mfanyakazi_title.
@@ -2003,7 +2021,7 @@ abstract class AppLocalizations {
   /// No description provided for @role_mfanyakazi_desc.
   ///
   /// In sw, this message translates to:
-  /// **'Mimi ni fundi, ninatafuta kazi'**
+  /// **'Mimi ni Mfanyakazi, ninatafuta kazi'**
   String get role_mfanyakazi_desc;
 
   /// No description provided for @withdraw_request_title.
@@ -2189,7 +2207,7 @@ abstract class AppLocalizations {
   /// No description provided for @register_badge_mfanyakazi.
   ///
   /// In sw, this message translates to:
-  /// **'Mfanyakazi / Fundi'**
+  /// **'Mfanyakazi / Mfanyakazi'**
   String get register_badge_mfanyakazi;
 
   /// No description provided for @register_title_muhitaji.
@@ -2303,7 +2321,7 @@ abstract class AppLocalizations {
   /// No description provided for @register_btn_mfanyakazi.
   ///
   /// In sw, this message translates to:
-  /// **'JIUNGE KAMA FUNDI'**
+  /// **'JIUNGE KAMA Mfanyakazi'**
   String get register_btn_mfanyakazi;
 
   /// No description provided for @register_location_title.
@@ -2465,13 +2483,13 @@ abstract class AppLocalizations {
   /// No description provided for @post_fill_details.
   ///
   /// In sw, this message translates to:
-  /// **'Jaza taarifa hizi ili mafundi wa karibu waanze kuomba.'**
+  /// **'Jaza taarifa hizi ili maMfanyakazi wa karibu waanze kuomba.'**
   String get post_fill_details;
 
   /// No description provided for @post_title_hint.
   ///
   /// In sw, this message translates to:
-  /// **'Mfano: Napata fundi bomba wa kurekebisha sinki'**
+  /// **'Mfano: Napata Mfanyakazi bomba wa kurekebisha sinki'**
   String get post_title_hint;
 
   /// No description provided for @post_budget_hint.
@@ -2495,7 +2513,7 @@ abstract class AppLocalizations {
   /// No description provided for @post_location_help.
   ///
   /// In sw, this message translates to:
-  /// **'Tunatumia GPS yako kutambua eneo ili mafundi wa karibu zaidi waone kazi yako.'**
+  /// **'Tunatumia GPS yako kutambua eneo ili maMfanyakazi wa karibu zaidi waone kazi yako.'**
   String get post_location_help;
 
   /// No description provided for @post_location_searching.
@@ -2735,7 +2753,7 @@ abstract class AppLocalizations {
   /// No description provided for @edit_title_hint.
   ///
   /// In sw, this message translates to:
-  /// **'Mfano: Fundi Bomba Anahitajika'**
+  /// **'Mfano: Mfanyakazi Bomba Anahitajika'**
   String get edit_title_hint;
 
   /// No description provided for @edit_title_required.
@@ -3181,6 +3199,96 @@ abstract class AppLocalizations {
   /// In sw, this message translates to:
   /// **'Inasubiri'**
   String get withdrawal_status_pending;
+
+  /// No description provided for @organization_title.
+  ///
+  /// In sw, this message translates to:
+  /// **'Shirika'**
+  String get organization_title;
+
+  /// No description provided for @organization_name.
+  ///
+  /// In sw, this message translates to:
+  /// **'Jina la Shirika'**
+  String get organization_name;
+
+  /// No description provided for @organization_name_hint.
+  ///
+  /// In sw, this message translates to:
+  /// **'Mfano: TendaPoa Ltd'**
+  String get organization_name_hint;
+
+  /// No description provided for @organization_email.
+  ///
+  /// In sw, this message translates to:
+  /// **'Barua Pepe ya Mawasiliano'**
+  String get organization_email;
+
+  /// No description provided for @organization_email_hint.
+  ///
+  /// In sw, this message translates to:
+  /// **'support@tendapoa.com'**
+  String get organization_email_hint;
+
+  /// No description provided for @organization_phone.
+  ///
+  /// In sw, this message translates to:
+  /// **'Simu ya Mawasiliano'**
+  String get organization_phone;
+
+  /// No description provided for @organization_phone_hint.
+  ///
+  /// In sw, this message translates to:
+  /// **'Mfano: +255 700 000 000'**
+  String get organization_phone_hint;
+
+  /// No description provided for @organization_address.
+  ///
+  /// In sw, this message translates to:
+  /// **'Anwani'**
+  String get organization_address;
+
+  /// No description provided for @organization_address_hint.
+  ///
+  /// In sw, this message translates to:
+  /// **'Anwani halisi au mahali'**
+  String get organization_address_hint;
+
+  /// No description provided for @organization_website.
+  ///
+  /// In sw, this message translates to:
+  /// **'Tovuti'**
+  String get organization_website;
+
+  /// No description provided for @organization_website_hint.
+  ///
+  /// In sw, this message translates to:
+  /// **'https://tendapoa.com'**
+  String get organization_website_hint;
+
+  /// No description provided for @organization_about.
+  ///
+  /// In sw, this message translates to:
+  /// **'Kuhusu Sisi'**
+  String get organization_about;
+
+  /// No description provided for @organization_about_hint.
+  ///
+  /// In sw, this message translates to:
+  /// **'Maelezo mafupi ya shirika'**
+  String get organization_about_hint;
+
+  /// No description provided for @organization_details.
+  ///
+  /// In sw, this message translates to:
+  /// **'Taarifa za Shirika'**
+  String get organization_details;
+
+  /// No description provided for @organization_save.
+  ///
+  /// In sw, this message translates to:
+  /// **'Hifadhi Shirika'**
+  String get organization_save;
 }
 
 class _AppLocalizationsDelegate

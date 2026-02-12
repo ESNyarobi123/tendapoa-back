@@ -143,6 +143,8 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
     final clientProvider = context.watch<ClientProvider>();
     final user = context.watch<AuthProvider>().user;
     final categories = context.watch<AppProvider>().categories;
+    final nameParts = (user?.name ?? '').trim().split(RegExp(r'\s+')).where((s) => s.isNotEmpty).toList();
+    final greetingName = nameParts.isEmpty ? context.tr('client_label') : nameParts.first;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -211,7 +213,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Text(
-                                          'Tendapoa',
+                                          context.tr('appTitle'),
                                           style: const TextStyle(
                                             color: AppColors.surface,
                                             fontSize: 22,
@@ -222,7 +224,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                                           maxLines: 1,
                                         ),
                                         Text(
-                                          'Pata Mfanyakazi Karibu Nawe',
+                                          context.tr('client_tagline'),
                                           style: TextStyle(
                                             color: AppColors.surface.withOpacity(0.8),
                                             fontSize: 12,
@@ -326,7 +328,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                         const SizedBox(height: 25),
                         // Greeting
                         Text(
-                          'Habari, ${user?.name.split(' ')[0] ?? 'Mteja'}! 👋',
+                          '${context.tr('hello')}, $greetingName! 👋',
                           style: const TextStyle(
                             color: AppColors.surface,
                             fontSize: 24,
@@ -337,7 +339,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          'Je, unahitaji msaada gani leo?',
+                          context.tr('what_help_today'),
                           style: TextStyle(
                             color: AppColors.surface.withOpacity(0.8),
                             fontSize: 14,
@@ -816,7 +818,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
       return Icons.park_rounded;
     } else if (lowerName.contains('other') || lowerName.contains('nyingine')) {
       return Icons.more_horiz_rounded;
-    } else if (lowerName.contains('repair') || lowerName.contains('fundi')) {
+    } else if (lowerName.contains('repair') || lowerName.contains('Mfanyakazi')) {
       return Icons.build_rounded;
     } else if (lowerName.contains('plumb') || lowerName.contains('bomba')) {
       return Icons.plumbing_rounded;
@@ -2131,7 +2133,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      user?.name ?? 'Mteja',
+                                      user?.name ?? context.tr('client_label'),
                                       style: const TextStyle(
                                         color: AppColors.surface,
                                         fontSize: 18,

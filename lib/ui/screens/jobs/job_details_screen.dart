@@ -466,7 +466,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                 if (_commentType == 'offer') ...[
                   const SizedBox(height: 16),
                   Text('💰 ${context.tr('your_price_label')}',
-                      style: TextStyle(
+                      style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: Color(0xFF475569))),
@@ -579,7 +579,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                   child: TextButton(
                     onPressed: () => Navigator.pop(context),
                     child: Text(context.tr('cancel'),
-                        style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
+                        style: const TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
                   ),
                 ),
               ],
@@ -733,7 +733,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(context.tr('job_details').toUpperCase(),
-                              style: TextStyle(
+                              style: const TextStyle(
                                   color: AppColors.textLight,
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
@@ -764,7 +764,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                   const SizedBox(height: 40),
 
                   Text(context.tr('job_description_title'),
-                      style: TextStyle(
+                      style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w900,
                           color: AppColors.textPrimary)),
@@ -779,7 +779,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
 
                   // LOCATION WITH MAP
                   Text(context.tr('location_title'),
-                      style: TextStyle(
+                      style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w900,
                           color: AppColors.textPrimary)),
@@ -1501,7 +1501,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15)),
               ),
-              child: const Text('MTEUE FUNDI HUYU',
+              child: const Text('MTEUE Mfanyakazi HUYU',
                   style: TextStyle(
                       fontWeight: FontWeight.w900,
                       fontSize: 13,

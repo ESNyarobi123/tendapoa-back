@@ -150,7 +150,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get posting_job => 'Tunaposti kazi yako...';
 
   @override
-  String get searching_workers => 'Tunatafuta mafundi karibu...';
+  String get searching_workers => 'Tunatafuta maMfanyakazi karibu...';
 
   @override
   String get go_back => 'Rudi nyuma';
@@ -163,10 +163,10 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get job_posted_message =>
-      'Kazi yako imepostiwa kwa mafanikio. Mafundi wataanza kuomba hivi punde.';
+      'Kazi yako imepostiwa kwa mafanikio. MaMfanyakazi wataanza kuomba hivi punde.';
 
   @override
-  String get workers_found_title => 'Mafundi Wamepatikana';
+  String get workers_found_title => 'MaMfanyakazi Wamepatikana';
 
   @override
   String get wait => 'Subiri kidogo';
@@ -175,11 +175,11 @@ class AppLocalizationsSw extends AppLocalizations {
   String get post_job_btn => 'Posti Kazi Sasa';
 
   @override
-  String get no_workers_title => 'Hakuna Mafundi?';
+  String get no_workers_title => 'Hakuna MaMfanyakazi?';
 
   @override
   String get no_workers_message =>
-      'Hatujapata mafundi karibu kwa sasa lakini tutaendelea kutafuta.';
+      'Hatujapata maMfanyakazi karibu kwa sasa lakini tutaendelea kutafuta.';
 
   @override
   String get network_error_title => 'Hitilafu ya Mtandao';
@@ -201,7 +201,16 @@ class AppLocalizationsSw extends AppLocalizations {
   String get enable_gps => 'Washa GPS';
 
   @override
-  String get how_to_find_worker => 'Jinsi ya kupata fundi';
+  String get how_to_find_worker => 'Jinsi ya kupata Mfanyakazi';
+
+  @override
+  String get client_tagline => 'Pata Mfanyakazi Karibu Nawe';
+
+  @override
+  String get what_help_today => 'Je, unahitaji msaada gani leo?';
+
+  @override
+  String get view_map => 'Ona Ramani';
 
   @override
   String get tips_description =>
@@ -345,7 +354,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get no_conversations => 'Hakuna mazungumzo';
 
   @override
-  String get conversations_subtitle => 'Anza kuongea na mafundi hapa.';
+  String get conversations_subtitle => 'Anza kuongea na maMfanyakazi hapa.';
 
   @override
   String get edit_profile => 'Badili Wasifu';
@@ -369,7 +378,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get status_completed => 'Imekamilika';
 
   @override
-  String get status_assigned => 'Imepewa Fundi';
+  String get status_assigned => 'Imepewa Mfanyakazi';
 
   @override
   String get status_in_progress => 'Inafanyika';
@@ -378,7 +387,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get status_active => 'Ipo Hewani';
 
   @override
-  String get status_offered => 'Inasubiri Fundi';
+  String get status_offered => 'Inasubiri Mfanyakazi';
 
   @override
   String get status_cancelled => 'Imefutwa';
@@ -393,22 +402,22 @@ class AppLocalizationsSw extends AppLocalizations {
   String get location_title => 'Eneo la Kazi';
 
   @override
-  String get worker_applications => 'Maombi ya Mafundi';
+  String get worker_applications => 'Maombi ya MaMfanyakazi';
 
   @override
   String get no_applications_yet => 'Hakuna maombi bado';
 
   @override
-  String get wait_for_workers => 'Subiri mafundi waone kazi yako.';
+  String get wait_for_workers => 'Subiri maMfanyakazi waone kazi yako.';
 
   @override
-  String get assigned_worker => 'Fundi Aliyechaguliwa';
+  String get assigned_worker => 'Mfanyakazi Aliyechaguliwa';
 
   @override
   String get completion_code_title => 'Code ya Kumaliza Kazi';
 
   @override
-  String get give_code_instruction => 'Mpe fundi code hii akimaliza kazi.';
+  String get give_code_instruction => 'Mpe Mfanyakazi code hii akimaliza kazi.';
 
   @override
   String get delete_job_btn => 'Futa Kazi';
@@ -420,10 +429,10 @@ class AppLocalizationsSw extends AppLocalizations {
   String get call_worker => 'Piga Simu';
 
   @override
-  String get chat_with_worker => 'Chat na Fundi';
+  String get chat_with_worker => 'Chat na Mfanyakazi';
 
   @override
-  String get select_worker => 'Chagua Fundi';
+  String get select_worker => 'Chagua Mfanyakazi';
 
   @override
   String get offer_price => 'Ofa ya Bei';
@@ -484,7 +493,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get apply_btn => 'Omba Kazi';
 
   @override
-  String get worker_role => 'Fundi';
+  String get worker_role => 'Mfanyakazi';
 
   @override
   String get my_profile_menu => 'Wasifu Wangu';
@@ -791,19 +800,19 @@ class AppLocalizationsSw extends AppLocalizations {
   String get wasifu_nav => 'Wasifu';
 
   @override
-  String get ask_worker_query => 'Unatafuta fundi gani leo?';
+  String get ask_worker_query => 'Unatafuta Mfanyakazi gani leo?';
 
   @override
-  String get search_hint => 'Tafuta fundi, huduma...';
+  String get search_hint => 'Tafuta Mfanyakazi, huduma...';
 
   @override
   String get services_label => 'Huduma';
 
   @override
-  String get nearby_workers_label => 'Mafundi Karibu';
+  String get nearby_workers_label => 'MaMfanyakazi Karibu';
 
   @override
-  String get no_workers_nearby => 'Hakuna mafundi karibu kwa sasa.';
+  String get no_workers_nearby => 'Hakuna maMfanyakazi karibu kwa sasa.';
 
   @override
   String get failed_to_delete => 'Imeshindwa kufuta';
@@ -876,7 +885,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get help_menu => 'Msaada';
 
   @override
-  String get worker_selected_success => 'Fundi amechaguliwa!';
+  String get worker_selected_success => 'Mfanyakazi amechaguliwa!';
 
   @override
   String get failed_fetch_job_details => 'Imeshindwa kupata taarifa za kazi';
@@ -967,13 +976,13 @@ class AppLocalizationsSw extends AppLocalizations {
   String get role_muhitaji_title => 'Muhitaji';
 
   @override
-  String get role_muhitaji_desc => 'Ninatafuta mfanyakazi/fundi';
+  String get role_muhitaji_desc => 'Ninatafuta mfanyakazi/Mfanyakazi';
 
   @override
   String get role_mfanyakazi_title => 'Mfanyakazi';
 
   @override
-  String get role_mfanyakazi_desc => 'Mimi ni fundi, ninatafuta kazi';
+  String get role_mfanyakazi_desc => 'Mimi ni Mfanyakazi, ninatafuta kazi';
 
   @override
   String get withdraw_request_title => 'Omba Kutoa Pesa';
@@ -1068,7 +1077,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get register_badge_muhitaji => 'Muhitaji / Mteja';
 
   @override
-  String get register_badge_mfanyakazi => 'Mfanyakazi / Fundi';
+  String get register_badge_mfanyakazi => 'Mfanyakazi / Mfanyakazi';
 
   @override
   String get register_title_muhitaji => 'Karibu TendaPoa!';
@@ -1127,7 +1136,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get register_btn_muhitaji => 'TENGENEZA AKAUNTI';
 
   @override
-  String get register_btn_mfanyakazi => 'JIUNGE KAMA FUNDI';
+  String get register_btn_mfanyakazi => 'JIUNGE KAMA Mfanyakazi';
 
   @override
   String get register_location_title => 'Eneo Lako';
@@ -1213,11 +1222,11 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get post_fill_details =>
-      'Jaza taarifa hizi ili mafundi wa karibu waanze kuomba.';
+      'Jaza taarifa hizi ili maMfanyakazi wa karibu waanze kuomba.';
 
   @override
   String get post_title_hint =>
-      'Mfano: Napata fundi bomba wa kurekebisha sinki';
+      'Mfano: Napata Mfanyakazi bomba wa kurekebisha sinki';
 
   @override
   String get post_budget_hint => 'Mfano: 20,000';
@@ -1230,7 +1239,7 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get post_location_help =>
-      'Tunatumia GPS yako kutambua eneo ili mafundi wa karibu zaidi waone kazi yako.';
+      'Tunatumia GPS yako kutambua eneo ili maMfanyakazi wa karibu zaidi waone kazi yako.';
 
   @override
   String get post_location_searching => 'Inatafuta eneo...';
@@ -1356,7 +1365,7 @@ class AppLocalizationsSw extends AppLocalizations {
   String get edit_address => 'Anwani';
 
   @override
-  String get edit_title_hint => 'Mfano: Fundi Bomba Anahitajika';
+  String get edit_title_hint => 'Mfano: Mfanyakazi Bomba Anahitajika';
 
   @override
   String get edit_title_required => 'Weka kichwa';
@@ -1587,4 +1596,49 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get withdrawal_status_pending => 'Inasubiri';
+
+  @override
+  String get organization_title => 'Shirika';
+
+  @override
+  String get organization_name => 'Jina la Shirika';
+
+  @override
+  String get organization_name_hint => 'Mfano: TendaPoa Ltd';
+
+  @override
+  String get organization_email => 'Barua Pepe ya Mawasiliano';
+
+  @override
+  String get organization_email_hint => 'support@tendapoa.com';
+
+  @override
+  String get organization_phone => 'Simu ya Mawasiliano';
+
+  @override
+  String get organization_phone_hint => 'Mfano: +255 700 000 000';
+
+  @override
+  String get organization_address => 'Anwani';
+
+  @override
+  String get organization_address_hint => 'Anwani halisi au mahali';
+
+  @override
+  String get organization_website => 'Tovuti';
+
+  @override
+  String get organization_website_hint => 'https://tendapoa.com';
+
+  @override
+  String get organization_about => 'Kuhusu Sisi';
+
+  @override
+  String get organization_about_hint => 'Maelezo mafupi ya shirika';
+
+  @override
+  String get organization_details => 'Taarifa za Shirika';
+
+  @override
+  String get organization_save => 'Hifadhi Shirika';
 }

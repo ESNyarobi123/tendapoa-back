@@ -140,6 +140,7 @@ class _HomeFeedTabState extends State<_HomeFeedTab> {
   Widget build(BuildContext context) {
     final worker = context.watch<WorkerProvider>();
     final user = context.watch<AuthProvider>().user;
+    final viewMapLabel = context.tr('view_map');
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -188,9 +189,9 @@ class _HomeFeedTabState extends State<_HomeFeedTab> {
                               ),
                             ),
                             const SizedBox(width: 12),
-                            const Text(
-                              'Tendapoa',
-                              style: TextStyle(
+                            Text(
+                              context.tr('appTitle'),
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
@@ -335,7 +336,7 @@ class _HomeFeedTabState extends State<_HomeFeedTab> {
                     const SizedBox(height: 25),
                     // Greeting
                     Text(
-                      'Habari, ${user?.name.split(' ').firstOrNull ?? 'Mfanyakazi'}! 👋',
+                      '${context.tr('hello')}, ${user?.name.split(' ').firstOrNull ?? context.tr('worker_role')}! 👋',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 26,
@@ -496,17 +497,18 @@ class _HomeFeedTabState extends State<_HomeFeedTab> {
                           color: AppColors.primary.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: const Row(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.map_outlined,
                               size: 16,
                               color: AppColors.primary,
                             ),
-                            SizedBox(width: 6),
+                            const SizedBox(width: 6),
                             Text(
-                              'Ona Ramani',
-                              style: TextStyle(
+                              viewMapLabel,
+                              style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.primary,
@@ -779,7 +781,7 @@ class _HomeFeedTabState extends State<_HomeFeedTab> {
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
-                          job.userName ?? 'Mteja',
+                          job.userName ?? context.tr('client_label'),
                           style: const TextStyle(
                             fontSize: 11,
                             color: AppColors.textSecondary,

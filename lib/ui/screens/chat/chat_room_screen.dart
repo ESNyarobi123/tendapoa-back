@@ -318,7 +318,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                 decoration: InputDecoration(
                   hintText: context.tr('enter_message_hint'),
                   border: InputBorder.none,
-                  hintStyle: TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
+                  hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
                 ),
               ),
             ),

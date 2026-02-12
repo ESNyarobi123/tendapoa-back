@@ -448,7 +448,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         )
                       : Text(
                           context.tr('save_changes').toUpperCase(),
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                 ),
               ),
