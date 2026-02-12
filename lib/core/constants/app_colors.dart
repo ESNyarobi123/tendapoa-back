@@ -29,8 +29,13 @@ class AppColors {
   static const Color errorLight = Color(0xFFFEE2E2);
   static const Color warning = Color(0xFFF59E0B); // Amber
   static const Color warningLight = Color(0xFFFEF3C7);
+  static const Color warningDark = Color(0xFF92400E); // Amber 800/dark text
   static const Color info = Color(0xFF3B82F6); // Blue
   static const Color infoLight = Color(0xFFDBEAFE);
+
+  /// Wallet/Withdraw accent (orange) – use for balance cards, withdraw CTAs
+  static const Color walletAccent = Color(0xFFF97316);
+  static const Color walletAccentDark = Color(0xFFEA580C);
 
   // Category Colors
   static const Color categoryUjenzi = Color(0xFFEA580C); // Orange
@@ -53,10 +58,16 @@ class AppColors {
     end: Alignment.bottomRight,
   );
 
+  static const Color splashDark = Color(0xFF1E3A8A);
   static const LinearGradient splashGradient = LinearGradient(
     colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
+  );
+  static const LinearGradient splashBackgroundGradient = LinearGradient(
+    colors: [textPrimary, splashDark, primaryDark],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
   );
 
   // Grey Scale

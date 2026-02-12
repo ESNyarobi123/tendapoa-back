@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/constants.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../providers/settings_provider.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -15,29 +16,26 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  final List<Map<String, dynamic>> _pages = [
-    {
-      'color': const Color(0xFF1E40AF),
-      'icon': Icons.rocket_launch_rounded,
-      'title': 'Karibu Tendapoa',
-      'subtitle':
-          'Suluhisho rahisi la kupata mafundi na wafanyakazi wa ndani kwa haraka na usalama.',
-    },
-    {
-      'color': const Color(0xFFF97316),
-      'icon': Icons.search_rounded,
-      'title': 'Tafuta kwa Urahisi',
-      'subtitle':
-          'Pata fundi yeyote unayemhitaji karibu nawe. Kuanzia mafundi bomba hadi walimu wa ziada.',
-    },
-    {
-      'color': const Color(0xFF059669),
-      'icon': Icons.verified_user_rounded,
-      'title': 'Huduma ya Uhakika',
-      'subtitle':
-          'Malipo yako ni salama. Tunatoa hakikisho la ubora kwa kila kazi unayoomba.',
-    },
-  ];
+  List<Map<String, dynamic>> _buildPages(BuildContext context) => [
+        {
+          'color': AppColors.primaryDark,
+          'icon': Icons.rocket_launch_rounded,
+          'title': context.tr('welcome_title_1'),
+          'subtitle': context.tr('welcome_subtitle_1'),
+        },
+        {
+          'color': AppColors.walletAccent,
+          'icon': Icons.search_rounded,
+          'title': context.tr('welcome_title_2'),
+          'subtitle': context.tr('welcome_subtitle_2'),
+        },
+        {
+          'color': AppColors.success,
+          'icon': Icons.verified_user_rounded,
+          'title': context.tr('welcome_title_3'),
+          'subtitle': context.tr('welcome_subtitle_3'),
+        },
+      ];
 
   @override
   void dispose() {
@@ -50,7 +48,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     final settings = context.watch<SettingsProvider>();
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surface,
       body: Stack(
         children: [
           // Background soft shapes
@@ -60,7 +58,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             child: CircleAvatar(
                 radius: 200,
                 backgroundColor:
-                    _pages[_currentPage]['color'].withValues(alpha: 0.05)),
+                    (_buildPages(context)[_currentPage]['color'] as Color).withValues(alpha: 0.05)),
           ),
 
           SafeArea(
@@ -77,8 +75,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                            color: const Color(0xFFF1F5F9),
-                            borderRadius: BorderRadius.circular(30)),
+                            color: AppColors.surfaceLight,
+                            borderRadius: AppSpacing.borderRadiusRound),
                         child: Row(
                           children: [
                             _buildLangBtn(
@@ -95,10 +93,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       TextButton(
                         onPressed: () => Navigator.pushReplacementNamed(
                             context, '/role-select'),
-                        child: const Text('Ruka',
-                            style: TextStyle(
-                                color: Color(0xFF64748B),
-                                fontWeight: FontWeight.bold)),
+                        child: Text(context.tr('skip'),
+                            style: AppTextStyles.labelLarge.copyWith(color: AppColors.textSecondary)),
                       ),
                     ],
                   ),
@@ -107,9 +103,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 Expanded(
                   child: PageView.builder(
                     controller: _pageController,
-                    itemCount: _pages.length,
+                    itemCount: _buildPages(context).length,
                     onPageChanged: (v) => setState(() => _currentPage = v),
-                    itemBuilder: (ctx, i) => _buildPage(i),
+                    itemBuilder: (ctx, i) => _buildPage(context, i),
                   ),
                 ),
 
@@ -122,7 +118,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(
-                            _pages.length,
+                            _buildPages(context).length,
                             (index) => AnimatedContainer(
                                   duration: const Duration(milliseconds: 300),
                                   margin:
@@ -131,63 +127,71 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                   height: 8,
                                   decoration: BoxDecoration(
                                     color: _currentPage == index
-                                        ? _pages[index]['color']
-                                        : const Color(0xFFE2E8F0),
-                                    borderRadius: BorderRadius.circular(4),
+                                        ? _buildPages(context)[index]['color'] as Color
+                                        : AppColors.grey200,
+                                    borderRadius: AppSpacing.borderRadiusSm,
                                   ),
                                 )),
                       ),
                       const SizedBox(height: 40),
 
-                      SizedBox(
-                        width: double.infinity,
-                        height: 60,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            if (_currentPage == _pages.length - 1) {
-                              Navigator.pushReplacementNamed(
-                                  context, '/role-select');
-                            } else {
-                              _pageController.nextPage(
-                                  duration: 500.ms, curve: Curves.easeOutQuart);
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: _pages[_currentPage]['color'],
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20)),
-                            elevation: 0,
-                          ),
-                          child: Text(
-                              _currentPage == _pages.length - 1
-                                  ? 'Anza Sasa'
-                                  : 'Endelea',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 16)),
-                        ),
+                      Builder(
+                        builder: (ctx) {
+                          final pages = _buildPages(ctx);
+                          return SizedBox(
+                            width: double.infinity,
+                            height: 60,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (_currentPage == pages.length - 1) {
+                                  Navigator.pushReplacementNamed(
+                                      context, '/role-select');
+                                } else {
+                                  _pageController.nextPage(
+                                      duration: 500.ms,
+                                      curve: Curves.easeOutQuart);
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: pages[_currentPage]['color'] as Color,
+                                foregroundColor: AppColors.textWhite,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: AppSpacing.borderRadiusLg),
+                                elevation: 0,
+                              ),
+                              child: Text(
+                                  _currentPage == pages.length - 1
+                                      ? context.tr('start_now')
+                                      : context.tr('continue_btn'),
+                                  style: AppTextStyles.buttonLarge.copyWith(color: AppColors.textWhite, fontSize: 16)),
+                            ),
+                          );
+                        },
                       )
                           .animate()
                           .fadeIn(delay: 200.ms)
                           .slideY(begin: 0.1, end: 0),
 
                       const SizedBox(height: 20),
-                      TextButton(
-                        onPressed: () => Navigator.pushNamed(context, '/login'),
-                        child: RichText(
-                          text: TextSpan(
-                            style: const TextStyle(
-                                color: Color(0xFF64748B), fontSize: 14),
-                            children: [
-                              const TextSpan(text: 'Tayari una akaunti? '),
-                              TextSpan(
-                                  text: 'Ingia hapa',
-                                  style: TextStyle(
-                                      color: _pages[_currentPage]['color'],
-                                      fontWeight: FontWeight.bold)),
-                            ],
-                          ),
-                        ),
+                      Builder(
+                        builder: (ctx) {
+                          final pages = _buildPages(ctx);
+                          return TextButton(
+                            onPressed: () =>
+                                Navigator.pushNamed(context, '/login'),
+                            child: RichText(
+                              text: TextSpan(
+                                style: AppTextStyles.bodyLarge.copyWith(color: AppColors.textSecondary),
+                                children: [
+                                  TextSpan(text: context.tr('welcome_have_account')),
+                                  TextSpan(
+                                      text: context.tr('welcome_login_link'),
+                                      style: AppTextStyles.labelLarge.copyWith(color: pages[_currentPage]['color'] as Color)),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
                       ).animate().fadeIn(delay: 400.ms),
                     ],
                   ),
@@ -207,27 +211,25 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         duration: 200.ms,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: active ? Colors.white : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
+          color: active ? AppColors.surface : Colors.transparent,
+          borderRadius: AppSpacing.borderRadiusRound,
           boxShadow: active
               ? [
                   BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
+                      color: AppColors.shadowLight,
                       blurRadius: 5)
                 ]
               : null,
         ),
         child: Text(label,
-            style: TextStyle(
-                color: active ? AppColors.primary : const Color(0xFF94A3B8),
-                fontWeight: FontWeight.bold,
-                fontSize: 12)),
+            style: AppTextStyles.labelMedium.copyWith(
+                color: active ? AppColors.primary : AppColors.textLight)),
       ),
     );
   }
 
-  Widget _buildPage(int index) {
-    final page = _pages[index];
+  Widget _buildPage(BuildContext context, int index) {
+    final page = _buildPages(context)[index];
     return SingleChildScrollView(
       padding: const EdgeInsets.all(40),
       child: Column(
@@ -236,7 +238,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           Container(
             padding: const EdgeInsets.all(30),
             decoration: BoxDecoration(
-              color: page['color'].withValues(alpha: 0.1),
+              color: (page['color'] as Color).withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(page['icon'] as IconData,
@@ -249,11 +251,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           Text(
             page['title']!,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1E293B),
-                letterSpacing: -1),
+            style: AppTextStyles.h1.copyWith(fontSize: 26, letterSpacing: -1),
           )
               .animate(key: ValueKey('t$index'))
               .fadeIn(delay: 200.ms)
@@ -262,8 +260,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           Text(
             page['subtitle']!,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-                fontSize: 14, color: Color(0xFF64748B), height: 1.5),
+            style: AppTextStyles.bodyLarge.copyWith(color: AppColors.textSecondary, height: 1.5),
           )
               .animate(key: ValueKey('s$index'))
               .fadeIn(delay: 400.ms)

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/constants.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/router/app_router.dart';
 import '../../../data/models/models.dart';
 import '../../../data/services/job_service.dart' as job_svc;
-import '../../../data/services/wallet_service.dart';
 import '../../../providers/providers.dart';
 import 'withdrawal_screen.dart';
 
@@ -184,7 +184,7 @@ class _WorkerDashboardScreenState extends State<WorkerDashboardScreen> {
                                         child: Text(
                                           user?.name.isNotEmpty == true
                                               ? user!.name[0].toUpperCase()
-                                              : 'W',
+                                              : context.tr('worker_role').isNotEmpty ? context.tr('worker_role')[0].toUpperCase() : 'W',
                                           style: const TextStyle(
                                             color: AppColors.primary,
                                             fontWeight: FontWeight.bold,
@@ -200,7 +200,7 @@ class _WorkerDashboardScreenState extends State<WorkerDashboardScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      user?.name ?? 'Mfanyakazi',
+                                      user?.name ?? context.tr('worker_role'),
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 22,
@@ -214,12 +214,12 @@ class _WorkerDashboardScreenState extends State<WorkerDashboardScreen> {
                                         vertical: 4,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFF97316),
+                                        color: AppColors.walletAccent,
                                         borderRadius: BorderRadius.circular(20),
                                       ),
-                                      child: const Text(
-                                        'Mfanyakazi',
-                                        style: TextStyle(
+                                      child: Text(
+                                        context.tr('worker_role'),
+                                        style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 12,
                                           fontWeight: FontWeight.w600,
@@ -260,14 +260,14 @@ class _WorkerDashboardScreenState extends State<WorkerDashboardScreen> {
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [Color(0xFFF97316), Color(0xFFEA580C)],
+                            colors: [AppColors.walletAccent, AppColors.walletAccentDark],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(24),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFFF97316).withOpacity(0.3),
+                              color: AppColors.walletAccent.withOpacity(0.3),
                               blurRadius: 20,
                               offset: const Offset(0, 10),
                             ),
@@ -282,9 +282,9 @@ class _WorkerDashboardScreenState extends State<WorkerDashboardScreen> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'SALIO LAKO',
-                                      style: TextStyle(
+                                    Text(
+                                      context.tr('dash_balance_label'),
+                                      style: const TextStyle(
                                         color: Colors.white70,
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600,
@@ -324,12 +324,12 @@ class _WorkerDashboardScreenState extends State<WorkerDashboardScreen> {
                                 onPressed: _openWithdrawalScreen,
                                 icon: const Icon(
                                   Icons.download,
-                                  color: Color(0xFFF97316),
+                                  color: AppColors.walletAccent,
                                 ),
-                                label: const Text(
-                                  'TOA PESA (Withdraw)',
-                                  style: TextStyle(
-                                    color: Color(0xFFF97316),
+                                label: Text(
+                                  context.tr('dash_withdraw_btn'),
+                                  style: const TextStyle(
+                                    color: AppColors.walletAccent,
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -365,30 +365,30 @@ class _WorkerDashboardScreenState extends State<WorkerDashboardScreen> {
                           _buildStatCard(
                             icon: Icons.trending_up,
                             iconBgColor: const Color(0xFFDCFCE7),
-                            iconColor: const Color(0xFF22C55E),
+                            iconColor: AppColors.success,
                             value: 'TZS ${NumberFormat('#,###').format(totalEarnings)}',
-                            label: 'Mapato Jumla',
+                            label: context.tr('dash_total_earnings'),
                           ),
                           _buildStatCard(
                             icon: Icons.download,
                             iconBgColor: const Color(0xFFFFEDD5),
-                            iconColor: const Color(0xFFF97316),
+                            iconColor: AppColors.walletAccent,
                             value: 'TZS ${NumberFormat('#,###').format(withdrawn)}',
-                            label: 'Imechukuliwa',
+                            label: context.tr('dash_withdrawn'),
                           ),
                           _buildStatCard(
                             icon: Icons.check_circle,
                             iconBgColor: const Color(0xFFDBEAFE),
                             iconColor: AppColors.primary,
                             value: '$completedJobs',
-                            label: 'Kazi Zilizomalizika',
+                            label: context.tr('dash_jobs_completed'),
                           ),
                           _buildStatCard(
                             icon: Icons.calendar_today,
                             iconBgColor: const Color(0xFFFCE7F3),
                             iconColor: const Color(0xFFEC4899),
                             value: '$monthlyJobs',
-                            label: 'Kazi za Mwezi',
+                            label: context.tr('dash_monthly_jobs'),
                           ),
                         ],
                       ),
@@ -402,21 +402,21 @@ class _WorkerDashboardScreenState extends State<WorkerDashboardScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'Historia ya Mapato',
-                            style: TextStyle(
+                          Text(
+                            context.tr('dash_earnings_history'),
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF1E293B),
+                              color: AppColors.textPrimary,
                             ),
                           ),
                           GestureDetector(
                             onTap: () {
                               Navigator.pushNamed(context, AppRouter.wallet);
                             },
-                            child: const Text(
-                              'Ona Zote',
-                              style: TextStyle(
+                            child: Text(
+                              context.tr('view_all_btn'),
+                              style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.primary,
@@ -436,19 +436,19 @@ class _WorkerDashboardScreenState extends State<WorkerDashboardScreen> {
                     ),
                   ),
 
-                  // Historia ya Uchukuliaji
-                  const SliverToBoxAdapter(
+                  // Withdrawal history header
+                  SliverToBoxAdapter(
                     child: Padding(
-                      padding: EdgeInsets.fromLTRB(20, 30, 20, 10),
+                      padding: const EdgeInsets.fromLTRB(20, 30, 20, 10),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Historia ya Uchukuliaji',
-                            style: TextStyle(
+                            context.tr('dash_withdrawal_history'),
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF1E293B),
+                              color: AppColors.textPrimary,
                             ),
                           ),
                         ],
@@ -482,18 +482,18 @@ class _WorkerDashboardScreenState extends State<WorkerDashboardScreen> {
                           },
                           icon: const Icon(
                             Icons.logout,
-                            color: Color(0xFFEF4444),
+                            color: AppColors.error,
                           ),
-                          label: const Text(
-                            'Toka',
-                            style: TextStyle(
-                              color: Color(0xFFEF4444),
+                          label: Text(
+                            context.tr('leave_btn'),
+                            style: const TextStyle(
+                              color: AppColors.error,
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Color(0xFFEF4444)),
+                            side: const BorderSide(color: AppColors.error),
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
@@ -552,7 +552,7 @@ class _WorkerDashboardScreenState extends State<WorkerDashboardScreen> {
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1E293B),
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
@@ -560,7 +560,7 @@ class _WorkerDashboardScreenState extends State<WorkerDashboardScreen> {
             label,
             style: const TextStyle(
               fontSize: 12,
-              color: Color(0xFF64748B),
+              color: AppColors.textSecondary,
             ),
           ),
         ],
@@ -575,7 +575,7 @@ class _WorkerDashboardScreenState extends State<WorkerDashboardScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: AppColors.grey200),
       ),
       child: Row(
         children: [
@@ -587,7 +587,7 @@ class _WorkerDashboardScreenState extends State<WorkerDashboardScreen> {
             ),
             child: const Icon(
               Icons.trending_up,
-              color: Color(0xFF22C55E),
+              color: AppColors.success,
               size: 20,
             ),
           ),
@@ -601,7 +601,7 @@ class _WorkerDashboardScreenState extends State<WorkerDashboardScreen> {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF1E293B),
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -609,7 +609,7 @@ class _WorkerDashboardScreenState extends State<WorkerDashboardScreen> {
                   _formatDate(transaction.createdAt),
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Color(0xFF94A3B8),
+                    color: AppColors.textLight,
                   ),
                 ),
               ],
@@ -620,7 +620,7 @@ class _WorkerDashboardScreenState extends State<WorkerDashboardScreen> {
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF22C55E),
+              color: AppColors.success,
             ),
           ),
         ],
@@ -635,7 +635,7 @@ class _WorkerDashboardScreenState extends State<WorkerDashboardScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: AppColors.grey200),
       ),
       child: Row(
         children: [
@@ -647,7 +647,7 @@ class _WorkerDashboardScreenState extends State<WorkerDashboardScreen> {
             ),
             child: const Icon(
               Icons.download,
-              color: Color(0xFFF97316),
+              color: AppColors.walletAccent,
               size: 20,
             ),
           ),
@@ -656,12 +656,12 @@ class _WorkerDashboardScreenState extends State<WorkerDashboardScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Withdrawal',
-                  style: TextStyle(
+                Text(
+                  context.tr('dash_withdraw_btn'),
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF1E293B),
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -669,7 +669,7 @@ class _WorkerDashboardScreenState extends State<WorkerDashboardScreen> {
                   _formatDate(transaction.createdAt),
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Color(0xFF94A3B8),
+                    color: AppColors.textLight,
                   ),
                 ),
               ],
@@ -680,7 +680,7 @@ class _WorkerDashboardScreenState extends State<WorkerDashboardScreen> {
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: Color(0xFFF97316),
+              color: AppColors.walletAccent,
             ),
           ),
         ],

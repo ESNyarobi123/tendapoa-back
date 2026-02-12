@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
 import '../../core/constants/constants.dart';
+import '../../core/localization/app_localizations.dart';
 import '../../core/router/app_router.dart';
 import '../../data/models/models.dart';
 import '../../data/services/notification_service.dart';
@@ -111,18 +112,18 @@ class _NotificationScreenState extends State<NotificationScreen> {
     }
   }
 
-  String _getRelativeDate(DateTime date) {
+  String _getRelativeDate(BuildContext context, DateTime date) {
     final now = DateTime.now();
     final diff = now.difference(date).inDays;
-    if (diff == 0) return 'Leo';
-    if (diff == 1) return 'Jana';
+    if (diff == 0) return context.tr('today');
+    if (diff == 1) return context.tr('yesterday');
     return DateFormat('d MMM').format(date);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       body: Column(
         children: [
           // Blue Header
@@ -158,9 +159,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           ),
                         ),
                         const SizedBox(width: 15),
-                        const Text(
-                          'Taarifa',
-                          style: TextStyle(
+                        Text(
+                          context.tr('notifications'),
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -171,9 +172,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     if (_notifications.any((n) => n.readAt == null))
                       TextButton(
                         onPressed: _markAllRead,
-                        child: const Text(
-                          'Soma Zote',
-                          style: TextStyle(
+                        child: Text(
+                          context.tr('mark_all_read'),
+                          style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
                           ),
@@ -239,18 +240,18 @@ class _NotificationScreenState extends State<NotificationScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
-            'Hakuna Taarifa',
-            style: TextStyle(
+          Text(
+            context.tr('no_notifications'),
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1E293B),
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Taarifa zako zitaonekana hapa',
-            style: TextStyle(color: Color(0xFF94A3B8)),
+          Text(
+            context.tr('notifications_empty_sub'),
+            style: const TextStyle(color: AppColors.textLight),
           ),
         ],
       ),
@@ -283,7 +284,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isRead ? const Color(0xFFF1F5F9) : Colors.white,
+                  color: isRead ? AppColors.surfaceLight : Colors.white,
                   shape: BoxShape.circle,
                   boxShadow: isRead
                       ? []
@@ -297,7 +298,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 ),
                 child: Icon(
                   _getIcon(n.type),
-                  color: isRead ? const Color(0xFF94A3B8) : AppColors.primary,
+                  color: isRead ? AppColors.textLight : AppColors.primary,
                   size: 20,
                 ),
               ),
@@ -317,7 +318,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                   ? FontWeight.w600
                                   : FontWeight.bold,
                               fontSize: 15,
-                              color: const Color(0xFF1E293B),
+                              color: AppColors.textPrimary,
                             ),
                           ),
                         ),
@@ -337,7 +338,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       n.message,
                       style: TextStyle(
                         color: isRead
-                            ? const Color(0xFF64748B)
+                            ? AppColors.textSecondary
                             : const Color(0xFF334155),
                         fontSize: 13,
                         height: 1.4,
@@ -345,9 +346,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '${_getRelativeDate(n.createdAt)} • ${DateFormat('HH:mm').format(n.createdAt)}',
+                      '${_getRelativeDate(context, n.createdAt)} • ${DateFormat('HH:mm').format(n.createdAt)}',
                       style: const TextStyle(
-                        color: Color(0xFF94A3B8),
+                        color: AppColors.textLight,
                         fontSize: 11,
                       ),
                     ),

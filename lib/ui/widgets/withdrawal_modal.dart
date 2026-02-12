@@ -57,7 +57,7 @@ class _WithdrawalModalState extends State<WithdrawalModal> {
                 style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E293B))),
+                    color: AppColors.textPrimary)),
             const SizedBox(height: 10),
             Container(
               padding: const EdgeInsets.all(15),
@@ -69,7 +69,7 @@ class _WithdrawalModalState extends State<WithdrawalModal> {
               child: Row(
                 children: [
                   const Icon(Icons.account_balance_wallet_rounded,
-                      color: Color(0xFFF97316), size: 20),
+                      color: AppColors.walletAccent, size: 20),
                   const SizedBox(width: 12),
                   Text('Salio Lako: ',
                       style:

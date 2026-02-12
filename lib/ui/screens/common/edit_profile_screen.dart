@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/constants.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../data/services/services.dart';
 import '../../../providers/providers.dart';
 
@@ -67,17 +68,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: const Color(0xFFE2E8F0),
+                color: AppColors.grey200,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Chagua Picha',
-              style: TextStyle(
+            Text(
+              context.tr('choose_photo'),
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1E293B),
+                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 20),
@@ -86,7 +87,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 Expanded(
                   child: _buildImageSourceOption(
                     icon: Icons.camera_alt_rounded,
-                    label: 'Kamera',
+                    label: context.tr('camera'),
                     color: const Color(0xFF3B82F6),
                     onTap: () => Navigator.pop(context, ImageSource.camera),
                   ),
@@ -95,7 +96,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 Expanded(
                   child: _buildImageSourceOption(
                     icon: Icons.photo_library_rounded,
-                    label: 'Galeri',
+                    label: context.tr('gallery'),
                     color: const Color(0xFF22C55E),
                     onTap: () => Navigator.pop(context, ImageSource.gallery),
                   ),
@@ -184,15 +185,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         await context.read<AuthProvider>().refreshUser();
         
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Row(
               children: [
-                Icon(Icons.check_circle, color: Colors.white),
-                SizedBox(width: 10),
-                Text('Wasifu umesasishwa!'),
+                const Icon(Icons.check_circle, color: Colors.white),
+                const SizedBox(width: 10),
+                Text(context.tr('profile_updated')),
               ],
             ),
-            backgroundColor: Color(0xFF22C55E),
+            backgroundColor: const Color(0xFF22C55E),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -204,7 +205,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Hitilafu: $e'),
+            content: Text('${context.tr('error_prefix')}: $e'),
             backgroundColor: const Color(0xFFEF4444),
             behavior: SnackBarBehavior.floating,
           ),
@@ -224,7 +225,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final themeColor = isMfanyakazi ? const Color(0xFFF97316) : AppColors.primary;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: themeColor,
         elevation: 0,
@@ -239,9 +240,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'Hariri Wasifu',
-          style: TextStyle(
+        title: Text(
+          context.tr('edit_profile'),
+          style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 18,
@@ -323,7 +324,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ).animate().scale(delay: 100.ms, duration: 300.ms),
                   const SizedBox(height: 15),
                   Text(
-                    user?.name ?? 'Mtumiaji',
+                    user?.name ?? context.tr('profile'),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 22,
@@ -359,13 +360,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildSectionTitle('Taarifa Binafsi'),
+                    _buildSectionTitle(context.tr('register_section_personal')),
                     const SizedBox(height: 15),
 
                     // Name Field
                     _buildInputField(
                       controller: _nameController,
-                      label: 'Jina Kamili',
+                      label: context.tr('register_full_name'),
                       icon: Icons.person_outline_rounded,
                       themeColor: themeColor,
                     ).animate().fadeIn(delay: 200.ms).slideX(begin: -0.1),
@@ -374,18 +375,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     // Email Field (Read Only)
                     _buildInputField(
                       controller: _emailController,
-                      label: 'Barua Pepe',
+                      label: context.tr('login_email_label'),
                       icon: Icons.email_outlined,
                       themeColor: themeColor,
                       readOnly: true,
-                      helperText: 'Barua pepe haiwezi kubadilishwa',
                     ).animate().fadeIn(delay: 250.ms).slideX(begin: -0.1),
                     const SizedBox(height: 15),
 
                     // Phone Field
                     _buildInputField(
                       controller: _phoneController,
-                      label: 'Namba ya Simu',
+                      label: context.tr('phone_number'),
                       icon: Icons.phone_android_rounded,
                       themeColor: themeColor,
                       keyboardType: TextInputType.phone,
@@ -416,14 +416,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   strokeWidth: 2.5,
                                 ),
                               )
-                            : const Row(
+                            : Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.save_rounded),
-                                  SizedBox(width: 10),
+                                  const Icon(Icons.save_rounded),
+                                  const SizedBox(width: 10),
                                   Text(
-                                    'HIFADHI MABADILIKO',
-                                    style: TextStyle(
+                                    context.tr('save_changes').toUpperCase(),
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 15,
                                       letterSpacing: 0.5,
@@ -447,14 +447,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Widget _buildDefaultAvatar(dynamic user) {
     return Container(
-      color: const Color(0xFFF1F5F9),
+      color: AppColors.surfaceLight,
       child: Center(
         child: Text(
           user?.name?.isNotEmpty == true ? user.name[0].toUpperCase() : 'U',
           style: const TextStyle(
             fontSize: 48,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF64748B),
+            color: AppColors.textSecondary,
           ),
         ),
       ),
@@ -478,7 +478,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF1E293B),
+            color: AppColors.textPrimary,
           ),
         ),
       ],
@@ -508,9 +508,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: readOnly ? const Color(0xFFF1F5F9) : Colors.white,
+            color: readOnly ? AppColors.surfaceLight : Colors.white,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
+            border: Border.all(color: AppColors.grey200),
             boxShadow: readOnly
                 ? null
                 : [
@@ -528,7 +528,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             validator: (v) => v!.isEmpty ? 'Tafadhali jaza hapa' : null,
             style: TextStyle(
               fontSize: 15,
-              color: readOnly ? const Color(0xFF94A3B8) : const Color(0xFF1E293B),
+              color: readOnly ? AppColors.textLight : AppColors.textPrimary,
             ),
             decoration: InputDecoration(
               prefixIcon: Icon(icon, size: 20, color: themeColor.withValues(alpha: readOnly ? 0.5 : 1)),
@@ -550,7 +550,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             helperText,
             style: const TextStyle(
               fontSize: 11,
-              color: Color(0xFF94A3B8),
+              color: AppColors.textLight,
             ),
           ),
         ],

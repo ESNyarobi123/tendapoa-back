@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/constants.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/router/app_router.dart';
 import '../../../providers/providers.dart';
 
@@ -89,7 +90,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        _showLocationError('Huduma ya eneo haijawashwa. Tafadhali washa GPS.');
+        _showLocationError(context.tr('register_location_disabled'));
         return;
       }
 
@@ -97,13 +98,13 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          _showLocationError('Ruhusa ya eneo imekataliwa');
+          _showLocationError(context.tr('register_location_denied'));
           return;
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
-        _showLocationError('Ruhusa ya eneo imekataliwa kabisa. Nenda Settings kubadilisha.');
+        _showLocationError(context.tr('register_location_denied_forever'));
         return;
       }
 
@@ -120,10 +121,10 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
       await _getAddressFromCoordinates();
 
       if (mounted) {
-        _showSuccessSnackBar('Eneo lako limepatikana! 📍');
+        _showSuccessSnackBar('${context.tr('register_location_success')} 📍');
       }
     } catch (e) {
-      _showLocationError('Imeshindikana kupata eneo: $e');
+      _showLocationError('${context.tr('register_location_failed')}: $e');
     } finally {
       if (mounted) {
         setState(() => _isLoadingLocation = false);
@@ -163,7 +164,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
             Expanded(child: Text(message)),
           ],
         ),
-        backgroundColor: const Color(0xFFEF4444),
+        backgroundColor: AppColors.error,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.all(16),
@@ -195,14 +196,14 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
     if (_passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Row(
+          content: Row(
             children: [
-              Icon(Icons.error_outline, color: Colors.white, size: 20),
-              SizedBox(width: 10),
-              Text('Nenosiri halifanani!'),
+              const Icon(Icons.error_outline, color: Colors.white, size: 20),
+              const SizedBox(width: 10),
+              Text(context.tr('register_password_mismatch')),
             ],
           ),
-          backgroundColor: const Color(0xFFEF4444),
+          backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           margin: const EdgeInsets.all(16),
@@ -243,10 +244,10 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
             children: [
               const Icon(Icons.error_outline, color: Colors.white, size: 20),
               const SizedBox(width: 10),
-              Expanded(child: Text(authProvider.error ?? 'Imeshindwa kusajili')),
+              Expanded(child: Text(authProvider.error ?? context.tr('register_failed'))),
             ],
           ),
-          backgroundColor: const Color(0xFFEF4444),
+          backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           margin: const EdgeInsets.all(16),
@@ -275,41 +276,41 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                 ),
                 child: const Icon(
                   Icons.location_off_rounded,
-                  color: Color(0xFFEF4444),
+                  color: AppColors.error,
                   size: 40,
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
-                'Eneo Linahitajika! 📍',
-                style: TextStyle(
+              Text(
+                '${context.tr('register_location_required_title')} 📍',
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E293B),
+                  color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 12),
-              const Text(
-                'Kama mfanyakazi, eneo lako ni lazima ili:',
+              Text(
+                context.tr('register_location_required_subtitle'),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
-                  color: Color(0xFF64748B),
+                  color: AppColors.textSecondary,
                 ),
               ),
               const SizedBox(height: 16),
-              _buildReasonItem('Wateja waone umbali wako'),
+              _buildReasonItem(context.tr('register_location_reason_1')),
               const SizedBox(height: 8),
-              _buildReasonItem('Upate kazi zilizo karibu nawe'),
+              _buildReasonItem(context.tr('register_location_reason_2')),
               const SizedBox(height: 8),
-              _buildReasonItem('Mfumo uhesabu umbali kwa usahihi'),
+              _buildReasonItem(context.tr('register_location_reason_3')),
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: () => Navigator.pop(context),
                   icon: const Icon(Icons.my_location),
-                  label: const Text('SAWA, NITAWEKA ENEO'),
+                  label: Text(context.tr('register_location_ok_btn')),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFF97316),
                     foregroundColor: Colors.white,
@@ -354,7 +355,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       body: CustomScrollView(
         slivers: [
           // Animated Header
@@ -419,7 +420,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  _isMfanyakazi ? 'Mfanyakazi / Fundi' : 'Muhitaji / Mteja',
+                                  _isMfanyakazi ? context.tr('register_badge_mfanyakazi') : context.tr('register_badge_muhitaji'),
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 13,
@@ -447,7 +448,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                _isMfanyakazi ? 'Jiunge na TendaPoa! 🔧' : 'Karibu TendaPoa! 👋',
+                                _isMfanyakazi ? '${context.tr('register_title_mfanyakazi')} 🔧' : '${context.tr('register_title_muhitaji')} 👋',
                                 style: const TextStyle(
                                   fontSize: 26,
                                   fontWeight: FontWeight.bold,
@@ -457,8 +458,8 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                               const SizedBox(height: 6),
                               Text(
                                 _isMfanyakazi 
-                                    ? 'Anza kupata kazi karibu nawe leo'
-                                    : 'Pata wafanyakazi wazuri karibu nawe',
+                                    ? context.tr('register_subtitle_mfanyakazi')
+                                    : context.tr('register_subtitle_muhitaji'),
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.9),
                                   fontSize: 15,
@@ -481,7 +482,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
               offset: const Offset(0, -25),
               child: Container(
                 decoration: const BoxDecoration(
-                  color: Color(0xFFF8FAFC),
+                  color: AppColors.background,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
                 ),
                 child: Padding(
@@ -497,37 +498,37 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
 
                         // Personal Info Section
                         _buildSectionCard(
-                          title: 'Taarifa Binafsi',
+                          title: context.tr('register_section_personal'),
                           icon: Icons.person_rounded,
                           children: [
                             _buildModernInput(
                               controller: _nameController,
-                              label: 'Jina Kamili',
-                              hint: 'Mfano: Juma Ramadhani',
+                              label: context.tr('register_full_name'),
+                              hint: context.tr('register_full_name_hint'),
                               icon: Icons.badge_outlined,
                               focusNode: _nameFocus,
                               nextFocus: _emailFocus,
-                              validator: (v) => v!.isEmpty ? 'Tafadhali weka jina lako' : null,
+                              validator: (v) => v!.isEmpty ? context.tr('register_full_name_error') : null,
                             ),
                             const SizedBox(height: 18),
                             _buildModernInput(
                               controller: _emailController,
-                              label: 'Barua Pepe',
-                              hint: 'mfano@email.com',
+                              label: context.tr('login_email_label'),
+                              hint: context.tr('login_email_hint'),
                               icon: Icons.email_outlined,
                               keyboardType: TextInputType.emailAddress,
                               focusNode: _emailFocus,
                               nextFocus: _phoneFocus,
                               validator: (v) {
-                                if (v!.isEmpty) return 'Tafadhali weka email';
-                                if (!v.contains('@')) return 'Email si sahihi';
+                                if (v!.isEmpty) return context.tr('register_email_error');
+                                if (!v.contains('@')) return context.tr('register_email_invalid');
                                 return null;
                               },
                             ),
                             const SizedBox(height: 18),
                             _buildModernInput(
                               controller: _phoneController,
-                              label: 'Namba ya Simu',
+                              label: context.tr('phone_number'),
                               hint: '07XXXXXXXX',
                               icon: Icons.phone_android_rounded,
                               keyboardType: TextInputType.phone,
@@ -535,8 +536,8 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                               nextFocus: _passwordFocus,
                               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                               validator: (v) {
-                                if (v!.isEmpty) return 'Tafadhali weka namba ya simu';
-                                if (v.length < 10) return 'Namba ya simu si sahihi';
+                                if (v!.isEmpty) return context.tr('register_phone_error');
+                                if (v.length < 10) return context.tr('register_phone_invalid');
                                 return null;
                               },
                             ),
@@ -552,12 +553,12 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
 
                         // Security Section
                         _buildSectionCard(
-                          title: 'Usalama',
+                          title: context.tr('register_section_security'),
                           icon: Icons.shield_rounded,
                           children: [
                             _buildModernInput(
                               controller: _passwordController,
-                              label: 'Nenosiri',
+                              label: context.tr('login_password_label'),
                               hint: '••••••••',
                               icon: Icons.lock_outline_rounded,
                               obscureText: _obscurePassword,
@@ -567,20 +568,20 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                 icon: Icon(
                                   _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
                                   size: 20,
-                                  color: const Color(0xFF94A3B8),
+                                  color: AppColors.textLight,
                                 ),
                                 onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                               ),
                               validator: (v) {
-                                if (v!.isEmpty) return 'Tafadhali weka nenosiri';
-                                if (v.length < 6) return 'Nenosiri liwe na herufi 6 au zaidi';
+                                if (v!.isEmpty) return context.tr('login_enter_password');
+                                if (v.length < 6) return context.tr('register_password_min');
                                 return null;
                               },
                             ),
                             const SizedBox(height: 18),
                             _buildModernInput(
                               controller: _confirmPasswordController,
-                              label: 'Thibitisha Nenosiri',
+                              label: context.tr('register_confirm_password'),
                               hint: '••••••••',
                               icon: Icons.lock_clock_outlined,
                               obscureText: _obscureConfirmPassword,
@@ -590,13 +591,13 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                 icon: Icon(
                                   _obscureConfirmPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
                                   size: 20,
-                                  color: const Color(0xFF94A3B8),
+                                  color: AppColors.textLight,
                                 ),
                                 onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
                               ),
                               validator: (v) {
-                                if (v!.isEmpty) return 'Tafadhali thibitisha nenosiri';
-                                if (v != _passwordController.text) return 'Nenosiri halifanani';
+                                if (v!.isEmpty) return context.tr('register_confirm_password_error');
+                                if (v != _passwordController.text) return context.tr('register_password_mismatch');
                                 return null;
                               },
                             ),
@@ -618,7 +619,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
-                                  'Kwa kusajili, unakubali Masharti na Sera ya Faragha yetu.',
+                                  context.tr('register_terms_notice'),
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: _themeColor.withOpacity(0.8),
@@ -655,7 +656,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                         Icon(_isMfanyakazi ? Icons.handyman : Icons.person_add),
                                         const SizedBox(width: 10),
                                         Text(
-                                          _isMfanyakazi ? 'JIUNGE KAMA FUNDI' : 'TENGENEZA AKAUNTI',
+                                          _isMfanyakazi ? context.tr('register_btn_mfanyakazi') : context.tr('register_btn_muhitaji'),
                                           style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 15,
@@ -674,14 +675,14 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Text(
-                                'Tayari una akaunti? ',
-                                style: TextStyle(color: Color(0xFF64748B), fontSize: 14),
+                              Text(
+                                context.tr('welcome_have_account'),
+                                style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
                               ),
                               GestureDetector(
                                 onTap: () => Navigator.pushReplacementNamed(context, AppRouter.login),
                                 child: Text(
-                                  'Ingia hapa',
+                                  context.tr('welcome_login_link'),
                                   style: TextStyle(
                                     color: _themeColor,
                                     fontWeight: FontWeight.bold,
@@ -708,13 +709,12 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
     final steps = _isMfanyakazi ? 3 : 2;
     return Row(
       children: List.generate(steps, (index) {
-        const isActive = true; // All steps visible at once in this design
         return Expanded(
           child: Container(
             margin: EdgeInsets.only(right: index < steps - 1 ? 8 : 0),
             height: 4,
             decoration: BoxDecoration(
-              color: isActive ? _themeColor : const Color(0xFFE2E8F0),
+              color: _themeColor,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -760,7 +760,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E293B),
+                  color: AppColors.textPrimary,
                 ),
               ),
             ],
@@ -779,7 +779,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: _locationDetected ? const Color(0xFF22C55E) : const Color(0xFFE2E8F0),
+          color: _locationDetected ? const Color(0xFF22C55E) : AppColors.grey200,
           width: _locationDetected ? 2 : 1,
         ),
         boxShadow: [
@@ -818,24 +818,24 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                   children: [
                     Row(
                       children: [
-                        const Text(
-                          'Eneo Lako',
-                          style: TextStyle(
+                        Text(
+                          context.tr('register_location_title'),
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF1E293B),
+                            color: AppColors.textPrimary,
                           ),
                         ),
                         const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFEF4444),
+                            color: AppColors.error,
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Text(
-                            'LAZIMA',
-                            style: TextStyle(
+                          child: Text(
+                            context.tr('register_required_badge'),
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 9,
                               fontWeight: FontWeight.bold,
@@ -847,13 +847,13 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                     const SizedBox(height: 2),
                     Text(
                       _locationDetected 
-                          ? 'Eneo limepatikana!'
-                          : 'Bonyeza kupata eneo lako',
+                          ? context.tr('register_location_found')
+                          : context.tr('register_location_tap'),
                       style: TextStyle(
                         fontSize: 12,
                         color: _locationDetected 
                             ? const Color(0xFF22C55E)
-                            : const Color(0xFF94A3B8),
+                            : AppColors.textLight,
                       ),
                     ),
                   ],
@@ -885,7 +885,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'Eneo lako linasaidia wateja kukupata kwa urahisi na kupata kazi zilizo karibu nawe.',
+                    context.tr('register_location_help'),
                     style: TextStyle(fontSize: 12, color: Colors.amber[900], height: 1.4),
                   ),
                 ),
@@ -949,14 +949,14 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                   : Icon(_locationDetected ? Icons.refresh : Icons.my_location),
               label: Text(
                 _isLoadingLocation 
-                    ? 'Inatafuta eneo...'
+                    ? context.tr('register_location_searching')
                     : _locationDetected 
-                        ? 'Sasisha Eneo' 
-                        : '📍 PATA ENEO LANGU',
+                        ? context.tr('register_location_refresh') 
+                        : '📍 ${context.tr('register_location_get_btn')}',
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: _locationDetected ? const Color(0xFF64748B) : _themeColor,
+                backgroundColor: _locationDetected ? AppColors.textSecondary : _themeColor,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -973,7 +973,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1F5F9),
+        color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -983,7 +983,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
             '$label: ',
             style: const TextStyle(
               fontSize: 12,
-              color: Color(0xFF94A3B8),
+              color: AppColors.textLight,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -991,7 +991,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
             value,
             style: const TextStyle(
               fontSize: 13,
-              color: Color(0xFF1E293B),
+              color: AppColors.textPrimary,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -1039,21 +1039,21 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
             }
           },
           validator: validator,
-          style: const TextStyle(fontSize: 15, color: Color(0xFF1E293B)),
+          style: const TextStyle(fontSize: 15, color: AppColors.textPrimary),
           decoration: InputDecoration(
             prefixIcon: Icon(icon, size: 20, color: _themeColor.withOpacity(0.7)),
             suffixIcon: suffix,
             hintText: hint,
             hintStyle: const TextStyle(color: Color(0xFFCBD5E1), fontSize: 14),
             filled: true,
-            fillColor: const Color(0xFFF8FAFC),
+            fillColor: AppColors.background,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+              borderSide: const BorderSide(color: AppColors.grey200),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+              borderSide: const BorderSide(color: AppColors.grey200),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
@@ -1061,11 +1061,11 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: Color(0xFFEF4444)),
+              borderSide: const BorderSide(color: AppColors.error),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: Color(0xFFEF4444), width: 2),
+              borderSide: const BorderSide(color: AppColors.error, width: 2),
             ),
             contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
           ),

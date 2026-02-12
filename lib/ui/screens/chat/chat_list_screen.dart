@@ -85,7 +85,7 @@ class _ChatListScreenState extends State<ChatListScreen> with WidgetsBindingObse
         title: const Text(
           'Meseji',
           style: TextStyle(
-            color: Color(0xFF1E293B),
+            color: AppColors.textPrimary,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -213,7 +213,7 @@ class _ChatListScreenState extends State<ChatListScreen> with WidgetsBindingObse
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: hasUnread ? FontWeight.bold : FontWeight.w600,
-                            color: const Color(0xFF1E293B),
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ),
@@ -244,7 +244,7 @@ class _ChatListScreenState extends State<ChatListScreen> with WidgetsBindingObse
                       fontSize: 14,
                       fontWeight: hasUnread ? FontWeight.w600 : FontWeight.normal,
                       color: hasUnread
-                          ? const Color(0xFF1E293B)
+                          ? AppColors.textPrimary
                           : const Color(0xFF94A3B8),
                     ),
                   ),

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/constants.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/router/app_router.dart';
 import '../../../data/models/models.dart';
 import '../../../data/services/job_service.dart';
@@ -29,14 +30,14 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(index: _currentIndex, children: _screens),
-      bottomNavigationBar: _buildBottomNav(),
+      bottomNavigationBar: _buildBottomNav(context),
     );
   }
 
-  Widget _buildBottomNav() {
+  Widget _buildBottomNav(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -51,10 +52,10 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(Icons.home_rounded, 'Nyumbani', 0),
-              _buildNavItem(Icons.work_outline_rounded, 'Kazi Zangu', 1),
-              _buildNavItem(Icons.chat_bubble_outline_rounded, 'Meseji', 2),
-              _buildNavItem(Icons.grid_view_rounded, 'Dashibodi', 3),
+              _buildNavItem(context, Icons.home_rounded, context.tr('nyumbani_nav'), 0),
+              _buildNavItem(context, Icons.work_outline_rounded, context.tr('kazi_zangu_nav'), 1),
+              _buildNavItem(context, Icons.chat_bubble_outline_rounded, context.tr('inbox_nav'), 2),
+              _buildNavItem(context, Icons.grid_view_rounded, context.tr('dash_nav'), 3),
             ],
           ),
         ),
@@ -62,7 +63,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label, int index) {
+  Widget _buildNavItem(BuildContext context, IconData icon, String label, int index) {
     final isSelected = _currentIndex == index;
     return GestureDetector(
       onTap: () => setState(() => _currentIndex = index),
@@ -77,7 +78,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
           children: [
             Icon(
               icon,
-              color: isSelected ? Colors.white : const Color(0xFF94A3B8),
+              color: isSelected ? AppColors.textWhite : AppColors.textLight,
               size: 20,
             ),
             if (isSelected) ...[
@@ -85,7 +86,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
               Text(
                 label,
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: AppColors.textWhite,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),
@@ -144,7 +145,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
     final categories = context.watch<AppProvider>().categories;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       body: RefreshIndicator(
         onRefresh: _loadData,
         color: AppColors.primary,
@@ -177,7 +178,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                                   width: 48,
                                   height: 48,
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: AppColors.surface,
                                     shape: BoxShape.circle,
                                     boxShadow: [
                                       BoxShadow(
@@ -192,7 +193,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                                       'assets/images/tendalogo.jpg',
                                       fit: BoxFit.cover,
                                       errorBuilder: (_, __, ___) => Container(
-                                        color: Colors.white,
+                                        color: AppColors.surface,
                                         child: const Icon(
                                           Icons.handyman_rounded,
                                           color: AppColors.primary,
@@ -209,7 +210,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                                     const Text(
                                       'Tendapoa',
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        color: AppColors.surface,
                                         fontSize: 22,
                                         fontWeight: FontWeight.bold,
                                         letterSpacing: -0.5,
@@ -218,7 +219,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                                     Text(
                                       'Pata Mfanyakazi Karibu Nawe',
                                       style: TextStyle(
-                                        color: Colors.white.withOpacity(0.8),
+                                        color: AppColors.surface.withOpacity(0.8),
                                         fontSize: 12,
                                       ),
                                     ),
@@ -230,13 +231,13 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                               children: [
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.2),
+                                    color: AppColors.surface.withOpacity(0.2),
                                     shape: BoxShape.circle,
                                   ),
                                   child: IconButton(
                                     icon: const Icon(
                                       Icons.notifications_outlined,
-                                      color: Colors.white,
+                                      color: AppColors.surface,
                                     ),
                                     onPressed: () => Navigator.pushNamed(
                                       context,
@@ -259,7 +260,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                                     children: [
                                       CircleAvatar(
                                         radius: 20,
-                                        backgroundColor: Colors.white,
+                                        backgroundColor: AppColors.surface,
                                         backgroundImage:
                                             user?.profilePhotoUrl != null
                                                 ? NetworkImage(
@@ -287,14 +288,14 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                                             color: Colors.blue,
                                             shape: BoxShape.circle,
                                             border: Border.all(
-                                              color: Colors.white,
+                                              color: AppColors.surface,
                                               width: 2,
                                             ),
                                           ),
                                           child: const Icon(
                                             Icons.edit,
                                             size: 8,
-                                            color: Colors.white,
+                                            color: AppColors.surface,
                                           ),
                                         ),
                                       ),
@@ -310,7 +311,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                         Text(
                           'Habari, ${user?.name.split(' ')[0] ?? 'Mteja'}! 👋',
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: AppColors.surface,
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
@@ -319,7 +320,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                         Text(
                           'Je, unahitaji msaada gani leo?',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
+                            color: AppColors.surface.withOpacity(0.8),
                             fontSize: 14,
                           ),
                         ),
@@ -342,7 +343,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFFF97316),
-                              foregroundColor: Colors.white,
+                              foregroundColor: AppColors.surface,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15),
@@ -404,7 +405,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF1E293B),
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     TextButton(
@@ -466,7 +467,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF1E293B),
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ],
@@ -474,14 +475,14 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF1F5F9),
+                        color: AppColors.surfaceLight,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         '${categories.length} aina',
                         style: const TextStyle(
                           fontSize: 11,
-                          color: Color(0xFF64748B),
+                          color: AppColors.textSecondary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -558,7 +559,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
       child: Container(
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
@@ -584,14 +585,14 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1E293B),
+                color: AppColors.textPrimary,
               ),
             ),
             Text(
               label,
               style: const TextStyle(
                 fontSize: 11,
-                color: Color(0xFF64748B),
+                color: AppColors.textSecondary,
               ),
             ),
           ],
@@ -611,7 +612,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
         width: 200,
         margin: const EdgeInsets.only(right: 15),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
@@ -639,20 +640,20 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => Container(
                             height: 100,
-                            color: const Color(0xFFF1F5F9),
+                            color: AppColors.surfaceLight,
                             child: const Icon(
                               Icons.image_not_supported,
-                              color: Color(0xFF94A3B8),
+                              color: AppColors.textLight,
                             ),
                           ),
                         )
                       : Container(
                           height: 100,
-                          color: const Color(0xFFF1F5F9),
+                          color: AppColors.surfaceLight,
                           child: const Center(
                             child: Icon(
                               Icons.work_outline_rounded,
-                              color: Color(0xFF94A3B8),
+                              color: AppColors.textLight,
                               size: 32,
                             ),
                           ),
@@ -673,7 +674,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                       child: Text(
                         _getStatusText(job.status),
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: AppColors.surface,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                         ),
@@ -696,7 +697,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -727,7 +728,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -852,7 +853,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
       case 'cancelled':
         return const Color(0xFFEF4444);
       default:
-        return const Color(0xFF94A3B8);
+        return AppColors.textLight;
     }
   }
 
@@ -945,7 +946,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
     final cancelledJobs = _getCancelledJobs(allJobs);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       body: RefreshIndicator(
         onRefresh: () => clientProvider.loadMyJobs(),
         color: AppColors.primary,
@@ -980,7 +981,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                               const Text(
                                 'Kazi Zangu',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: AppColors.surface,
                                   fontSize: 26,
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: -0.5,
@@ -990,7 +991,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                               Text(
                                 'Jumla: ${allJobs.length} kazi',
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.8),
+                                  color: AppColors.surface.withOpacity(0.8),
                                   fontSize: 14,
                                 ),
                               ),
@@ -999,7 +1000,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                           // Refresh Button
                           Container(
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: AppColors.surface.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: IconButton(
@@ -1009,10 +1010,10 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                                       height: 20,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
-                                        color: Colors.white,
+                                        color: AppColors.surface,
                                       ),
                                     )
-                                  : const Icon(Icons.refresh_rounded, color: Colors.white),
+                                  : const Icon(Icons.refresh_rounded, color: AppColors.surface),
                               onPressed: () => clientProvider.loadMyJobs(),
                             ),
                           ),
@@ -1057,12 +1058,12 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                         isScrollable: true,
                         indicatorSize: TabBarIndicatorSize.label,
                         indicator: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.surface,
                           borderRadius: BorderRadius.circular(25),
                         ),
                         dividerColor: Colors.transparent,
                         labelColor: AppColors.primary,
-                        unselectedLabelColor: Colors.white.withOpacity(0.8),
+                        unselectedLabelColor: AppColors.surface.withOpacity(0.8),
                         labelStyle: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
@@ -1113,9 +1114,9 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.15),
+          color: AppColors.surface.withOpacity(0.15),
           borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: Colors.white.withOpacity(0.2)),
+          border: Border.all(color: AppColors.surface.withOpacity(0.2)),
         ),
         child: Column(
           children: [
@@ -1125,13 +1126,13 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                 color: color.withOpacity(0.2),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: Colors.white, size: 18),
+              child: Icon(icon, color: AppColors.surface, size: 18),
             ),
             const SizedBox(height: 8),
             Text(
               count.toString(),
               style: const TextStyle(
-                color: Colors.white,
+                color: AppColors.surface,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -1139,7 +1140,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
             Text(
               label,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.8),
+                color: AppColors.surface.withOpacity(0.8),
                 fontSize: 10,
               ),
             ),
@@ -1154,9 +1155,9 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.white : Colors.transparent,
+          color: isSelected ? AppColors.textWhite : Colors.transparent,
           borderRadius: BorderRadius.circular(25),
-          border: isSelected ? null : Border.all(color: Colors.white.withOpacity(0.3)),
+          border: isSelected ? null : Border.all(color: AppColors.surface.withOpacity(0.3)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -1166,7 +1167,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primary.withOpacity(0.1) : Colors.white.withOpacity(0.2),
+                color: isSelected ? AppColors.primary.withOpacity(0.1) : AppColors.surface.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
@@ -1174,7 +1175,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
-                  color: isSelected ? AppColors.primary : Colors.white,
+                  color: isSelected ? AppColors.primary : AppColors.textLight,
                 ),
               ),
             ),
@@ -1235,7 +1236,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: const Color(0xFFFECACA), width: 2),
         boxShadow: [
@@ -1289,7 +1290,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                   child: const Text(
                     'PENDING',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.surface,
                       fontSize: 9,
                       fontWeight: FontWeight.bold,
                     ),
@@ -1351,7 +1352,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                             style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF1E293B),
+                              color: AppColors.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 6),
@@ -1360,14 +1361,14 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFF1F5F9),
+                                  color: AppColors.surfaceLight,
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
                                   job.categoryName ?? 'Kazi',
                                   style: const TextStyle(
                                     fontSize: 10,
-                                    color: Color(0xFF64748B),
+                                    color: AppColors.textSecondary,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -1384,7 +1385,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF8FAFC),
+                    color: AppColors.background,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -1393,14 +1394,14 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                       const Text(
                         'Kiasi cha kulipa:',
                         style: TextStyle(
-                          color: Color(0xFF64748B),
+                          color: AppColors.textSecondary,
                           fontSize: 13,
                         ),
                       ),
                       Text(
                         'TZS ${_formatJobPrice(job.price)}',
                         style: const TextStyle(
-                          color: Color(0xFF1E293B),
+                          color: AppColors.textPrimary,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -1417,7 +1418,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                       child: OutlinedButton.icon(
                         onPressed: () => _showDeleteConfirmation(job),
                         icon: const Icon(Icons.delete_outline_rounded, size: 18),
-                        label: const Text('FUTA'),
+                        label: Text(context.tr('delete_job_btn').toUpperCase()),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: const Color(0xFFEF4444),
                           side: const BorderSide(color: Color(0xFFEF4444)),
@@ -1435,10 +1436,10 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                       child: ElevatedButton.icon(
                         onPressed: () => _retryPayment(job),
                         icon: const Icon(Icons.refresh_rounded, size: 18),
-                        label: const Text('LIPIA TENA'),
+                        label: Text(context.tr('retry_payment_btn').toUpperCase()),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF22C55E),
-                          foregroundColor: Colors.white,
+                          foregroundColor: AppColors.surface,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
@@ -1474,25 +1475,25 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                 color: Color(0xFFEF4444), size: 24),
             ),
             const SizedBox(width: 12),
-            const Text('Futa Kazi?', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(context.tr('confirm_delete_title'), style: const TextStyle(fontWeight: FontWeight.bold)),
           ],
         ),
         content: Text(
-          'Una uhakika unataka kufuta kazi "${job.title}"?\n\nKazi hii haijakulipiwa, kwa hiyo itafutwa kabisa.',
-          style: const TextStyle(color: Color(0xFF64748B)),
+          context.tr('confirm_delete_job'),
+          style: const TextStyle(color: AppColors.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('HAPANA'),
+            child: Text(context.tr('no').toUpperCase()),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFEF4444),
-              foregroundColor: Colors.white,
+              foregroundColor: AppColors.surface,
             ),
-            child: const Text('NDIYO, FUTA'),
+            child: Text(context.tr('yes_delete').toUpperCase()),
           ),
         ],
       ),
@@ -1619,7 +1620,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
             Container(
               padding: const EdgeInsets.all(24),
               decoration: const BoxDecoration(
-                color: Color(0xFFF1F5F9),
+                color: AppColors.surfaceLight,
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -1671,7 +1672,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -1715,7 +1716,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF1E293B),
+                            color: AppColors.textPrimary,
                             height: 1.3,
                           ),
                         ),
@@ -1747,14 +1748,14 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF1F5F9),
+                          color: AppColors.surfaceLight,
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
                           job.categoryName ?? 'Other',
                           style: const TextStyle(
                             fontSize: 10,
-                            color: Color(0xFF64748B),
+                            color: AppColors.textSecondary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -1790,7 +1791,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                         Expanded(
                           child: Text(
                             job.workerName ?? 'Mfanyakazi',
-                            style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                            style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -1921,7 +1922,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
       case 'cancelled':
         return const Color(0xFFEF4444);
       default:
-        return const Color(0xFF94A3B8);
+        return AppColors.textLight;
     }
   }
 
@@ -1994,7 +1995,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
     final isLoading = clientProvider.isDashboardLoading;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       body: RefreshIndicator(
         onRefresh: _loadData,
         color: AppColors.primary,
@@ -2027,7 +2028,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                             const Text(
                               'Dashibodi',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AppColors.surface,
                                 fontSize: 26,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: -0.5,
@@ -2037,7 +2038,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                               children: [
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.2),
+                                    color: AppColors.surface.withOpacity(0.2),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: IconButton(
@@ -2047,21 +2048,21 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                                             height: 20,
                                             child: CircularProgressIndicator(
                                               strokeWidth: 2,
-                                              color: Colors.white,
+                                              color: AppColors.surface,
                                             ),
                                           )
-                                        : const Icon(Icons.refresh_rounded, color: Colors.white),
+                                        : const Icon(Icons.refresh_rounded, color: AppColors.surface),
                                     onPressed: _loadData,
                                   ),
                                 ),
                                 const SizedBox(width: 8),
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.2),
+                                    color: AppColors.surface.withOpacity(0.2),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: IconButton(
-                                    icon: const Icon(Icons.settings_outlined, color: Colors.white),
+                                    icon: const Icon(Icons.settings_outlined, color: AppColors.surface),
                                     onPressed: () => Navigator.pushNamed(context, AppRouter.settingsPage),
                                   ),
                                 ),
@@ -2074,9 +2075,9 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                         Container(
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
+                            color: AppColors.surface.withOpacity(0.15),
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.white.withOpacity(0.2)),
+                            border: Border.all(color: AppColors.surface.withOpacity(0.2)),
                           ),
                           child: Row(
                             children: [
@@ -2087,11 +2088,11 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                                     padding: const EdgeInsets.all(3),
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      border: Border.all(color: Colors.white, width: 2),
+                                      border: Border.all(color: AppColors.surface, width: 2),
                                     ),
                                     child: CircleAvatar(
                                       radius: 32,
-                                      backgroundColor: Colors.white,
+                                      backgroundColor: AppColors.surface,
                                       backgroundImage: user?.profilePhotoUrl != null
                                           ? NetworkImage(user!.profilePhotoUrl!)
                                           : null,
@@ -2116,7 +2117,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                                         color: Color(0xFF22C55E),
                                         shape: BoxShape.circle,
                                       ),
-                                      child: const Icon(Icons.check, size: 12, color: Colors.white),
+                                      child: const Icon(Icons.check, size: 12, color: AppColors.surface),
                                     ),
                                   ),
                                 ],
@@ -2129,7 +2130,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                                     Text(
                                       user?.name ?? 'Mteja',
                                       style: const TextStyle(
-                                        color: Colors.white,
+                                        color: AppColors.surface,
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -2138,7 +2139,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                                     Text(
                                       user?.email ?? '',
                                       style: TextStyle(
-                                        color: Colors.white.withOpacity(0.8),
+                                        color: AppColors.surface.withOpacity(0.8),
                                         fontSize: 13,
                                       ),
                                     ),
@@ -2147,7 +2148,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                                       Text(
                                         user!.phone!,
                                         style: TextStyle(
-                                          color: Colors.white.withOpacity(0.7),
+                                          color: AppColors.surface.withOpacity(0.7),
                                           fontSize: 12,
                                         ),
                                       ),
@@ -2164,7 +2165,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                                 child: const Text(
                                   'Muhitaji',
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: AppColors.surface,
                                     fontSize: 11,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -2211,16 +2212,16 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                               Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.2),
+                                  color: AppColors.surface.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: const Icon(Icons.account_balance_wallet_rounded, color: Colors.white, size: 24),
+                                child: const Icon(Icons.account_balance_wallet_rounded, color: AppColors.surface, size: 24),
                               ),
                               const SizedBox(width: 12),
                               const Text(
                                 'Salio la Wallet',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: AppColors.surface,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -2233,7 +2234,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: AppColors.surface,
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: const Row(
@@ -2261,7 +2262,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                           const Text(
                             'TZS ',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppColors.surface,
                               fontSize: 20,
                               fontWeight: FontWeight.w500,
                             ),
@@ -2271,14 +2272,14 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                                   width: 24,
                                   height: 24,
                                   child: CircularProgressIndicator(
-                                    color: Colors.white,
+                                    color: AppColors.surface,
                                     strokeWidth: 2,
                                   ),
                                 )
                               : Text(
                                   _formatCurrency(clientProvider.walletBalance),
                                   style: const TextStyle(
-                                    color: Colors.white,
+                                    color: AppColors.surface,
                                     fontSize: 36,
                                     fontWeight: FontWeight.bold,
                                     letterSpacing: -1,
@@ -2291,7 +2292,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.15),
+                            color: AppColors.surface.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: const Text(
@@ -2314,14 +2315,14 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [Color(0xFF059669), Color(0xFF10B981)],
+                      colors: [AppColors.success, AppColors.success],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF059669).withValues(alpha: 0.3),
+                        color: AppColors.success.withValues(alpha: 0.3),
                         blurRadius: 15,
                         offset: const Offset(0, 6),
                       ),
@@ -2332,10 +2333,10 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
+                          color: AppColors.surface.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(14),
                         ),
-                        child: const Icon(Icons.payments_rounded, color: Colors.white, size: 28),
+                        child: const Icon(Icons.payments_rounded, color: AppColors.surface, size: 28),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
@@ -2353,7 +2354,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                             Text(
                               'TZS ${_formatCurrency(dashboard?.totalPaid ?? 0)}',
                               style: const TextStyle(
-                                color: Colors.white,
+                                color: AppColors.surface,
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -2364,12 +2365,12 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
+                          color: AppColors.surface.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
                           '${dashboard?.paymentHistory.length ?? 0} malipo',
-                          style: const TextStyle(color: Colors.white, fontSize: 11),
+                          style: const TextStyle(color: AppColors.surface, fontSize: 11),
                         ),
                       ),
                     ],
@@ -2418,7 +2419,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF1E293B),
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     if (dashboard?.paymentHistory.isNotEmpty == true)
@@ -2445,7 +2446,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                   child: Container(
                     padding: const EdgeInsets.all(30),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.surface,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
@@ -2517,7 +2518,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
       child: Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
@@ -2547,7 +2548,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
+                      color: AppColors.textPrimary,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -2555,7 +2556,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                     label,
                     style: const TextStyle(
                       fontSize: 10,
-                      color: Color(0xFF64748B),
+                      color: AppColors.textSecondary,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -2574,7 +2575,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -2614,7 +2615,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF1E293B),
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -2624,12 +2625,12 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF1F5F9),
+                          color: AppColors.surfaceLight,
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
                           payment.channel!,
-                          style: const TextStyle(fontSize: 10, color: Color(0xFF64748B)),
+                          style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -2637,7 +2638,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                     if (payment.createdAt != null)
                       Text(
                         _formatPaymentDate(payment.createdAt!),
-                        style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+                        style: const TextStyle(fontSize: 11, color: AppColors.textLight),
                       ),
                   ],
                 ),
@@ -2653,7 +2654,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                 style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E293B),
+                  color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 2),
@@ -2722,7 +2723,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
               bottom: MediaQuery.of(context).viewInsets.bottom,
             ),
             decoration: const BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(30),
                 topRight: Radius.circular(30),
@@ -2740,7 +2741,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                       width: 50,
                       height: 5,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFE2E8F0),
+                        color: AppColors.grey200,
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
@@ -2757,7 +2758,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1E293B),
+                          color: AppColors.textPrimary,
                         ),
                       ),
                     ],
@@ -2766,7 +2767,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                   Text(
                     'Salio lako: TZS ${_formatCurrency(clientProvider.walletBalance)}',
                     style: const TextStyle(
-                      color: Color(0xFF64748B),
+                      color: AppColors.textSecondary,
                       fontSize: 14,
                     ),
                   ),
@@ -2777,7 +2778,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                     'Kiasi (TZS)',
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF1E293B),
+                      color: AppColors.textPrimary,
                       fontSize: 14,
                     ),
                   ),
@@ -2787,16 +2788,16 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       hintText: 'Mfano: 5000',
-                      prefixIcon: const Icon(Icons.payments_outlined, color: Color(0xFF94A3B8)),
+                      prefixIcon: const Icon(Icons.payments_outlined, color: AppColors.textLight),
                       filled: true,
-                      fillColor: const Color(0xFFF8FAFC),
+                      fillColor: AppColors.background,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide.none,
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                        borderSide: const BorderSide(color: AppColors.grey200),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
@@ -2811,7 +2812,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                     'Namba ya Simu',
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF1E293B),
+                      color: AppColors.textPrimary,
                       fontSize: 14,
                     ),
                   ),
@@ -2821,16 +2822,16 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                     keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
                       hintText: '07XXXXXXXX',
-                      prefixIcon: const Icon(Icons.phone_android_rounded, color: Color(0xFF94A3B8)),
+                      prefixIcon: const Icon(Icons.phone_android_rounded, color: AppColors.textLight),
                       filled: true,
-                      fillColor: const Color(0xFFF8FAFC),
+                      fillColor: AppColors.background,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide.none,
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                        borderSide: const BorderSide(color: AppColors.grey200),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
@@ -2845,7 +2846,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                     'Jina la M-Pesa',
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF1E293B),
+                      color: AppColors.textPrimary,
                       fontSize: 14,
                     ),
                   ),
@@ -2854,16 +2855,16 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                     controller: nameController,
                     decoration: InputDecoration(
                       hintText: 'Jina lililosajiliwa kwenye simu',
-                      prefixIcon: const Icon(Icons.person_outline_rounded, color: Color(0xFF94A3B8)),
+                      prefixIcon: const Icon(Icons.person_outline_rounded, color: AppColors.textLight),
                       filled: true,
-                      fillColor: const Color(0xFFF8FAFC),
+                      fillColor: AppColors.background,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide.none,
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                        borderSide: const BorderSide(color: AppColors.grey200),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
@@ -2878,7 +2879,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                     'Mtandao',
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF1E293B),
+                      color: AppColors.textPrimary,
                       fontSize: 14,
                     ),
                   ),
@@ -2916,9 +2917,9 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
 
                               if (amount < 5000) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Kiasi cha chini ni TZS 5,000'),
-                                    backgroundColor: Color(0xFFEF4444),
+                                  SnackBar(
+                                    content: Text(context.tr('min_amount_error')),
+                                    backgroundColor: const Color(0xFFEF4444),
                                   ),
                                 );
                                 return;
@@ -2926,9 +2927,9 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
 
                               if (amount > clientProvider.walletBalance) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Salio lako halitoshi'),
-                                    backgroundColor: Color(0xFFEF4444),
+                                  SnackBar(
+                                    content: Text(context.tr('insufficient_balance_error')),
+                                    backgroundColor: const Color(0xFFEF4444),
                                   ),
                                 );
                                 return;
@@ -2936,9 +2937,9 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
 
                               if (phone.isEmpty || name.isEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Tafadhali jaza taarifa zote'),
-                                    backgroundColor: Color(0xFFEF4444),
+                                  SnackBar(
+                                    content: Text(context.tr('fill_all_fields')),
+                                    backgroundColor: const Color(0xFFEF4444),
                                   ),
                                 );
                                 return;
@@ -2955,9 +2956,9 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                                 if (context.mounted) {
                                   Navigator.pop(context);
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Ombi lako limewasilishwa! Subiri uthibitisho.'),
-                                      backgroundColor: Color(0xFF22C55E),
+                                    SnackBar(
+                                      content: Text(context.tr('withdrawal_submitted')),
+                                      backgroundColor: const Color(0xFF22C55E),
                                     ),
                                   );
                                 }
@@ -2965,7 +2966,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text('Hitilafu: $e'),
+                                      content: Text('${context.tr("error_prefix")}: $e'),
                                       backgroundColor: const Color(0xFFEF4444),
                                     ),
                                   );
@@ -2974,7 +2975,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                             },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF7C3AED),
-                        foregroundColor: Colors.white,
+                        foregroundColor: AppColors.surface,
                         padding: const EdgeInsets.symmetric(vertical: 18),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
@@ -2986,7 +2987,7 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
                               width: 24,
                               height: 24,
                               child: CircularProgressIndicator(
-                                color: Colors.white,
+                                color: AppColors.surface,
                                 strokeWidth: 2.5,
                               ),
                             )
@@ -3016,16 +3017,16 @@ class _ClientDashboardTabState extends State<_ClientDashboardTab> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF7C3AED) : const Color(0xFFF8FAFC),
+          color: isSelected ? const Color(0xFF7C3AED) : AppColors.background,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? const Color(0xFF7C3AED) : const Color(0xFFE2E8F0),
+            color: isSelected ? const Color(0xFF7C3AED) : AppColors.grey200,
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.white : const Color(0xFF64748B),
+            color: isSelected ? AppColors.textWhite : AppColors.textSecondary,
             fontWeight: FontWeight.w600,
             fontSize: 13,
           ),

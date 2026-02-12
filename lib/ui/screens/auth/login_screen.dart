@@ -4,6 +4,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/constants.dart';
+import '../../../core/localization/app_localizations.dart';
+import '../../../ui/widgets/buttons.dart';
 import '../../../core/router/app_router.dart';
 import '../../../providers/providers.dart';
 
@@ -31,8 +33,8 @@ class _LoginScreenState extends State<LoginScreen> {
   void _login() async {
     if (!_formKey.currentState!.validate()) return;
     if (!_acceptedTerms) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Tafadhali kubali vigezo na masharti'),
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(context.tr('login_accept_terms_error')),
           backgroundColor: AppColors.error));
       return;
     }
@@ -47,29 +49,49 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(authProvider.error ?? 'Imeshindwa kuingia'),
+          content: Text(authProvider.error ?? context.tr('login_failed_error')),
           backgroundColor: AppColors.error));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final settingsProvider = context.watch<SettingsProvider>();
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surface,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
+          padding: AppSpacing.screenPaddingLarge,
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 50),
+                AppSpacing.verticalMd,
+                // Language switcher (SW | EN) – same as welcome screen
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    _buildLangChip(
+                      'SW',
+                      settingsProvider.locale.languageCode == 'sw',
+                      () => settingsProvider.setLocale(const Locale('sw')),
+                    ),
+                    AppSpacing.horizontalSm,
+                    _buildLangChip(
+                      'EN',
+                      settingsProvider.locale.languageCode == 'en',
+                      () => settingsProvider.setLocale(const Locale('en')),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 30),
                 Center(
                   child: Container(
                     padding: const EdgeInsets.all(20),
-                    decoration: const BoxDecoration(
-                        color: Color(0xFFEFF6FF), shape: BoxShape.circle),
+                    decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.08),
+                        shape: BoxShape.circle),
                     child: Image.asset('assets/images/tendalogo.jpg',
                         width: 60,
                         height: 60,
@@ -80,29 +102,27 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
                 const SizedBox(height: 30),
-                const Center(
-                    child: Text('Karibu Tena!',
-                        style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF1E293B)))),
+                Center(
+                    child: Text(context.tr('login_welcome_title'),
+                        style: AppTextStyles.h1)),
                 const SizedBox(height: 10),
-                const Center(
-                    child: Text('Ingia kwenye akaunti yako ili uendelee.',
-                        style:
-                            TextStyle(fontSize: 15, color: Color(0xFF64748B)))),
+                Center(
+                    child: Text(context.tr('login_subtitle'),
+                        style: AppTextStyles.bodyLarge.copyWith(
+                            color: AppColors.textSecondary))),
                 const SizedBox(height: 50),
 
                 // Inputs
-                _buildLabel('Barua Pepe'),
+                _buildLabel(context.tr('login_email_label')),
                 _buildInput(
                   controller: _emailController,
-                  hint: 'mfano@email.com',
+                  hint: context.tr('login_email_hint'),
                   icon: Icons.email_outlined,
-                  validator: (v) => v!.isEmpty ? 'Weka barua pepe' : null,
+                  validator: (v) =>
+                      v!.isEmpty ? context.tr('login_enter_email') : null,
                 ),
                 const SizedBox(height: 20),
-                _buildLabel('Nenosiri'),
+                _buildLabel(context.tr('login_password_label')),
                 _buildInput(
                   controller: _passwordController,
                   hint: '••••••••',
@@ -114,22 +134,20 @@ class _LoginScreenState extends State<LoginScreen> {
                             ? Icons.visibility_outlined
                             : Icons.visibility_off_outlined,
                         size: 20,
-                        color: const Color(0xFF94A3B8)),
+                        color: AppColors.textLight),
                     onPressed: () =>
                         setState(() => _obscurePassword = !_obscurePassword),
                   ),
-                  validator: (v) => v!.isEmpty ? 'Weka nenosiri' : null,
+                  validator: (v) =>
+                      v!.isEmpty ? context.tr('login_enter_password') : null,
                 ),
 
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
                       onPressed: () {},
-                      child: const Text('Umesahau Nenosiri?',
-                          style: TextStyle(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13))),
+                      child: Text(context.tr('login_forgot_password'),
+                          style: AppTextStyles.link)),
                 ),
 
                 const SizedBox(height: 15),
@@ -153,22 +171,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     Expanded(
                       child: RichText(
                         text: TextSpan(
-                          style: const TextStyle(
-                              color: Color(0xFF64748B), fontSize: 12),
+                          style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
                           children: [
-                            const TextSpan(text: 'Nimekubali '),
+                            TextSpan(text: context.tr('login_terms_agree')),
                             TextSpan(
-                              text: 'Vigezo na Masharti',
-                              style: const TextStyle(
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.bold,
-                                  decoration: TextDecoration.underline),
+                              text: context.tr('login_terms_link'),
+                              style: AppTextStyles.link,
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () async {
-                                  final url =
-                                      Uri.parse('https://tendapoa.com/terms-and-conditions');
+                                  final url = Uri.parse(
+                                      'https://tendapoa.com/terms-and-conditions');
                                   if (await canLaunchUrl(url)) {
-                                    await launchUrl(url, mode: LaunchMode.externalApplication);
+                                    await launchUrl(url,
+                                        mode: LaunchMode.externalApplication);
                                   }
                                 },
                             ),
@@ -182,28 +197,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 40),
 
                 Consumer<AuthProvider>(
-                  builder: (_, auth, __) => SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: ElevatedButton(
-                      onPressed: auth.isLoading ? null : _login,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18)),
-                        elevation: 0,
-                      ),
-                      child: auth.isLoading
-                          ? const SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                  color: Colors.white, strokeWidth: 2))
-                          : const Text('Ingia Sasa',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 16)),
-                    ),
+                  builder: (_, auth, __) => PrimaryButton(
+                    text: context.tr('login_btn'),
+                    onPressed: _login,
+                    isLoading: auth.isLoading,
+                    isFullWidth: true,
                   ),
                 ),
 
@@ -213,16 +211,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () =>
                         Navigator.pushNamed(context, AppRouter.roleSelect),
                     child: RichText(
-                      text: const TextSpan(
-                        style:
-                            TextStyle(color: Color(0xFF64748B), fontSize: 14),
+                      text: TextSpan(
+                        style: AppTextStyles.bodyLarge.copyWith(color: AppColors.textSecondary),
                         children: [
-                          TextSpan(text: 'Huna akaunti? '),
+                          TextSpan(text: context.tr('login_no_account')),
                           TextSpan(
-                              text: 'Jiunge hapa',
-                              style: TextStyle(
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.bold)),
+                              text: context.tr('login_register_here'),
+style: AppTextStyles.link.copyWith(decoration: TextDecoration.none)),
                         ],
                       ),
                     ),
@@ -237,14 +232,31 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  Widget _buildLangChip(String label, bool active, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: active ? AppColors.primary.withValues(alpha: 0.15) : AppColors.surfaceLight,
+          borderRadius: AppSpacing.borderRadiusRound,
+          border: active ? Border.all(color: AppColors.primary, width: 1.5) : null,
+        ),
+        child: Text(
+          label,
+          style: AppTextStyles.labelLarge.copyWith(
+            color: active ? AppColors.primary : AppColors.textLight,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildLabel(String text) {
     return Padding(
         padding: const EdgeInsets.only(bottom: 8, left: 4),
-        child: Text(text,
-            style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF475569),
-                fontSize: 13)));
+        child: Text(text, style: AppTextStyles.labelLarge.copyWith(color: AppColors.textSecondary)));
   }
 
   Widget _buildInput(
@@ -256,18 +268,18 @@ class _LoginScreenState extends State<LoginScreen> {
       String? Function(String?)? validator}) {
     return Container(
       decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: const Color(0xFFF1F5F9))),
+          color: AppColors.background,
+          borderRadius: AppSpacing.borderRadiusLg,
+          border: Border.all(color: AppColors.surfaceLight)),
       child: TextFormField(
         controller: controller,
         obscureText: obscureText,
         validator: validator,
         decoration: InputDecoration(
-          prefixIcon: Icon(icon, size: 20, color: const Color(0xFF94A3B8)),
+          prefixIcon: Icon(icon, size: AppSpacing.iconSizeSm, color: AppColors.textLight),
           suffixIcon: suffix,
           hintText: hint,
-          hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
+          hintStyle: AppTextStyles.bodyLarge.copyWith(color: AppColors.textLight),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 18),
         ),

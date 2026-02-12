@@ -41,12 +41,14 @@ class AppSpacing {
   static const double radiusMd = 12.0;
   static const double radiusLg = 16.0;
   static const double radiusXl = 24.0;
+  static const double radius2xl = 30.0;
   static const double radiusRound = 100.0;
 
   static BorderRadius borderRadiusSm = BorderRadius.circular(radiusSm);
   static BorderRadius borderRadiusMd = BorderRadius.circular(radiusMd);
   static BorderRadius borderRadiusLg = BorderRadius.circular(radiusLg);
   static BorderRadius borderRadiusXl = BorderRadius.circular(radiusXl);
+  static BorderRadius borderRadius2xl = BorderRadius.circular(radius2xl);
   static BorderRadius borderRadiusRound = BorderRadius.circular(radiusRound);
 
   // Dimensions

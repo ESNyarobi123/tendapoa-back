@@ -14,6 +14,8 @@ class AppConstants {
   static const String fcmTokenKey = 'fcm_token';
   static const String categoriesKey = 'categories_cache';
   static const String settingsKey = 'settings_cache';
+  /// Language for API Accept-Language header (same key as SettingsProvider)
+  static const String languageKey = 'app_language';
 
   // ===== USER ROLES =====
   static const String roleMuhitaji = 'muhitaji';

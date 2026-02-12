@@ -248,14 +248,14 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF1E293B),
+                                color: AppColors.textPrimary,
                               ),
                             ),
                             Text(
                               'Wateja wamekuchagua - kubali au kataa',
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Color(0xFF64748B),
+                                color: AppColors.textSecondary,
                               ),
                             ),
                           ],
@@ -356,7 +356,7 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1E293B),
+              color: AppColors.textPrimary,
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -400,7 +400,7 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
                   child: Text(
                     job.categoryName!,
                     style: const TextStyle(
-                      color: Color(0xFF64748B),
+                      color: AppColors.textSecondary,
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
@@ -452,7 +452,7 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 13,
-                        color: Color(0xFF1E293B),
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     if (job.addressText != null)
@@ -600,7 +600,7 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
                         'Kazi Inayoendelea',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Color(0xFF64748B),
+                          color: AppColors.textSecondary,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -609,7 +609,7 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1E293B),
+                          color: AppColors.textPrimary,
                         ),
                       ),
                     ],

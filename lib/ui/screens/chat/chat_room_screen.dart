@@ -139,7 +139,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         centerTitle: false,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded,
-              color: Color(0xFF1E293B), size: 18),
+              color: AppColors.textPrimary, size: 18),
           onPressed: () => Navigator.pop(context),
         ),
         title: Row(
@@ -168,7 +168,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                 children: [
                   Text(otherUser?.name ?? 'Chat',
                       style: const TextStyle(
-                          color: Color(0xFF1E293B),
+                          color: AppColors.textPrimary,
                           fontSize: 16,
                           fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis),
@@ -185,12 +185,13 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.call_outlined,
-                color: Color(0xFF1E293B), size: 22),
+                color: AppColors.textPrimary, size: 22),
             onPressed: () {
               if (otherUser?.phone != null) {
                 _makePhoneCall(otherUser!.phone!);
-              } else if (widget.conversation.job?.phone != null)
+              } else if (widget.conversation.job?.phone != null) {
                 _makePhoneCall(widget.conversation.job!.phone!);
+              }
             },
           ),
           const SizedBox(width: 10),
@@ -276,7 +277,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             child: Text(
               msg.message,
               style: TextStyle(
-                color: isMe ? Colors.white : const Color(0xFF1E293B),
+                color: isMe ? Colors.white : AppColors.textPrimary,
                 fontSize: 15,
                 height: 1.4,
               ),

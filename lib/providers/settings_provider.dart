@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../core/constants/app_constants.dart';
 
 class SettingsProvider with ChangeNotifier {
-  static const String keyLanguage = 'app_language';
+  static const String keyLanguage = AppConstants.languageKey;
   static const String keyTheme = 'app_theme';
 
   Locale _locale = const Locale('sw'); // Default to Swahili

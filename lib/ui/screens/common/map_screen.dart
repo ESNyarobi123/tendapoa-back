@@ -135,7 +135,7 @@ class _MapScreenState extends State<MapScreen> {
                     Text(
                       'TZS ${NumberFormat.compact().format(job.price)}',
                       style: TextStyle(
-                        color: isSelected ? Colors.white : const Color(0xFF1E293B),
+                        color: isSelected ? Colors.white : AppColors.textPrimary,
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                       ),
@@ -252,7 +252,7 @@ class _MapScreenState extends State<MapScreen> {
                 ),
                 child: const Icon(
                   Icons.arrow_back_ios_new,
-                  color: Color(0xFF1E293B),
+                  color: AppColors.textPrimary,
                   size: 20,
                 ),
               ),
@@ -386,7 +386,7 @@ class _MapScreenState extends State<MapScreen> {
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1E293B),
+                          color: AppColors.textPrimary,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -490,7 +490,7 @@ class _MapScreenState extends State<MapScreen> {
                   child: Text(
                     job.userName ?? 'Mteja',
                     style: const TextStyle(
-                      color: Color(0xFF64748B),
+                      color: AppColors.textSecondary,
                       fontSize: 14,
                     ),
                   ),

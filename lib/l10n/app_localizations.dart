@@ -1298,6 +1298,108 @@ abstract class AppLocalizations {
   /// **'Tayari nina akaunti? Ingia'**
   String get have_account_login;
 
+  /// No description provided for @welcome_have_account.
+  ///
+  /// In sw, this message translates to:
+  /// **'Tayari una akaunti? '**
+  String get welcome_have_account;
+
+  /// No description provided for @welcome_login_link.
+  ///
+  /// In sw, this message translates to:
+  /// **'Ingia hapa'**
+  String get welcome_login_link;
+
+  /// No description provided for @login_welcome_title.
+  ///
+  /// In sw, this message translates to:
+  /// **'Karibu Tena!'**
+  String get login_welcome_title;
+
+  /// No description provided for @login_subtitle.
+  ///
+  /// In sw, this message translates to:
+  /// **'Ingia kwenye akaunti yako ili uendelee.'**
+  String get login_subtitle;
+
+  /// No description provided for @login_email_label.
+  ///
+  /// In sw, this message translates to:
+  /// **'Barua Pepe'**
+  String get login_email_label;
+
+  /// No description provided for @login_email_hint.
+  ///
+  /// In sw, this message translates to:
+  /// **'mfano@email.com'**
+  String get login_email_hint;
+
+  /// No description provided for @login_password_label.
+  ///
+  /// In sw, this message translates to:
+  /// **'Nenosiri'**
+  String get login_password_label;
+
+  /// No description provided for @login_forgot_password.
+  ///
+  /// In sw, this message translates to:
+  /// **'Umesahau Nenosiri?'**
+  String get login_forgot_password;
+
+  /// No description provided for @login_terms_agree.
+  ///
+  /// In sw, this message translates to:
+  /// **'Nimekubali '**
+  String get login_terms_agree;
+
+  /// No description provided for @login_terms_link.
+  ///
+  /// In sw, this message translates to:
+  /// **'Vigezo na Masharti'**
+  String get login_terms_link;
+
+  /// No description provided for @login_btn.
+  ///
+  /// In sw, this message translates to:
+  /// **'Ingia Sasa'**
+  String get login_btn;
+
+  /// No description provided for @login_no_account.
+  ///
+  /// In sw, this message translates to:
+  /// **'Huna akaunti? '**
+  String get login_no_account;
+
+  /// No description provided for @login_register_here.
+  ///
+  /// In sw, this message translates to:
+  /// **'Jiunge hapa'**
+  String get login_register_here;
+
+  /// No description provided for @login_accept_terms_error.
+  ///
+  /// In sw, this message translates to:
+  /// **'Tafadhali kubali vigezo na masharti'**
+  String get login_accept_terms_error;
+
+  /// No description provided for @login_failed_error.
+  ///
+  /// In sw, this message translates to:
+  /// **'Imeshindwa kuingia'**
+  String get login_failed_error;
+
+  /// No description provided for @login_enter_email.
+  ///
+  /// In sw, this message translates to:
+  /// **'Weka barua pepe'**
+  String get login_enter_email;
+
+  /// No description provided for @login_enter_password.
+  ///
+  /// In sw, this message translates to:
+  /// **'Weka nenosiri'**
+  String get login_enter_password;
+
   /// No description provided for @nyumbani_nav.
   ///
   /// In sw, this message translates to:
@@ -1574,6 +1676,18 @@ abstract class AppLocalizations {
   /// **'Wewe ni nani?'**
   String get who_are_you;
 
+  /// No description provided for @role_select_title.
+  ///
+  /// In sw, this message translates to:
+  /// **'Chagua Aina ya Akaunti'**
+  String get role_select_title;
+
+  /// No description provided for @role_select_subtitle.
+  ///
+  /// In sw, this message translates to:
+  /// **'Niambie namna ungependa kutumia Tendapoa ili tusaidie vizuri.'**
+  String get role_select_subtitle;
+
   /// No description provided for @role_muhitaji_title.
   ///
   /// In sw, this message translates to:
@@ -1669,6 +1783,1056 @@ abstract class AppLocalizations {
   /// In sw, this message translates to:
   /// **'Lipia Tena'**
   String get retry_payment_btn;
+
+  /// No description provided for @register_password_mismatch.
+  ///
+  /// In sw, this message translates to:
+  /// **'Nenosiri halifanani!'**
+  String get register_password_mismatch;
+
+  /// No description provided for @register_failed.
+  ///
+  /// In sw, this message translates to:
+  /// **'Imeshindwa kusajili'**
+  String get register_failed;
+
+  /// No description provided for @register_location_required_title.
+  ///
+  /// In sw, this message translates to:
+  /// **'Eneo Linahitajika!'**
+  String get register_location_required_title;
+
+  /// No description provided for @register_location_required_subtitle.
+  ///
+  /// In sw, this message translates to:
+  /// **'Kama mfanyakazi, eneo lako ni lazima ili:'**
+  String get register_location_required_subtitle;
+
+  /// No description provided for @register_location_reason_1.
+  ///
+  /// In sw, this message translates to:
+  /// **'Wateja waone umbali wako'**
+  String get register_location_reason_1;
+
+  /// No description provided for @register_location_reason_2.
+  ///
+  /// In sw, this message translates to:
+  /// **'Upate kazi zilizo karibu nawe'**
+  String get register_location_reason_2;
+
+  /// No description provided for @register_location_reason_3.
+  ///
+  /// In sw, this message translates to:
+  /// **'Mfumo uhesabu umbali kwa usahihi'**
+  String get register_location_reason_3;
+
+  /// No description provided for @register_location_ok_btn.
+  ///
+  /// In sw, this message translates to:
+  /// **'SAWA, NITAWEKA ENEO'**
+  String get register_location_ok_btn;
+
+  /// No description provided for @register_badge_muhitaji.
+  ///
+  /// In sw, this message translates to:
+  /// **'Muhitaji / Mteja'**
+  String get register_badge_muhitaji;
+
+  /// No description provided for @register_badge_mfanyakazi.
+  ///
+  /// In sw, this message translates to:
+  /// **'Mfanyakazi / Fundi'**
+  String get register_badge_mfanyakazi;
+
+  /// No description provided for @register_title_muhitaji.
+  ///
+  /// In sw, this message translates to:
+  /// **'Karibu TendaPoa!'**
+  String get register_title_muhitaji;
+
+  /// No description provided for @register_title_mfanyakazi.
+  ///
+  /// In sw, this message translates to:
+  /// **'Jiunge na TendaPoa!'**
+  String get register_title_mfanyakazi;
+
+  /// No description provided for @register_subtitle_muhitaji.
+  ///
+  /// In sw, this message translates to:
+  /// **'Pata wafanyakazi wazuri karibu nawe'**
+  String get register_subtitle_muhitaji;
+
+  /// No description provided for @register_subtitle_mfanyakazi.
+  ///
+  /// In sw, this message translates to:
+  /// **'Anza kupata kazi karibu nawe leo'**
+  String get register_subtitle_mfanyakazi;
+
+  /// No description provided for @register_section_personal.
+  ///
+  /// In sw, this message translates to:
+  /// **'Taarifa Binafsi'**
+  String get register_section_personal;
+
+  /// No description provided for @register_full_name.
+  ///
+  /// In sw, this message translates to:
+  /// **'Jina Kamili'**
+  String get register_full_name;
+
+  /// No description provided for @register_full_name_hint.
+  ///
+  /// In sw, this message translates to:
+  /// **'Mfano: Juma Ramadhani'**
+  String get register_full_name_hint;
+
+  /// No description provided for @register_full_name_error.
+  ///
+  /// In sw, this message translates to:
+  /// **'Tafadhali weka jina lako'**
+  String get register_full_name_error;
+
+  /// No description provided for @register_email_error.
+  ///
+  /// In sw, this message translates to:
+  /// **'Tafadhali weka email'**
+  String get register_email_error;
+
+  /// No description provided for @register_email_invalid.
+  ///
+  /// In sw, this message translates to:
+  /// **'Email si sahihi'**
+  String get register_email_invalid;
+
+  /// No description provided for @register_phone_error.
+  ///
+  /// In sw, this message translates to:
+  /// **'Tafadhali weka namba ya simu'**
+  String get register_phone_error;
+
+  /// No description provided for @register_phone_invalid.
+  ///
+  /// In sw, this message translates to:
+  /// **'Namba ya simu si sahihi'**
+  String get register_phone_invalid;
+
+  /// No description provided for @register_section_security.
+  ///
+  /// In sw, this message translates to:
+  /// **'Usalama'**
+  String get register_section_security;
+
+  /// No description provided for @register_confirm_password.
+  ///
+  /// In sw, this message translates to:
+  /// **'Thibitisha Nenosiri'**
+  String get register_confirm_password;
+
+  /// No description provided for @register_confirm_password_error.
+  ///
+  /// In sw, this message translates to:
+  /// **'Tafadhali thibitisha nenosiri'**
+  String get register_confirm_password_error;
+
+  /// No description provided for @register_password_min.
+  ///
+  /// In sw, this message translates to:
+  /// **'Nenosiri liwe na herufi 6 au zaidi'**
+  String get register_password_min;
+
+  /// No description provided for @register_terms_notice.
+  ///
+  /// In sw, this message translates to:
+  /// **'Kwa kusajili, unakubali Masharti na Sera ya Faragha yetu.'**
+  String get register_terms_notice;
+
+  /// No description provided for @register_btn_muhitaji.
+  ///
+  /// In sw, this message translates to:
+  /// **'TENGENEZA AKAUNTI'**
+  String get register_btn_muhitaji;
+
+  /// No description provided for @register_btn_mfanyakazi.
+  ///
+  /// In sw, this message translates to:
+  /// **'JIUNGE KAMA FUNDI'**
+  String get register_btn_mfanyakazi;
+
+  /// No description provided for @register_location_title.
+  ///
+  /// In sw, this message translates to:
+  /// **'Eneo Lako'**
+  String get register_location_title;
+
+  /// No description provided for @register_required_badge.
+  ///
+  /// In sw, this message translates to:
+  /// **'LAZIMA'**
+  String get register_required_badge;
+
+  /// No description provided for @register_location_found.
+  ///
+  /// In sw, this message translates to:
+  /// **'Eneo limepatikana!'**
+  String get register_location_found;
+
+  /// No description provided for @register_location_tap.
+  ///
+  /// In sw, this message translates to:
+  /// **'Bonyeza kupata eneo lako'**
+  String get register_location_tap;
+
+  /// No description provided for @register_location_help.
+  ///
+  /// In sw, this message translates to:
+  /// **'Eneo lako linasaidia wateja kukupata kwa urahisi na kupata kazi zilizo karibu nawe.'**
+  String get register_location_help;
+
+  /// No description provided for @register_location_searching.
+  ///
+  /// In sw, this message translates to:
+  /// **'Inatafuta eneo...'**
+  String get register_location_searching;
+
+  /// No description provided for @register_location_refresh.
+  ///
+  /// In sw, this message translates to:
+  /// **'Sasisha Eneo'**
+  String get register_location_refresh;
+
+  /// No description provided for @register_location_get_btn.
+  ///
+  /// In sw, this message translates to:
+  /// **'PATA ENEO LANGU'**
+  String get register_location_get_btn;
+
+  /// No description provided for @register_location_success.
+  ///
+  /// In sw, this message translates to:
+  /// **'Eneo lako limepatikana!'**
+  String get register_location_success;
+
+  /// No description provided for @register_location_disabled.
+  ///
+  /// In sw, this message translates to:
+  /// **'Huduma ya eneo haijawashwa. Tafadhali washa GPS.'**
+  String get register_location_disabled;
+
+  /// No description provided for @register_location_denied.
+  ///
+  /// In sw, this message translates to:
+  /// **'Ruhusa ya eneo imekataliwa'**
+  String get register_location_denied;
+
+  /// No description provided for @register_location_denied_forever.
+  ///
+  /// In sw, this message translates to:
+  /// **'Ruhusa ya eneo imekataliwa kabisa. Nenda Settings kubadilisha.'**
+  String get register_location_denied_forever;
+
+  /// No description provided for @register_location_failed.
+  ///
+  /// In sw, this message translates to:
+  /// **'Imeshindikana kupata eneo'**
+  String get register_location_failed;
+
+  /// No description provided for @splash_tagline.
+  ///
+  /// In sw, this message translates to:
+  /// **'Kazi Imeisha!'**
+  String get splash_tagline;
+
+  /// No description provided for @confirm_delete_title.
+  ///
+  /// In sw, this message translates to:
+  /// **'Futa Kazi?'**
+  String get confirm_delete_title;
+
+  /// No description provided for @min_amount_error.
+  ///
+  /// In sw, this message translates to:
+  /// **'Kiasi cha chini ni TZS 5,000'**
+  String get min_amount_error;
+
+  /// No description provided for @fill_all_fields.
+  ///
+  /// In sw, this message translates to:
+  /// **'Tafadhali jaza taarifa zote'**
+  String get fill_all_fields;
+
+  /// No description provided for @withdrawal_submitted.
+  ///
+  /// In sw, this message translates to:
+  /// **'Ombi lako limewasilishwa! Subiri uthibitisho.'**
+  String get withdrawal_submitted;
+
+  /// No description provided for @error_prefix.
+  ///
+  /// In sw, this message translates to:
+  /// **'Hitilafu'**
+  String get error_prefix;
+
+  /// No description provided for @post_job_new.
+  ///
+  /// In sw, this message translates to:
+  /// **'Post Kazi Mpya'**
+  String get post_job_new;
+
+  /// No description provided for @gps_enable_first.
+  ///
+  /// In sw, this message translates to:
+  /// **'Tafadhali washa GPS yako kwanza'**
+  String get gps_enable_first;
+
+  /// No description provided for @location_detected.
+  ///
+  /// In sw, this message translates to:
+  /// **'Eneo limetambuliwa'**
+  String get location_detected;
+
+  /// No description provided for @job_location_placeholder.
+  ///
+  /// In sw, this message translates to:
+  /// **'Eneo la Kazi'**
+  String get job_location_placeholder;
+
+  /// No description provided for @step_details.
+  ///
+  /// In sw, this message translates to:
+  /// **'Maelezo'**
+  String get step_details;
+
+  /// No description provided for @step_location_post.
+  ///
+  /// In sw, this message translates to:
+  /// **'Eneo & Post'**
+  String get step_location_post;
+
+  /// No description provided for @post_need_help.
+  ///
+  /// In sw, this message translates to:
+  /// **'Unahitaji msaidizi gani?'**
+  String get post_need_help;
+
+  /// No description provided for @post_fill_details.
+  ///
+  /// In sw, this message translates to:
+  /// **'Jaza taarifa hizi ili mafundi wa karibu waanze kuomba.'**
+  String get post_fill_details;
+
+  /// No description provided for @post_title_hint.
+  ///
+  /// In sw, this message translates to:
+  /// **'Mfano: Napata fundi bomba wa kurekebisha sinki'**
+  String get post_title_hint;
+
+  /// No description provided for @post_budget_hint.
+  ///
+  /// In sw, this message translates to:
+  /// **'Mfano: 20,000'**
+  String get post_budget_hint;
+
+  /// No description provided for @post_description_hint.
+  ///
+  /// In sw, this message translates to:
+  /// **'Elezea kazi kwa undani zaidi hapa...'**
+  String get post_description_hint;
+
+  /// No description provided for @post_description_error.
+  ///
+  /// In sw, this message translates to:
+  /// **'Elezea kazi yako'**
+  String get post_description_error;
+
+  /// No description provided for @post_location_help.
+  ///
+  /// In sw, this message translates to:
+  /// **'Tunatumia GPS yako kutambua eneo ili mafundi wa karibu zaidi waone kazi yako.'**
+  String get post_location_help;
+
+  /// No description provided for @post_location_searching.
+  ///
+  /// In sw, this message translates to:
+  /// **'Inatafuta eneo...'**
+  String get post_location_searching;
+
+  /// No description provided for @post_allow_gps.
+  ///
+  /// In sw, this message translates to:
+  /// **'Tafadhali ruhusu GPS kwanza'**
+  String get post_allow_gps;
+
+  /// No description provided for @post_retry_location.
+  ///
+  /// In sw, this message translates to:
+  /// **'RUDIA KUTAFUTA'**
+  String get post_retry_location;
+
+  /// No description provided for @post_searching_workers.
+  ///
+  /// In sw, this message translates to:
+  /// **'Inatafuta wafanyakazi karibu nawe...'**
+  String get post_searching_workers;
+
+  /// No description provided for @post_no_workers_nearby.
+  ///
+  /// In sw, this message translates to:
+  /// **'Hakuna Wafanyakazi Karibu'**
+  String get post_no_workers_nearby;
+
+  /// No description provided for @post_continue_anyway.
+  ///
+  /// In sw, this message translates to:
+  /// **'Unaweza kuendelea lakini muda wa kupata mfanyakazi unaweza kuwa mrefu.'**
+  String get post_continue_anyway;
+
+  /// No description provided for @post_workers_found.
+  ///
+  /// In sw, this message translates to:
+  /// **'Wafanyakazi Wamepatikana!'**
+  String get post_workers_found;
+
+  /// No description provided for @post_job_visible_soon.
+  ///
+  /// In sw, this message translates to:
+  /// **'Kazi yako itaonekana haraka!'**
+  String get post_job_visible_soon;
+
+  /// No description provided for @post_within_km.
+  ///
+  /// In sw, this message translates to:
+  /// **'ndani'**
+  String get post_within_km;
+
+  /// No description provided for @post_continue_btn.
+  ///
+  /// In sw, this message translates to:
+  /// **'Endelea'**
+  String get post_continue_btn;
+
+  /// No description provided for @choose_photo.
+  ///
+  /// In sw, this message translates to:
+  /// **'Chagua Picha'**
+  String get choose_photo;
+
+  /// No description provided for @camera.
+  ///
+  /// In sw, this message translates to:
+  /// **'Kamera'**
+  String get camera;
+
+  /// No description provided for @gallery.
+  ///
+  /// In sw, this message translates to:
+  /// **'Galeri'**
+  String get gallery;
+
+  /// No description provided for @profile_updated.
+  ///
+  /// In sw, this message translates to:
+  /// **'Wasifu umesasishwa!'**
+  String get profile_updated;
+
+  /// No description provided for @today.
+  ///
+  /// In sw, this message translates to:
+  /// **'Leo'**
+  String get today;
+
+  /// No description provided for @yesterday.
+  ///
+  /// In sw, this message translates to:
+  /// **'Jana'**
+  String get yesterday;
+
+  /// No description provided for @mark_all_read.
+  ///
+  /// In sw, this message translates to:
+  /// **'Soma Zote'**
+  String get mark_all_read;
+
+  /// No description provided for @no_notifications.
+  ///
+  /// In sw, this message translates to:
+  /// **'Hakuna Taarifa'**
+  String get no_notifications;
+
+  /// No description provided for @notifications_empty_sub.
+  ///
+  /// In sw, this message translates to:
+  /// **'Taarifa zako zitaonekana hapa'**
+  String get notifications_empty_sub;
+
+  /// No description provided for @edit_job_title.
+  ///
+  /// In sw, this message translates to:
+  /// **'Hariri Kazi'**
+  String get edit_job_title;
+
+  /// No description provided for @select_job_location.
+  ///
+  /// In sw, this message translates to:
+  /// **'Tafadhali chagua eneo la kazi kwenye ramani'**
+  String get select_job_location;
+
+  /// No description provided for @price_cannot_decrease.
+  ///
+  /// In sw, this message translates to:
+  /// **'Huwezi kupunguza bei. Bei ya sasa ni TZS'**
+  String get price_cannot_decrease;
+
+  /// No description provided for @extra_payment_required.
+  ///
+  /// In sw, this message translates to:
+  /// **'Malipo ya ziada yanahitajika'**
+  String get extra_payment_required;
+
+  /// No description provided for @job_updated.
+  ///
+  /// In sw, this message translates to:
+  /// **'Kazi imebadilishwa!'**
+  String get job_updated;
+
+  /// No description provided for @refund_note.
+  ///
+  /// In sw, this message translates to:
+  /// **'Kama kazi ililipiwa, pesa itarudishwa kwenye wallet yako.'**
+  String get refund_note;
+
+  /// No description provided for @job_deleted.
+  ///
+  /// In sw, this message translates to:
+  /// **'Kazi imefutwa!'**
+  String get job_deleted;
+
+  /// No description provided for @cannot_edit.
+  ///
+  /// In sw, this message translates to:
+  /// **'Huwezi Kuhariri'**
+  String get cannot_edit;
+
+  /// No description provided for @cannot_edit_reason.
+  ///
+  /// In sw, this message translates to:
+  /// **'Kazi hii haiwezi kuhaririwa kwa sababu imeanza au imekamilika.'**
+  String get cannot_edit_reason;
+
+  /// No description provided for @edit_section_title.
+  ///
+  /// In sw, this message translates to:
+  /// **'Kichwa cha Kazi'**
+  String get edit_section_title;
+
+  /// No description provided for @edit_section_category.
+  ///
+  /// In sw, this message translates to:
+  /// **'Kategoria'**
+  String get edit_section_category;
+
+  /// No description provided for @edit_section_price.
+  ///
+  /// In sw, this message translates to:
+  /// **'Bei (TZS)'**
+  String get edit_section_price;
+
+  /// No description provided for @edit_section_description.
+  ///
+  /// In sw, this message translates to:
+  /// **'Maelezo'**
+  String get edit_section_description;
+
+  /// No description provided for @edit_price_hint.
+  ///
+  /// In sw, this message translates to:
+  /// **'Mfano: 25000'**
+  String get edit_price_hint;
+
+  /// No description provided for @edit_price_required.
+  ///
+  /// In sw, this message translates to:
+  /// **'Weka bei'**
+  String get edit_price_required;
+
+  /// No description provided for @edit_price_min.
+  ///
+  /// In sw, this message translates to:
+  /// **'Bei lazima iwe TZS 500+'**
+  String get edit_price_min;
+
+  /// No description provided for @edit_current_price_prefix.
+  ///
+  /// In sw, this message translates to:
+  /// **'Bei ya sasa: TZS '**
+  String get edit_current_price_prefix;
+
+  /// No description provided for @edit_current_price_suffix.
+  ///
+  /// In sw, this message translates to:
+  /// **'. Unaweza kuongeza tu, si kupunguza.'**
+  String get edit_current_price_suffix;
+
+  /// No description provided for @edit_my_location.
+  ///
+  /// In sw, this message translates to:
+  /// **'Eneo Langu'**
+  String get edit_my_location;
+
+  /// No description provided for @edit_address.
+  ///
+  /// In sw, this message translates to:
+  /// **'Anwani'**
+  String get edit_address;
+
+  /// No description provided for @edit_title_hint.
+  ///
+  /// In sw, this message translates to:
+  /// **'Mfano: Fundi Bomba Anahitajika'**
+  String get edit_title_hint;
+
+  /// No description provided for @edit_title_required.
+  ///
+  /// In sw, this message translates to:
+  /// **'Weka kichwa'**
+  String get edit_title_required;
+
+  /// No description provided for @edit_description_hint.
+  ///
+  /// In sw, this message translates to:
+  /// **'Eleza kazi kwa undani...'**
+  String get edit_description_hint;
+
+  /// No description provided for @edit_select_category.
+  ///
+  /// In sw, this message translates to:
+  /// **'Chagua kategoria'**
+  String get edit_select_category;
+
+  /// No description provided for @edit_section_image.
+  ///
+  /// In sw, this message translates to:
+  /// **'Picha ya Kazi'**
+  String get edit_section_image;
+
+  /// No description provided for @edit_tap_add_photo.
+  ///
+  /// In sw, this message translates to:
+  /// **'Bonyeza kuongeza picha'**
+  String get edit_tap_add_photo;
+
+  /// No description provided for @edit_change_photo.
+  ///
+  /// In sw, this message translates to:
+  /// **'Badilisha'**
+  String get edit_change_photo;
+
+  /// No description provided for @edit_address_placeholder.
+  ///
+  /// In sw, this message translates to:
+  /// **'Bonyeza ramani kuchagua eneo'**
+  String get edit_address_placeholder;
+
+  /// No description provided for @payment_check_phone.
+  ///
+  /// In sw, this message translates to:
+  /// **'Tafadhali kagua simu yako na uingize PIN ya M-Pesa...'**
+  String get payment_check_phone;
+
+  /// No description provided for @payment_timeout.
+  ///
+  /// In sw, this message translates to:
+  /// **'Muda umeisha. Malipo hayajakamilika.'**
+  String get payment_timeout;
+
+  /// No description provided for @payment_success_msg.
+  ///
+  /// In sw, this message translates to:
+  /// **'Malipo Yamefanikiwa! Kazi yako sasa ipo hewani.'**
+  String get payment_success_msg;
+
+  /// No description provided for @payment_retrying.
+  ///
+  /// In sw, this message translates to:
+  /// **'Inaanzisha malipo tena...'**
+  String get payment_retrying;
+
+  /// No description provided for @payment_retry_failed.
+  ///
+  /// In sw, this message translates to:
+  /// **'Imeshindikana kuanzisha malipo. Jaribu tena.'**
+  String get payment_retry_failed;
+
+  /// No description provided for @payment_retry_btn.
+  ///
+  /// In sw, this message translates to:
+  /// **'JARIBU TENA'**
+  String get payment_retry_btn;
+
+  /// No description provided for @cancel_and_go_back.
+  ///
+  /// In sw, this message translates to:
+  /// **'Futa na Rudi Nyuma'**
+  String get cancel_and_go_back;
+
+  /// No description provided for @payment_dont_close.
+  ///
+  /// In sw, this message translates to:
+  /// **'Usifunge ukurasa huu mpaka utakapopata uthibitisho.'**
+  String get payment_dont_close;
+
+  /// No description provided for @payment_check_phone_label.
+  ///
+  /// In sw, this message translates to:
+  /// **'Angalia simu'**
+  String get payment_check_phone_label;
+
+  /// No description provided for @payment_enter_pin.
+  ///
+  /// In sw, this message translates to:
+  /// **'Ingiza PIN'**
+  String get payment_enter_pin;
+
+  /// No description provided for @payment_confirm.
+  ///
+  /// In sw, this message translates to:
+  /// **'Thibitisha'**
+  String get payment_confirm;
+
+  /// No description provided for @payment_status_completed.
+  ///
+  /// In sw, this message translates to:
+  /// **'MALIPO YAMEKAMILIKA'**
+  String get payment_status_completed;
+
+  /// No description provided for @payment_status_failed.
+  ///
+  /// In sw, this message translates to:
+  /// **'MALIPO YAMESHINDIKANA'**
+  String get payment_status_failed;
+
+  /// No description provided for @payment_status_waiting.
+  ///
+  /// In sw, this message translates to:
+  /// **'INASUBIRI MALIPO'**
+  String get payment_status_waiting;
+
+  /// No description provided for @payment_exit_title.
+  ///
+  /// In sw, this message translates to:
+  /// **'Unataka Kutoka?'**
+  String get payment_exit_title;
+
+  /// No description provided for @payment_exit_message.
+  ///
+  /// In sw, this message translates to:
+  /// **'Ikiwa malipo bado yanaendelea, kazi yako itachapishwa baada ya malipo kukamilika.'**
+  String get payment_exit_message;
+
+  /// No description provided for @continue_waiting.
+  ///
+  /// In sw, this message translates to:
+  /// **'Endelea Kusubiri'**
+  String get continue_waiting;
+
+  /// No description provided for @leave_btn.
+  ///
+  /// In sw, this message translates to:
+  /// **'Toka'**
+  String get leave_btn;
+
+  /// No description provided for @dash_balance_label.
+  ///
+  /// In sw, this message translates to:
+  /// **'SALIO LAKO'**
+  String get dash_balance_label;
+
+  /// No description provided for @dash_withdraw_btn.
+  ///
+  /// In sw, this message translates to:
+  /// **'TOA PESA (Withdraw)'**
+  String get dash_withdraw_btn;
+
+  /// No description provided for @dash_total_earnings.
+  ///
+  /// In sw, this message translates to:
+  /// **'Mapato Jumla'**
+  String get dash_total_earnings;
+
+  /// No description provided for @dash_withdrawn.
+  ///
+  /// In sw, this message translates to:
+  /// **'Imechukuliwa'**
+  String get dash_withdrawn;
+
+  /// No description provided for @dash_jobs_completed.
+  ///
+  /// In sw, this message translates to:
+  /// **'Kazi Zilizomalizika'**
+  String get dash_jobs_completed;
+
+  /// No description provided for @dash_monthly_jobs.
+  ///
+  /// In sw, this message translates to:
+  /// **'Kazi za Mwezi'**
+  String get dash_monthly_jobs;
+
+  /// No description provided for @dash_earnings_history.
+  ///
+  /// In sw, this message translates to:
+  /// **'Historia ya Mapato'**
+  String get dash_earnings_history;
+
+  /// No description provided for @dash_withdrawal_history.
+  ///
+  /// In sw, this message translates to:
+  /// **'Historia ya Uchukuliaji'**
+  String get dash_withdrawal_history;
+
+  /// No description provided for @view_all_btn.
+  ///
+  /// In sw, this message translates to:
+  /// **'Ona Zote'**
+  String get view_all_btn;
+
+  /// No description provided for @wallet_my_wallet.
+  ///
+  /// In sw, this message translates to:
+  /// **'Mkoba Wangu'**
+  String get wallet_my_wallet;
+
+  /// No description provided for @wallet_balance_now.
+  ///
+  /// In sw, this message translates to:
+  /// **'SALIO LAKO LA SASA'**
+  String get wallet_balance_now;
+
+  /// No description provided for @wallet_add_balance.
+  ///
+  /// In sw, this message translates to:
+  /// **'Ongeza Salio'**
+  String get wallet_add_balance;
+
+  /// No description provided for @wallet_withdraw.
+  ///
+  /// In sw, this message translates to:
+  /// **'Toa Fedha'**
+  String get wallet_withdraw;
+
+  /// No description provided for @wallet_payment_history.
+  ///
+  /// In sw, this message translates to:
+  /// **'Historia ya Malipo'**
+  String get wallet_payment_history;
+
+  /// No description provided for @wallet_view_all.
+  ///
+  /// In sw, this message translates to:
+  /// **'Ona Zote'**
+  String get wallet_view_all;
+
+  /// No description provided for @wallet_no_history.
+  ///
+  /// In sw, this message translates to:
+  /// **'Bado hujaanza kutumia mkoba'**
+  String get wallet_no_history;
+
+  /// No description provided for @wallet_credit.
+  ///
+  /// In sw, this message translates to:
+  /// **'Pesa Ingia'**
+  String get wallet_credit;
+
+  /// No description provided for @wallet_debit.
+  ///
+  /// In sw, this message translates to:
+  /// **'Pesa Toka'**
+  String get wallet_debit;
+
+  /// No description provided for @withdrawal_insufficient.
+  ///
+  /// In sw, this message translates to:
+  /// **'Salio lako halitoshi. Unahitaji TZS'**
+  String get withdrawal_insufficient;
+
+  /// No description provided for @withdrawal_failed_submit.
+  ///
+  /// In sw, this message translates to:
+  /// **'Imeshindikana kutuma ombi'**
+  String get withdrawal_failed_submit;
+
+  /// No description provided for @withdrawal_title.
+  ///
+  /// In sw, this message translates to:
+  /// **'Toa Pesa'**
+  String get withdrawal_title;
+
+  /// No description provided for @withdrawal_subtitle.
+  ///
+  /// In sw, this message translates to:
+  /// **'Jaza fomu hii kutoa pesa kwenye simu yako'**
+  String get withdrawal_subtitle;
+
+  /// No description provided for @withdrawal_amount_section.
+  ///
+  /// In sw, this message translates to:
+  /// **'Kiasi cha Kutoa'**
+  String get withdrawal_amount_section;
+
+  /// No description provided for @withdrawal_amount_hint.
+  ///
+  /// In sw, this message translates to:
+  /// **'Weka kiasi (mf. 10000)'**
+  String get withdrawal_amount_hint;
+
+  /// No description provided for @withdrawal_amount_required.
+  ///
+  /// In sw, this message translates to:
+  /// **'Tafadhali weka kiasi'**
+  String get withdrawal_amount_required;
+
+  /// No description provided for @withdrawal_min_label.
+  ///
+  /// In sw, this message translates to:
+  /// **'Kiasi cha chini:'**
+  String get withdrawal_min_label;
+
+  /// No description provided for @withdrawal_fee_label.
+  ///
+  /// In sw, this message translates to:
+  /// **'Makato ya huduma:'**
+  String get withdrawal_fee_label;
+
+  /// No description provided for @withdrawal_you_receive.
+  ///
+  /// In sw, this message translates to:
+  /// **'Utapokea:'**
+  String get withdrawal_you_receive;
+
+  /// No description provided for @withdrawal_network_section.
+  ///
+  /// In sw, this message translates to:
+  /// **'Chagua Mtandao'**
+  String get withdrawal_network_section;
+
+  /// No description provided for @withdrawal_phone_section.
+  ///
+  /// In sw, this message translates to:
+  /// **'Nambari ya Simu'**
+  String get withdrawal_phone_section;
+
+  /// No description provided for @withdrawal_phone_hint.
+  ///
+  /// In sw, this message translates to:
+  /// **'07XXXXXXXX'**
+  String get withdrawal_phone_hint;
+
+  /// No description provided for @withdrawal_phone_required.
+  ///
+  /// In sw, this message translates to:
+  /// **'Tafadhali weka nambari ya simu'**
+  String get withdrawal_phone_required;
+
+  /// No description provided for @withdrawal_phone_invalid.
+  ///
+  /// In sw, this message translates to:
+  /// **'Nambari ya simu si sahihi'**
+  String get withdrawal_phone_invalid;
+
+  /// No description provided for @withdrawal_name_section.
+  ///
+  /// In sw, this message translates to:
+  /// **'Jina Lililosajiliwa'**
+  String get withdrawal_name_section;
+
+  /// No description provided for @withdrawal_name_hint.
+  ///
+  /// In sw, this message translates to:
+  /// **'Jina linaloonekana kwenye M-Pesa/Tigo Pesa'**
+  String get withdrawal_name_hint;
+
+  /// No description provided for @withdrawal_name_required.
+  ///
+  /// In sw, this message translates to:
+  /// **'Tafadhali weka jina lililosajiliwa'**
+  String get withdrawal_name_required;
+
+  /// No description provided for @withdrawal_name_short.
+  ///
+  /// In sw, this message translates to:
+  /// **'Jina ni fupi sana'**
+  String get withdrawal_name_short;
+
+  /// No description provided for @withdrawal_submit_btn.
+  ///
+  /// In sw, this message translates to:
+  /// **'TUMA OMBI LA KUTOA PESA'**
+  String get withdrawal_submit_btn;
+
+  /// No description provided for @withdrawal_success_title.
+  ///
+  /// In sw, this message translates to:
+  /// **'Ombi Limetumwa!'**
+  String get withdrawal_success_title;
+
+  /// No description provided for @withdrawal_success_body.
+  ///
+  /// In sw, this message translates to:
+  /// **'Ombi lako la kutoa TZS'**
+  String get withdrawal_success_body;
+
+  /// No description provided for @withdrawal_success_footer.
+  ///
+  /// In sw, this message translates to:
+  /// **'Subiri uthibitisho wa Admin. Pesa itatumwa ndani ya masaa 24.'**
+  String get withdrawal_success_footer;
+
+  /// No description provided for @withdrawal_ok_btn.
+  ///
+  /// In sw, this message translates to:
+  /// **'SAWA'**
+  String get withdrawal_ok_btn;
+
+  /// No description provided for @withdrawal_history_title.
+  ///
+  /// In sw, this message translates to:
+  /// **'Historia ya Kutoa Pesa'**
+  String get withdrawal_history_title;
+
+  /// No description provided for @withdrawal_no_history.
+  ///
+  /// In sw, this message translates to:
+  /// **'Hakuna historia ya kutoa pesa'**
+  String get withdrawal_no_history;
+
+  /// No description provided for @withdrawal_important_note.
+  ///
+  /// In sw, this message translates to:
+  /// **'Muhimu!'**
+  String get withdrawal_important_note;
+
+  /// No description provided for @withdrawal_note_body.
+  ///
+  /// In sw, this message translates to:
+  /// **'Hakikisha nambari ya simu na jina ni sahihi. Pesa itatumwa ndani ya masaa 24 baada ya uthibitisho wa Admin.'**
+  String get withdrawal_note_body;
+
+  /// No description provided for @withdrawal_status_paid.
+  ///
+  /// In sw, this message translates to:
+  /// **'Imelipwa'**
+  String get withdrawal_status_paid;
+
+  /// No description provided for @withdrawal_status_rejected.
+  ///
+  /// In sw, this message translates to:
+  /// **'Imekataliwa'**
+  String get withdrawal_status_rejected;
+
+  /// No description provided for @withdrawal_status_pending.
+  ///
+  /// In sw, this message translates to:
+  /// **'Inasubiri'**
+  String get withdrawal_status_pending;
 }
 
 class _AppLocalizationsDelegate

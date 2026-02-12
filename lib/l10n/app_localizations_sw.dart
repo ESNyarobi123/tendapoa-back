@@ -618,6 +618,57 @@ class AppLocalizationsSw extends AppLocalizations {
   String get have_account_login => 'Tayari nina akaunti? Ingia';
 
   @override
+  String get welcome_have_account => 'Tayari una akaunti? ';
+
+  @override
+  String get welcome_login_link => 'Ingia hapa';
+
+  @override
+  String get login_welcome_title => 'Karibu Tena!';
+
+  @override
+  String get login_subtitle => 'Ingia kwenye akaunti yako ili uendelee.';
+
+  @override
+  String get login_email_label => 'Barua Pepe';
+
+  @override
+  String get login_email_hint => 'mfano@email.com';
+
+  @override
+  String get login_password_label => 'Nenosiri';
+
+  @override
+  String get login_forgot_password => 'Umesahau Nenosiri?';
+
+  @override
+  String get login_terms_agree => 'Nimekubali ';
+
+  @override
+  String get login_terms_link => 'Vigezo na Masharti';
+
+  @override
+  String get login_btn => 'Ingia Sasa';
+
+  @override
+  String get login_no_account => 'Huna akaunti? ';
+
+  @override
+  String get login_register_here => 'Jiunge hapa';
+
+  @override
+  String get login_accept_terms_error => 'Tafadhali kubali vigezo na masharti';
+
+  @override
+  String get login_failed_error => 'Imeshindwa kuingia';
+
+  @override
+  String get login_enter_email => 'Weka barua pepe';
+
+  @override
+  String get login_enter_password => 'Weka nenosiri';
+
+  @override
   String get nyumbani_nav => 'Nyumbani';
 
   @override
@@ -757,6 +808,13 @@ class AppLocalizationsSw extends AppLocalizations {
   String get who_are_you => 'Wewe ni nani?';
 
   @override
+  String get role_select_title => 'Chagua Aina ya Akaunti';
+
+  @override
+  String get role_select_subtitle =>
+      'Niambie namna ungependa kutumia Tendapoa ili tusaidie vizuri.';
+
+  @override
   String get role_muhitaji_title => 'Muhitaji';
 
   @override
@@ -804,4 +862,553 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get retry_payment_btn => 'Lipia Tena';
+
+  @override
+  String get register_password_mismatch => 'Nenosiri halifanani!';
+
+  @override
+  String get register_failed => 'Imeshindwa kusajili';
+
+  @override
+  String get register_location_required_title => 'Eneo Linahitajika!';
+
+  @override
+  String get register_location_required_subtitle =>
+      'Kama mfanyakazi, eneo lako ni lazima ili:';
+
+  @override
+  String get register_location_reason_1 => 'Wateja waone umbali wako';
+
+  @override
+  String get register_location_reason_2 => 'Upate kazi zilizo karibu nawe';
+
+  @override
+  String get register_location_reason_3 => 'Mfumo uhesabu umbali kwa usahihi';
+
+  @override
+  String get register_location_ok_btn => 'SAWA, NITAWEKA ENEO';
+
+  @override
+  String get register_badge_muhitaji => 'Muhitaji / Mteja';
+
+  @override
+  String get register_badge_mfanyakazi => 'Mfanyakazi / Fundi';
+
+  @override
+  String get register_title_muhitaji => 'Karibu TendaPoa!';
+
+  @override
+  String get register_title_mfanyakazi => 'Jiunge na TendaPoa!';
+
+  @override
+  String get register_subtitle_muhitaji =>
+      'Pata wafanyakazi wazuri karibu nawe';
+
+  @override
+  String get register_subtitle_mfanyakazi => 'Anza kupata kazi karibu nawe leo';
+
+  @override
+  String get register_section_personal => 'Taarifa Binafsi';
+
+  @override
+  String get register_full_name => 'Jina Kamili';
+
+  @override
+  String get register_full_name_hint => 'Mfano: Juma Ramadhani';
+
+  @override
+  String get register_full_name_error => 'Tafadhali weka jina lako';
+
+  @override
+  String get register_email_error => 'Tafadhali weka email';
+
+  @override
+  String get register_email_invalid => 'Email si sahihi';
+
+  @override
+  String get register_phone_error => 'Tafadhali weka namba ya simu';
+
+  @override
+  String get register_phone_invalid => 'Namba ya simu si sahihi';
+
+  @override
+  String get register_section_security => 'Usalama';
+
+  @override
+  String get register_confirm_password => 'Thibitisha Nenosiri';
+
+  @override
+  String get register_confirm_password_error => 'Tafadhali thibitisha nenosiri';
+
+  @override
+  String get register_password_min => 'Nenosiri liwe na herufi 6 au zaidi';
+
+  @override
+  String get register_terms_notice =>
+      'Kwa kusajili, unakubali Masharti na Sera ya Faragha yetu.';
+
+  @override
+  String get register_btn_muhitaji => 'TENGENEZA AKAUNTI';
+
+  @override
+  String get register_btn_mfanyakazi => 'JIUNGE KAMA FUNDI';
+
+  @override
+  String get register_location_title => 'Eneo Lako';
+
+  @override
+  String get register_required_badge => 'LAZIMA';
+
+  @override
+  String get register_location_found => 'Eneo limepatikana!';
+
+  @override
+  String get register_location_tap => 'Bonyeza kupata eneo lako';
+
+  @override
+  String get register_location_help =>
+      'Eneo lako linasaidia wateja kukupata kwa urahisi na kupata kazi zilizo karibu nawe.';
+
+  @override
+  String get register_location_searching => 'Inatafuta eneo...';
+
+  @override
+  String get register_location_refresh => 'Sasisha Eneo';
+
+  @override
+  String get register_location_get_btn => 'PATA ENEO LANGU';
+
+  @override
+  String get register_location_success => 'Eneo lako limepatikana!';
+
+  @override
+  String get register_location_disabled =>
+      'Huduma ya eneo haijawashwa. Tafadhali washa GPS.';
+
+  @override
+  String get register_location_denied => 'Ruhusa ya eneo imekataliwa';
+
+  @override
+  String get register_location_denied_forever =>
+      'Ruhusa ya eneo imekataliwa kabisa. Nenda Settings kubadilisha.';
+
+  @override
+  String get register_location_failed => 'Imeshindikana kupata eneo';
+
+  @override
+  String get splash_tagline => 'Kazi Imeisha!';
+
+  @override
+  String get confirm_delete_title => 'Futa Kazi?';
+
+  @override
+  String get min_amount_error => 'Kiasi cha chini ni TZS 5,000';
+
+  @override
+  String get fill_all_fields => 'Tafadhali jaza taarifa zote';
+
+  @override
+  String get withdrawal_submitted =>
+      'Ombi lako limewasilishwa! Subiri uthibitisho.';
+
+  @override
+  String get error_prefix => 'Hitilafu';
+
+  @override
+  String get post_job_new => 'Post Kazi Mpya';
+
+  @override
+  String get gps_enable_first => 'Tafadhali washa GPS yako kwanza';
+
+  @override
+  String get location_detected => 'Eneo limetambuliwa';
+
+  @override
+  String get job_location_placeholder => 'Eneo la Kazi';
+
+  @override
+  String get step_details => 'Maelezo';
+
+  @override
+  String get step_location_post => 'Eneo & Post';
+
+  @override
+  String get post_need_help => 'Unahitaji msaidizi gani?';
+
+  @override
+  String get post_fill_details =>
+      'Jaza taarifa hizi ili mafundi wa karibu waanze kuomba.';
+
+  @override
+  String get post_title_hint =>
+      'Mfano: Napata fundi bomba wa kurekebisha sinki';
+
+  @override
+  String get post_budget_hint => 'Mfano: 20,000';
+
+  @override
+  String get post_description_hint => 'Elezea kazi kwa undani zaidi hapa...';
+
+  @override
+  String get post_description_error => 'Elezea kazi yako';
+
+  @override
+  String get post_location_help =>
+      'Tunatumia GPS yako kutambua eneo ili mafundi wa karibu zaidi waone kazi yako.';
+
+  @override
+  String get post_location_searching => 'Inatafuta eneo...';
+
+  @override
+  String get post_allow_gps => 'Tafadhali ruhusu GPS kwanza';
+
+  @override
+  String get post_retry_location => 'RUDIA KUTAFUTA';
+
+  @override
+  String get post_searching_workers => 'Inatafuta wafanyakazi karibu nawe...';
+
+  @override
+  String get post_no_workers_nearby => 'Hakuna Wafanyakazi Karibu';
+
+  @override
+  String get post_continue_anyway =>
+      'Unaweza kuendelea lakini muda wa kupata mfanyakazi unaweza kuwa mrefu.';
+
+  @override
+  String get post_workers_found => 'Wafanyakazi Wamepatikana!';
+
+  @override
+  String get post_job_visible_soon => 'Kazi yako itaonekana haraka!';
+
+  @override
+  String get post_within_km => 'ndani';
+
+  @override
+  String get post_continue_btn => 'Endelea';
+
+  @override
+  String get choose_photo => 'Chagua Picha';
+
+  @override
+  String get camera => 'Kamera';
+
+  @override
+  String get gallery => 'Galeri';
+
+  @override
+  String get profile_updated => 'Wasifu umesasishwa!';
+
+  @override
+  String get today => 'Leo';
+
+  @override
+  String get yesterday => 'Jana';
+
+  @override
+  String get mark_all_read => 'Soma Zote';
+
+  @override
+  String get no_notifications => 'Hakuna Taarifa';
+
+  @override
+  String get notifications_empty_sub => 'Taarifa zako zitaonekana hapa';
+
+  @override
+  String get edit_job_title => 'Hariri Kazi';
+
+  @override
+  String get select_job_location =>
+      'Tafadhali chagua eneo la kazi kwenye ramani';
+
+  @override
+  String get price_cannot_decrease =>
+      'Huwezi kupunguza bei. Bei ya sasa ni TZS';
+
+  @override
+  String get extra_payment_required => 'Malipo ya ziada yanahitajika';
+
+  @override
+  String get job_updated => 'Kazi imebadilishwa!';
+
+  @override
+  String get refund_note =>
+      'Kama kazi ililipiwa, pesa itarudishwa kwenye wallet yako.';
+
+  @override
+  String get job_deleted => 'Kazi imefutwa!';
+
+  @override
+  String get cannot_edit => 'Huwezi Kuhariri';
+
+  @override
+  String get cannot_edit_reason =>
+      'Kazi hii haiwezi kuhaririwa kwa sababu imeanza au imekamilika.';
+
+  @override
+  String get edit_section_title => 'Kichwa cha Kazi';
+
+  @override
+  String get edit_section_category => 'Kategoria';
+
+  @override
+  String get edit_section_price => 'Bei (TZS)';
+
+  @override
+  String get edit_section_description => 'Maelezo';
+
+  @override
+  String get edit_price_hint => 'Mfano: 25000';
+
+  @override
+  String get edit_price_required => 'Weka bei';
+
+  @override
+  String get edit_price_min => 'Bei lazima iwe TZS 500+';
+
+  @override
+  String get edit_current_price_prefix => 'Bei ya sasa: TZS ';
+
+  @override
+  String get edit_current_price_suffix =>
+      '. Unaweza kuongeza tu, si kupunguza.';
+
+  @override
+  String get edit_my_location => 'Eneo Langu';
+
+  @override
+  String get edit_address => 'Anwani';
+
+  @override
+  String get edit_title_hint => 'Mfano: Fundi Bomba Anahitajika';
+
+  @override
+  String get edit_title_required => 'Weka kichwa';
+
+  @override
+  String get edit_description_hint => 'Eleza kazi kwa undani...';
+
+  @override
+  String get edit_select_category => 'Chagua kategoria';
+
+  @override
+  String get edit_section_image => 'Picha ya Kazi';
+
+  @override
+  String get edit_tap_add_photo => 'Bonyeza kuongeza picha';
+
+  @override
+  String get edit_change_photo => 'Badilisha';
+
+  @override
+  String get edit_address_placeholder => 'Bonyeza ramani kuchagua eneo';
+
+  @override
+  String get payment_check_phone =>
+      'Tafadhali kagua simu yako na uingize PIN ya M-Pesa...';
+
+  @override
+  String get payment_timeout => 'Muda umeisha. Malipo hayajakamilika.';
+
+  @override
+  String get payment_success_msg =>
+      'Malipo Yamefanikiwa! Kazi yako sasa ipo hewani.';
+
+  @override
+  String get payment_retrying => 'Inaanzisha malipo tena...';
+
+  @override
+  String get payment_retry_failed =>
+      'Imeshindikana kuanzisha malipo. Jaribu tena.';
+
+  @override
+  String get payment_retry_btn => 'JARIBU TENA';
+
+  @override
+  String get cancel_and_go_back => 'Futa na Rudi Nyuma';
+
+  @override
+  String get payment_dont_close =>
+      'Usifunge ukurasa huu mpaka utakapopata uthibitisho.';
+
+  @override
+  String get payment_check_phone_label => 'Angalia simu';
+
+  @override
+  String get payment_enter_pin => 'Ingiza PIN';
+
+  @override
+  String get payment_confirm => 'Thibitisha';
+
+  @override
+  String get payment_status_completed => 'MALIPO YAMEKAMILIKA';
+
+  @override
+  String get payment_status_failed => 'MALIPO YAMESHINDIKANA';
+
+  @override
+  String get payment_status_waiting => 'INASUBIRI MALIPO';
+
+  @override
+  String get payment_exit_title => 'Unataka Kutoka?';
+
+  @override
+  String get payment_exit_message =>
+      'Ikiwa malipo bado yanaendelea, kazi yako itachapishwa baada ya malipo kukamilika.';
+
+  @override
+  String get continue_waiting => 'Endelea Kusubiri';
+
+  @override
+  String get leave_btn => 'Toka';
+
+  @override
+  String get dash_balance_label => 'SALIO LAKO';
+
+  @override
+  String get dash_withdraw_btn => 'TOA PESA (Withdraw)';
+
+  @override
+  String get dash_total_earnings => 'Mapato Jumla';
+
+  @override
+  String get dash_withdrawn => 'Imechukuliwa';
+
+  @override
+  String get dash_jobs_completed => 'Kazi Zilizomalizika';
+
+  @override
+  String get dash_monthly_jobs => 'Kazi za Mwezi';
+
+  @override
+  String get dash_earnings_history => 'Historia ya Mapato';
+
+  @override
+  String get dash_withdrawal_history => 'Historia ya Uchukuliaji';
+
+  @override
+  String get view_all_btn => 'Ona Zote';
+
+  @override
+  String get wallet_my_wallet => 'Mkoba Wangu';
+
+  @override
+  String get wallet_balance_now => 'SALIO LAKO LA SASA';
+
+  @override
+  String get wallet_add_balance => 'Ongeza Salio';
+
+  @override
+  String get wallet_withdraw => 'Toa Fedha';
+
+  @override
+  String get wallet_payment_history => 'Historia ya Malipo';
+
+  @override
+  String get wallet_view_all => 'Ona Zote';
+
+  @override
+  String get wallet_no_history => 'Bado hujaanza kutumia mkoba';
+
+  @override
+  String get wallet_credit => 'Pesa Ingia';
+
+  @override
+  String get wallet_debit => 'Pesa Toka';
+
+  @override
+  String get withdrawal_insufficient => 'Salio lako halitoshi. Unahitaji TZS';
+
+  @override
+  String get withdrawal_failed_submit => 'Imeshindikana kutuma ombi';
+
+  @override
+  String get withdrawal_title => 'Toa Pesa';
+
+  @override
+  String get withdrawal_subtitle => 'Jaza fomu hii kutoa pesa kwenye simu yako';
+
+  @override
+  String get withdrawal_amount_section => 'Kiasi cha Kutoa';
+
+  @override
+  String get withdrawal_amount_hint => 'Weka kiasi (mf. 10000)';
+
+  @override
+  String get withdrawal_amount_required => 'Tafadhali weka kiasi';
+
+  @override
+  String get withdrawal_min_label => 'Kiasi cha chini:';
+
+  @override
+  String get withdrawal_fee_label => 'Makato ya huduma:';
+
+  @override
+  String get withdrawal_you_receive => 'Utapokea:';
+
+  @override
+  String get withdrawal_network_section => 'Chagua Mtandao';
+
+  @override
+  String get withdrawal_phone_section => 'Nambari ya Simu';
+
+  @override
+  String get withdrawal_phone_hint => '07XXXXXXXX';
+
+  @override
+  String get withdrawal_phone_required => 'Tafadhali weka nambari ya simu';
+
+  @override
+  String get withdrawal_phone_invalid => 'Nambari ya simu si sahihi';
+
+  @override
+  String get withdrawal_name_section => 'Jina Lililosajiliwa';
+
+  @override
+  String get withdrawal_name_hint =>
+      'Jina linaloonekana kwenye M-Pesa/Tigo Pesa';
+
+  @override
+  String get withdrawal_name_required => 'Tafadhali weka jina lililosajiliwa';
+
+  @override
+  String get withdrawal_name_short => 'Jina ni fupi sana';
+
+  @override
+  String get withdrawal_submit_btn => 'TUMA OMBI LA KUTOA PESA';
+
+  @override
+  String get withdrawal_success_title => 'Ombi Limetumwa!';
+
+  @override
+  String get withdrawal_success_body => 'Ombi lako la kutoa TZS';
+
+  @override
+  String get withdrawal_success_footer =>
+      'Subiri uthibitisho wa Admin. Pesa itatumwa ndani ya masaa 24.';
+
+  @override
+  String get withdrawal_ok_btn => 'SAWA';
+
+  @override
+  String get withdrawal_history_title => 'Historia ya Kutoa Pesa';
+
+  @override
+  String get withdrawal_no_history => 'Hakuna historia ya kutoa pesa';
+
+  @override
+  String get withdrawal_important_note => 'Muhimu!';
+
+  @override
+  String get withdrawal_note_body =>
+      'Hakikisha nambari ya simu na jina ni sahihi. Pesa itatumwa ndani ya masaa 24 baada ya uthibitisho wa Admin.';
+
+  @override
+  String get withdrawal_status_paid => 'Imelipwa';
+
+  @override
+  String get withdrawal_status_rejected => 'Imekataliwa';
+
+  @override
+  String get withdrawal_status_pending => 'Inasubiri';
 }

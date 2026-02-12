@@ -2,6 +2,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
+import '../../core/constants/constants.dart';
+import '../../core/localization/app_localizations.dart';
 import '../../core/router/app_router.dart';
 import '../../providers/auth_provider.dart';
 
@@ -73,15 +75,7 @@ class _SplashScreenState extends State<SplashScreen>
         width: double.infinity,
         height: double.infinity,
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFF0F172A),
-              Color(0xFF1E3A8A),
-              Color(0xFF1E40AF),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          gradient: AppColors.splashBackgroundGradient,
         ),
         child: Stack(
           alignment: Alignment.center,
@@ -262,9 +256,9 @@ class _SplashScreenState extends State<SplashScreen>
                   shaderCallback: (bounds) => const LinearGradient(
                     colors: [Colors.white, Color(0xFF93C5FD)],
                   ).createShader(bounds),
-                  child: const Text(
-                    'Tendapoa',
-                    style: TextStyle(
+                  child: Text(
+                    context.tr('appTitle'),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 36,
                       fontWeight: FontWeight.w900,
@@ -288,9 +282,9 @@ class _SplashScreenState extends State<SplashScreen>
                       color: Colors.white.withValues(alpha: 0.1),
                     ),
                   ),
-                  child: const Text(
-                    '✨ Kazi Imeisha!',
-                    style: TextStyle(
+                  child: Text(
+                    '✨ ${context.tr('splash_tagline')}',
+                    style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 13,
                       fontWeight: FontWeight.w500,

@@ -618,6 +618,58 @@ class AppLocalizationsEn extends AppLocalizations {
   String get have_account_login => 'Already have an account? Login';
 
   @override
+  String get welcome_have_account => 'Already have an account? ';
+
+  @override
+  String get welcome_login_link => 'Login here';
+
+  @override
+  String get login_welcome_title => 'Welcome Back!';
+
+  @override
+  String get login_subtitle => 'Sign in to your account to continue.';
+
+  @override
+  String get login_email_label => 'Email';
+
+  @override
+  String get login_email_hint => 'e.g. email@example.com';
+
+  @override
+  String get login_password_label => 'Password';
+
+  @override
+  String get login_forgot_password => 'Forgot Password?';
+
+  @override
+  String get login_terms_agree => 'I agree to ';
+
+  @override
+  String get login_terms_link => 'Terms and Conditions';
+
+  @override
+  String get login_btn => 'Sign In';
+
+  @override
+  String get login_no_account => 'Don\'t have an account? ';
+
+  @override
+  String get login_register_here => 'Register here';
+
+  @override
+  String get login_accept_terms_error =>
+      'Please accept the terms and conditions';
+
+  @override
+  String get login_failed_error => 'Login failed';
+
+  @override
+  String get login_enter_email => 'Enter email';
+
+  @override
+  String get login_enter_password => 'Enter password';
+
+  @override
   String get nyumbani_nav => 'Home';
 
   @override
@@ -757,6 +809,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get who_are_you => 'Who are you?';
 
   @override
+  String get role_select_title => 'Choose Account Type';
+
+  @override
+  String get role_select_subtitle =>
+      'Tell us how you\'d like to use Tendapoa so we can help you better.';
+
+  @override
   String get role_muhitaji_title => 'Client';
 
   @override
@@ -804,4 +863,549 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get retry_payment_btn => 'Retry Payment';
+
+  @override
+  String get register_password_mismatch => 'Passwords do not match!';
+
+  @override
+  String get register_failed => 'Registration failed';
+
+  @override
+  String get register_location_required_title => 'Location Required!';
+
+  @override
+  String get register_location_required_subtitle =>
+      'As a worker, your location is required so that:';
+
+  @override
+  String get register_location_reason_1 => 'Clients can see your distance';
+
+  @override
+  String get register_location_reason_2 => 'You get jobs near you';
+
+  @override
+  String get register_location_reason_3 =>
+      'The system calculates distance correctly';
+
+  @override
+  String get register_location_ok_btn => 'OK, I\'LL SET LOCATION';
+
+  @override
+  String get register_badge_muhitaji => 'Client';
+
+  @override
+  String get register_badge_mfanyakazi => 'Worker / Handyman';
+
+  @override
+  String get register_title_muhitaji => 'Welcome to TendaPoa!';
+
+  @override
+  String get register_title_mfanyakazi => 'Join TendaPoa!';
+
+  @override
+  String get register_subtitle_muhitaji => 'Find great workers near you';
+
+  @override
+  String get register_subtitle_mfanyakazi =>
+      'Start getting jobs near you today';
+
+  @override
+  String get register_section_personal => 'Personal Info';
+
+  @override
+  String get register_full_name => 'Full Name';
+
+  @override
+  String get register_full_name_hint => 'e.g. John Doe';
+
+  @override
+  String get register_full_name_error => 'Please enter your name';
+
+  @override
+  String get register_email_error => 'Please enter email';
+
+  @override
+  String get register_email_invalid => 'Invalid email';
+
+  @override
+  String get register_phone_error => 'Please enter phone number';
+
+  @override
+  String get register_phone_invalid => 'Invalid phone number';
+
+  @override
+  String get register_section_security => 'Security';
+
+  @override
+  String get register_confirm_password => 'Confirm Password';
+
+  @override
+  String get register_confirm_password_error => 'Please confirm password';
+
+  @override
+  String get register_password_min => 'Password must be at least 6 characters';
+
+  @override
+  String get register_terms_notice =>
+      'By registering you agree to our Terms and Privacy Policy.';
+
+  @override
+  String get register_btn_muhitaji => 'CREATE ACCOUNT';
+
+  @override
+  String get register_btn_mfanyakazi => 'JOIN AS WORKER';
+
+  @override
+  String get register_location_title => 'Your Location';
+
+  @override
+  String get register_required_badge => 'REQUIRED';
+
+  @override
+  String get register_location_found => 'Location found!';
+
+  @override
+  String get register_location_tap => 'Tap to get your location';
+
+  @override
+  String get register_location_help =>
+      'Your location helps clients find you easily and get jobs near you.';
+
+  @override
+  String get register_location_searching => 'Finding location...';
+
+  @override
+  String get register_location_refresh => 'Refresh Location';
+
+  @override
+  String get register_location_get_btn => 'GET MY LOCATION';
+
+  @override
+  String get register_location_success => 'Your location was found!';
+
+  @override
+  String get register_location_disabled =>
+      'Location service is off. Please enable GPS.';
+
+  @override
+  String get register_location_denied => 'Location permission denied';
+
+  @override
+  String get register_location_denied_forever =>
+      'Location permission permanently denied. Go to Settings to change.';
+
+  @override
+  String get register_location_failed => 'Failed to get location';
+
+  @override
+  String get splash_tagline => 'Job Done!';
+
+  @override
+  String get confirm_delete_title => 'Delete Job?';
+
+  @override
+  String get min_amount_error => 'Minimum amount is TZS 5,000';
+
+  @override
+  String get fill_all_fields => 'Please fill in all fields';
+
+  @override
+  String get withdrawal_submitted =>
+      'Your request has been submitted! Awaiting verification.';
+
+  @override
+  String get error_prefix => 'Error';
+
+  @override
+  String get post_job_new => 'Post New Job';
+
+  @override
+  String get gps_enable_first => 'Please enable GPS first';
+
+  @override
+  String get location_detected => 'Location detected';
+
+  @override
+  String get job_location_placeholder => 'Job location';
+
+  @override
+  String get step_details => 'Details';
+
+  @override
+  String get step_location_post => 'Location & Post';
+
+  @override
+  String get post_need_help => 'What help do you need?';
+
+  @override
+  String get post_fill_details =>
+      'Fill in these details so nearby workers can apply.';
+
+  @override
+  String get post_title_hint => 'e.g. Need a plumber to fix sink';
+
+  @override
+  String get post_budget_hint => 'e.g. 20,000';
+
+  @override
+  String get post_description_hint => 'Describe the job in detail...';
+
+  @override
+  String get post_description_error => 'Please describe the job';
+
+  @override
+  String get post_location_help =>
+      'We use your GPS so nearby workers can see your job.';
+
+  @override
+  String get post_location_searching => 'Finding location...';
+
+  @override
+  String get post_allow_gps => 'Please allow GPS first';
+
+  @override
+  String get post_retry_location => 'RETRY LOCATION';
+
+  @override
+  String get post_searching_workers => 'Searching for workers near you...';
+
+  @override
+  String get post_no_workers_nearby => 'No Workers Nearby';
+
+  @override
+  String get post_continue_anyway =>
+      'You can continue but it may take longer to find a worker.';
+
+  @override
+  String get post_workers_found => 'Workers Found!';
+
+  @override
+  String get post_job_visible_soon => 'Your job will be visible soon!';
+
+  @override
+  String get post_within_km => 'within';
+
+  @override
+  String get post_continue_btn => 'Continue';
+
+  @override
+  String get choose_photo => 'Choose Photo';
+
+  @override
+  String get camera => 'Camera';
+
+  @override
+  String get gallery => 'Gallery';
+
+  @override
+  String get profile_updated => 'Profile updated!';
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get yesterday => 'Yesterday';
+
+  @override
+  String get mark_all_read => 'Mark all read';
+
+  @override
+  String get no_notifications => 'No notifications';
+
+  @override
+  String get notifications_empty_sub => 'Your notifications will appear here';
+
+  @override
+  String get edit_job_title => 'Edit Job';
+
+  @override
+  String get select_job_location => 'Please select job location on the map';
+
+  @override
+  String get price_cannot_decrease =>
+      'You cannot reduce the price. Current price is TZS';
+
+  @override
+  String get extra_payment_required => 'Additional payment required';
+
+  @override
+  String get job_updated => 'Job updated!';
+
+  @override
+  String get refund_note =>
+      'If the job was paid, funds will be refunded to your wallet.';
+
+  @override
+  String get job_deleted => 'Job deleted!';
+
+  @override
+  String get cannot_edit => 'Cannot Edit';
+
+  @override
+  String get cannot_edit_reason =>
+      'This job cannot be edited because it has started or been completed.';
+
+  @override
+  String get edit_section_title => 'Title';
+
+  @override
+  String get edit_section_category => 'Category';
+
+  @override
+  String get edit_section_price => 'Price (TZS)';
+
+  @override
+  String get edit_section_description => 'Description';
+
+  @override
+  String get edit_price_hint => 'e.g. 25000';
+
+  @override
+  String get edit_price_required => 'Enter price';
+
+  @override
+  String get edit_price_min => 'Price must be at least TZS 500';
+
+  @override
+  String get edit_current_price_prefix => 'Current price: TZS ';
+
+  @override
+  String get edit_current_price_suffix =>
+      '. You can only increase, not decrease.';
+
+  @override
+  String get edit_my_location => 'My Location';
+
+  @override
+  String get edit_address => 'Address';
+
+  @override
+  String get edit_title_hint => 'e.g. Plumber Needed';
+
+  @override
+  String get edit_title_required => 'Enter title';
+
+  @override
+  String get edit_description_hint => 'Describe the job in detail...';
+
+  @override
+  String get edit_select_category => 'Select category';
+
+  @override
+  String get edit_section_image => 'Job Image';
+
+  @override
+  String get edit_tap_add_photo => 'Tap to add photo';
+
+  @override
+  String get edit_change_photo => 'Change';
+
+  @override
+  String get edit_address_placeholder => 'Tap map to select location';
+
+  @override
+  String get payment_check_phone =>
+      'Please check your phone and enter M-Pesa PIN...';
+
+  @override
+  String get payment_timeout => 'Time\'s up. Payment was not completed.';
+
+  @override
+  String get payment_success_msg => 'Payment Successful! Your job is now live.';
+
+  @override
+  String get payment_retrying => 'Starting payment again...';
+
+  @override
+  String get payment_retry_failed => 'Failed to start payment. Try again.';
+
+  @override
+  String get payment_retry_btn => 'Retry';
+
+  @override
+  String get cancel_and_go_back => 'Cancel and Go Back';
+
+  @override
+  String get payment_dont_close =>
+      'Do not close this page until you get confirmation.';
+
+  @override
+  String get payment_check_phone_label => 'Check phone';
+
+  @override
+  String get payment_enter_pin => 'Enter PIN';
+
+  @override
+  String get payment_confirm => 'Confirm';
+
+  @override
+  String get payment_status_completed => 'Payment completed';
+
+  @override
+  String get payment_status_failed => 'Payment failed';
+
+  @override
+  String get payment_status_waiting => 'Waiting for payment';
+
+  @override
+  String get payment_exit_title => 'Want to leave?';
+
+  @override
+  String get payment_exit_message =>
+      'If payment is still in progress, your job will be posted once payment completes.';
+
+  @override
+  String get continue_waiting => 'Keep Waiting';
+
+  @override
+  String get leave_btn => 'Leave';
+
+  @override
+  String get dash_balance_label => 'Your Balance';
+
+  @override
+  String get dash_withdraw_btn => 'Withdraw';
+
+  @override
+  String get dash_total_earnings => 'Total Earnings';
+
+  @override
+  String get dash_withdrawn => 'Withdrawn';
+
+  @override
+  String get dash_jobs_completed => 'Jobs Completed';
+
+  @override
+  String get dash_monthly_jobs => 'Jobs This Month';
+
+  @override
+  String get dash_earnings_history => 'Earnings History';
+
+  @override
+  String get dash_withdrawal_history => 'Withdrawal History';
+
+  @override
+  String get view_all_btn => 'View All';
+
+  @override
+  String get wallet_my_wallet => 'My Wallet';
+
+  @override
+  String get wallet_balance_now => 'Current Balance';
+
+  @override
+  String get wallet_add_balance => 'Add Balance';
+
+  @override
+  String get wallet_withdraw => 'Withdraw';
+
+  @override
+  String get wallet_payment_history => 'Payment History';
+
+  @override
+  String get wallet_view_all => 'View All';
+
+  @override
+  String get wallet_no_history => 'No wallet activity yet';
+
+  @override
+  String get wallet_credit => 'Credit';
+
+  @override
+  String get wallet_debit => 'Debit';
+
+  @override
+  String get withdrawal_insufficient => 'Insufficient balance. You need TZS';
+
+  @override
+  String get withdrawal_failed_submit => 'Failed to submit request';
+
+  @override
+  String get withdrawal_title => 'Withdraw';
+
+  @override
+  String get withdrawal_subtitle => 'Fill the form to withdraw to your phone';
+
+  @override
+  String get withdrawal_amount_section => 'Amount to Withdraw';
+
+  @override
+  String get withdrawal_amount_hint => 'Enter amount (e.g. 10000)';
+
+  @override
+  String get withdrawal_amount_required => 'Please enter amount';
+
+  @override
+  String get withdrawal_min_label => 'Minimum:';
+
+  @override
+  String get withdrawal_fee_label => 'Service fee:';
+
+  @override
+  String get withdrawal_you_receive => 'You will receive:';
+
+  @override
+  String get withdrawal_network_section => 'Select Network';
+
+  @override
+  String get withdrawal_phone_section => 'Phone Number';
+
+  @override
+  String get withdrawal_phone_hint => '07XXXXXXXX';
+
+  @override
+  String get withdrawal_phone_required => 'Please enter phone number';
+
+  @override
+  String get withdrawal_phone_invalid => 'Invalid phone number';
+
+  @override
+  String get withdrawal_name_section => 'Registered Name';
+
+  @override
+  String get withdrawal_name_hint => 'Name as on M-Pesa/Tigo Pesa';
+
+  @override
+  String get withdrawal_name_required => 'Please enter registered name';
+
+  @override
+  String get withdrawal_name_short => 'Name too short';
+
+  @override
+  String get withdrawal_submit_btn => 'SUBMIT WITHDRAWAL REQUEST';
+
+  @override
+  String get withdrawal_success_title => 'Request Sent!';
+
+  @override
+  String get withdrawal_success_body => 'Your withdrawal request for TZS';
+
+  @override
+  String get withdrawal_success_footer =>
+      'Await Admin verification. Funds within 24 hours.';
+
+  @override
+  String get withdrawal_ok_btn => 'OK';
+
+  @override
+  String get withdrawal_history_title => 'Withdrawal History';
+
+  @override
+  String get withdrawal_no_history => 'No withdrawal history';
+
+  @override
+  String get withdrawal_important_note => 'Important!';
+
+  @override
+  String get withdrawal_note_body =>
+      'Ensure phone number and name are correct. Funds will be sent within 24 hours after Admin verification.';
+
+  @override
+  String get withdrawal_status_paid => 'Paid';
+
+  @override
+  String get withdrawal_status_rejected => 'Rejected';
+
+  @override
+  String get withdrawal_status_pending => 'Pending';
 }

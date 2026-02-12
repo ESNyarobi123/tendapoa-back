@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/constants.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/router/app_router.dart';
 import '../../../data/models/models.dart';
 import '../../../data/services/services.dart';
@@ -25,7 +26,7 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
   bool _isSuccess = false;
   bool _isFailed = false;
   bool _isRetrying = false;
-  String _statusMessage = 'Tafadhali kagua simu yako na uingize PIN ya M-Pesa...';
+  String _statusKey = 'payment_check_phone';
 
   late AnimationController _pulseController;
 
@@ -55,7 +56,7 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
         if (_secondsRemaining == 0 && !_isSuccess && mounted) {
           setState(() {
             _isFailed = true;
-            _statusMessage = 'Muda umeisha. Malipo hayajakamilika.';
+            _statusKey = 'payment_timeout';
           });
         }
         return;
@@ -89,7 +90,7 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
         if (mounted) {
           setState(() {
             _isSuccess = true;
-            _statusMessage = 'Malipo Yamefanikiwa!\nKazi yako sasa ipo hewani.';
+            _statusKey = 'payment_success_msg';
           });
 
           // Refresh jobs
@@ -116,7 +117,7 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
     setState(() {
       _isRetrying = true;
       _isFailed = false;
-      _statusMessage = 'Inaanzisha malipo tena...';
+      _statusKey = 'payment_retrying';
     });
 
     try {
@@ -126,7 +127,7 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
         setState(() {
           _isRetrying = false;
           _secondsRemaining = 120;
-          _statusMessage = 'Tafadhali kagua simu yako na uingize PIN ya M-Pesa...';
+          _statusKey = 'payment_check_phone';
         });
         _startPolling();
         _startCountdown();
@@ -136,7 +137,7 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
         setState(() {
           _isRetrying = false;
           _isFailed = true;
-          _statusMessage = 'Imeshindikana kuanzisha malipo. Jaribu tena.';
+          _statusKey = 'payment_retry_failed';
         });
       }
     }
@@ -151,7 +152,7 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Container(
           width: double.infinity,
@@ -218,12 +219,12 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
 
         // Status Message
         Text(
-          _statusMessage,
+          context.tr(_statusKey),
           textAlign: TextAlign.center,
           style: const TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF1E293B),
+            color: AppColors.textPrimary,
             height: 1.4,
           ),
         ),
@@ -247,14 +248,14 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
         height: 140,
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [Color(0xFF10B981), Color(0xFF059669)],
+            colors: [AppColors.success, Color(0xFF059669)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF10B981).withValues(alpha: 0.4),
+              color: AppColors.success.withValues(alpha: 0.4),
               blurRadius: 30,
               offset: const Offset(0, 10),
             ),
@@ -272,14 +273,14 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
         height: 140,
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
+            colors: [AppColors.error, Color(0xFFDC2626)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFEF4444).withValues(alpha: 0.4),
+              color: AppColors.error.withValues(alpha: 0.4),
               blurRadius: 30,
               offset: const Offset(0, 10),
             ),
@@ -369,7 +370,7 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
         children: [
           Icon(
             Icons.timer_outlined,
-            color: _secondsRemaining < 30 ? const Color(0xFFEF4444) : const Color(0xFF64748B),
+            color: _secondsRemaining < 30 ? AppColors.error : AppColors.textSecondary,
             size: 24,
           ),
           const SizedBox(width: 12),
@@ -379,7 +380,7 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
               fontSize: 32,
               fontWeight: FontWeight.w900,
               fontFamily: 'monospace',
-              color: _secondsRemaining < 30 ? const Color(0xFFEF4444) : const Color(0xFF1E293B),
+              color: _secondsRemaining < 30 ? AppColors.error : AppColors.textPrimary,
               letterSpacing: 2,
             ),
           ),
@@ -395,7 +396,7 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: AppColors.grey200),
       ),
       child: Row(
         children: [
@@ -417,7 +418,7 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
-                    color: Color(0xFF1E293B),
+                    color: AppColors.textPrimary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -470,14 +471,14 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
                         strokeWidth: 2.5,
                       ),
                     )
-                  : const Row(
+                  : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.refresh_rounded, size: 20),
-                        SizedBox(width: 10),
+                        const Icon(Icons.refresh_rounded, size: 20),
+                        const SizedBox(width: 10),
                         Text(
-                          'JARIBU TENA',
-                          style: TextStyle(
+                          context.tr('payment_retry_btn'),
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
@@ -490,10 +491,10 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
           // Cancel Button
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'Futa na Rudi Nyuma',
-              style: TextStyle(
-                color: Color(0xFF64748B),
+            child: Text(
+              context.tr('cancel_and_go_back'),
+              style: const TextStyle(
+                color: AppColors.textSecondary,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -506,7 +507,7 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
     return Column(
       children: [
         Text(
-          'Usifunge ukurasa huu mpaka utakapopata uthibitisho.',
+          context.tr('payment_dont_close'),
           textAlign: TextAlign.center,
           style: TextStyle(
             color: Colors.black.withValues(alpha: 0.4),
@@ -517,15 +518,15 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
         Row(
           children: [
             Expanded(
-              child: _buildInfoChip(Icons.phone_android_rounded, 'Angalia simu'),
+              child: _buildInfoChip(Icons.phone_android_rounded, context.tr('payment_check_phone_label')),
             ),
             const SizedBox(width: 10),
             Expanded(
-              child: _buildInfoChip(Icons.lock_outline_rounded, 'Ingiza PIN'),
+              child: _buildInfoChip(Icons.lock_outline_rounded, context.tr('payment_enter_pin')),
             ),
             const SizedBox(width: 10),
             Expanded(
-              child: _buildInfoChip(Icons.check_circle_outline_rounded, 'Thibitisha'),
+              child: _buildInfoChip(Icons.check_circle_outline_rounded, context.tr('payment_confirm')),
             ),
           ],
         ),
@@ -539,7 +540,7 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: AppColors.grey200),
       ),
       child: Column(
         children: [
@@ -550,7 +551,7 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
             style: const TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF64748B),
+              color: AppColors.textSecondary,
             ),
           ),
         ],
@@ -559,15 +560,15 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
   }
 
   Color _getStatusColor() {
-    if (_isSuccess) return const Color(0xFF10B981);
-    if (_isFailed) return const Color(0xFFEF4444);
+    if (_isSuccess) return AppColors.success;
+    if (_isFailed) return AppColors.error;
     return AppColors.primary;
   }
 
   String _getStatusLabel() {
-    if (_isSuccess) return 'MALIPO YAMEKAMILIKA';
-    if (_isFailed) return 'MALIPO YAMESHINDIKANA';
-    return 'INASUBIRI MALIPO';
+    if (_isSuccess) return context.tr('payment_status_completed');
+    if (_isFailed) return context.tr('payment_status_failed');
+    return context.tr('payment_status_waiting');
   }
 
   String _formatPrice(int price) {
@@ -580,26 +581,24 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
   void _showExitDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Unataka Kutoka?'),
-        content: const Text(
-          'Ikiwa malipo bado yanaendelea, kazi yako itachapishwa baada ya malipo kukamilika.',
-        ),
+        title: Text(context.tr('payment_exit_title')),
+        content: Text(context.tr('payment_exit_message')),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Endelea Kusubiri'),
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(context.tr('continue_waiting')),
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(context); // Close dialog
+              Navigator.pop(ctx); // Close dialog
               Navigator.pop(context); // Close screen
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF1E293B),
+              backgroundColor: AppColors.textPrimary,
             ),
-            child: const Text('Toka'),
+            child: Text(context.tr('leave_btn')),
           ),
         ],
       ),

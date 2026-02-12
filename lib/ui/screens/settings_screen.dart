@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/constants/constants.dart';
+import '../../core/localization/app_localizations.dart';
 import '../../providers/providers.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -17,11 +18,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
+    final settingsProvider = context.watch<SettingsProvider>();
     final user = authProvider.user;
     final isClient = user?.isMuhitaji ?? true;
+    final currentLang = settingsProvider.locale.languageCode;
+    final langSubtitle = currentLang == 'sw' ? context.tr('swahili') : context.tr('english');
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       body: CustomScrollView(
         slivers: [
           // Blue Header
@@ -55,9 +59,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                       ),
                       const SizedBox(width: 15),
-                      const Text(
-                        'Mipangilio',
-                        style: TextStyle(
+                      Text(
+                        context.tr('settings'),
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -94,7 +98,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              user?.name ?? 'Mtumiaji',
+                              user?.name ?? context.tr('profile'),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
@@ -127,19 +131,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // ACCOUNT SECTION
-                  _buildSectionHeader('AKAUNTI YAKO'),
+                  _buildSectionHeader(context.tr('account').toUpperCase()),
                   _buildSettingsCard([
                     _buildSettingItem(
                       icon: Icons.person_outline_rounded,
-                      title: 'Hariri Wasifu',
-                      subtitle: user?.name ?? 'Mteja',
+                      title: context.tr('edit_profile'),
+                      subtitle: user?.name ?? context.tr('client_label'),
                       onTap: () => _showEditProfileDialog(context),
                     ),
                     const Divider(height: 1),
                     _buildSettingItem(
                       icon: Icons.lock_outline_rounded,
-                      title: 'Badili Password',
-                      subtitle: 'Imarisha usalama wa akaunti',
+                      title: currentLang == 'sw' ? 'Badili Password' : 'Change Password',
+                      subtitle: currentLang == 'sw' ? 'Imarisha usalama wa akaunti' : 'Strengthen account security',
                       onTap: () => _showChangePasswordDialog(context),
                     ),
                   ]),
@@ -147,28 +151,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 25),
 
                   // PREFERENCES SECTION
-                  _buildSectionHeader('MAPENDEKEZO'),
+                  _buildSectionHeader(context.tr('general').toUpperCase()),
                   _buildSettingsCard([
                     _buildToggleItem(
                       icon: Icons.notifications_none_rounded,
-                      title: 'Taarifa (Notifications)',
-                      subtitle: 'Pata arifa za kazi na meseji',
+                      title: context.tr('notifications'),
+                      subtitle: currentLang == 'sw' ? 'Pata arifa za kazi na meseji' : 'Get job and message notifications',
                       value: _notificationsEnabled,
                       onChanged: (v) => setState(() => _notificationsEnabled = v),
                     ),
                     const Divider(height: 1),
                     _buildSettingItem(
                       icon: Icons.language_rounded,
-                      title: 'Lugha (Language)',
-                      subtitle: 'Kiswahili (Tanzania)',
-                      onTap: () {},
+                      title: context.tr('language'),
+                      subtitle: langSubtitle,
+                      onTap: () => _showLanguageSheet(context, settingsProvider, authProvider),
                     ),
                   ]),
 
                   const SizedBox(height: 25),
 
                   // SUPPORT SECTION
-                  _buildSectionHeader('MSAADA NA TAARIFA'),
+                  _buildSectionHeader(settingsProvider.locale.languageCode == 'sw' ? 'MSAADA NA TAARIFA' : 'HELP & INFO'),
                   _buildSettingsCard([
                     _buildSettingItem(
                       icon: Icons.support_agent_rounded,
@@ -210,9 +214,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         }
                       },
                       icon: const Icon(Icons.logout, color: Colors.red),
-                      label: const Text(
-                        'Toka kwenye Akaunti',
-                        style: TextStyle(
+                      label: Text(
+                        context.tr('logout'),
+                        style: const TextStyle(
                           color: Colors.red,
                           fontWeight: FontWeight.bold,
                         ),
@@ -232,7 +236,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: Text(
                       'Version 1.0.0 • Tendapoa',
                       style: TextStyle(
-                        color: Color(0xFF94A3B8),
+                        color: AppColors.textLight,
                         fontSize: 12,
                       ),
                     ),
@@ -255,7 +259,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         style: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF94A3B8),
+          color: AppColors.textLight,
           letterSpacing: 1,
         ),
       ),
@@ -302,14 +306,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
         style: const TextStyle(
           fontWeight: FontWeight.w600,
           fontSize: 15,
-          color: Color(0xFF1E293B),
+          color: AppColors.textPrimary,
         ),
       ),
       subtitle: subtitle != null
           ? Text(
               subtitle,
               style: const TextStyle(
-                color: Color(0xFF94A3B8),
+                color: AppColors.textLight,
                 fontSize: 12,
               ),
             )
@@ -345,13 +349,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
         style: const TextStyle(
           fontWeight: FontWeight.w600,
           fontSize: 15,
-          color: Color(0xFF1E293B),
+          color: AppColors.textPrimary,
         ),
       ),
       subtitle: Text(
         subtitle,
         style: const TextStyle(
-          color: Color(0xFF94A3B8),
+          color: AppColors.textLight,
           fontSize: 12,
         ),
       ),
@@ -394,7 +398,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E293B),
+                  color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 25),
@@ -486,7 +490,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E293B),
+                  color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 25),
@@ -532,7 +536,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           }
                         },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1E293B),
+                    backgroundColor: AppColors.textPrimary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 18),
                     shape: RoundedRectangleBorder(
@@ -574,7 +578,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           label,
           style: const TextStyle(
             fontWeight: FontWeight.w600,
-            color: Color(0xFF64748B),
+            color: AppColors.textSecondary,
             fontSize: 13,
           ),
         ),
@@ -585,7 +589,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           decoration: InputDecoration(
             prefixIcon: Icon(icon, color: AppColors.primary, size: 20),
             filled: true,
-            fillColor: const Color(0xFFF8FAFC),
+            fillColor: AppColors.background,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
               borderSide: BorderSide.none,
@@ -598,6 +602,84 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ],
     );
+  }
+
+  /// Language switcher: save locale + refetch so API returns title/description in new language
+  void _showLanguageSheet(BuildContext context, SettingsProvider settingsProvider, AuthProvider authProvider) {
+    final isMuhitaji = authProvider.user?.isMuhitaji ?? true;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  context.tr('chooseLanguage'),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.language),
+                title: Text(context.tr('english')),
+                trailing: settingsProvider.locale.languageCode == 'en'
+                    ? const Icon(Icons.check_circle, color: Colors.green)
+                    : null,
+                onTap: () async {
+                  Navigator.pop(ctx);
+                  await settingsProvider.setLocale(const Locale('en'));
+                  if (!ctx.mounted) return;
+                  _refetchDataAfterLanguageChange(ctx, isMuhitaji);
+                  if (mounted) setState(() {});
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.language),
+                title: Text(context.tr('swahili')),
+                trailing: settingsProvider.locale.languageCode == 'sw'
+                    ? const Icon(Icons.check_circle, color: Colors.green)
+                    : null,
+                onTap: () async {
+                  Navigator.pop(ctx);
+                  await settingsProvider.setLocale(const Locale('sw'));
+                  if (!ctx.mounted) return;
+                  _refetchDataAfterLanguageChange(ctx, isMuhitaji);
+                  if (mounted) setState(() {});
+                },
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _refetchDataAfterLanguageChange(BuildContext context, bool isMuhitaji) async {
+    try {
+      if (isMuhitaji) {
+        await context.read<ClientProvider>().loadMyJobs(silent: true);
+        await context.read<ClientProvider>().loadDashboard();
+      } else {
+        await context.read<WorkerProvider>().refreshAll();
+      }
+      if (mounted) {
+        _showSnackbar(
+          context.tr('language') == 'Language'
+              ? 'Language changed. Content updated.'
+              : 'Lugha imebadilishwa. Maudhui yamesasishwa.',
+        );
+      }
+    } catch (_) {
+      if (mounted) _showSnackbar(context.tr('language') == 'Language' ? 'Language updated.' : 'Lugha imesasishwa.');
+    }
   }
 
   void _showSnackbar(String msg, {bool isError = false}) {

@@ -43,7 +43,7 @@ class _FilterModalState extends State<FilterModal> {
                   style: TextStyle(
                       fontWeight: FontWeight.w900,
                       fontSize: 20,
-                      color: Color(0xFF1E293B))),
+                      color: AppColors.textPrimary)),
               TextButton(
                 onPressed: () {
                   context.read<WorkerProvider>().clearFilters();
@@ -84,7 +84,7 @@ class _FilterModalState extends State<FilterModal> {
                           style: TextStyle(
                               color: isSelected
                                   ? Colors.white
-                                  : const Color(0xFF64748B),
+                                  : AppColors.textSecondary,
                               fontWeight: FontWeight.bold,
                               fontSize: 13)),
                     ),
@@ -126,7 +126,7 @@ class _FilterModalState extends State<FilterModal> {
                 Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1E293B),
+                backgroundColor: AppColors.textPrimary,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 20),
                 shape: RoundedRectangleBorder(

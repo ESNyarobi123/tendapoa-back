@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../../core/constants/constants.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/router/app_router.dart';
 import '../../../providers/providers.dart';
 import '../../../data/models/category_model.dart' as models;
@@ -117,7 +118,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
     if (_formKey.currentState!.validate()) {
       if (_selectedCategory == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Tafadhali chagua kategoria')));
+            SnackBar(content: Text(context.tr('category_error'))));
         return;
       }
       setState(() => _currentStep = 1);
@@ -130,7 +131,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
       if (_lat == null || _lng == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Tafadhali washa GPS yako kwanza')));
+              SnackBar(content: Text(context.tr('gps_enable_first'))));
         }
         return;
       }
@@ -147,7 +148,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
             phone: _phoneController.text.isNotEmpty
                 ? _phoneController.text
                 : 'N/A',
-            addressText: _addressText ?? 'Eneo la Kazi',
+            addressText: _addressText ?? context.tr('job_location_placeholder'),
             image: _selectedImage,
           );
 
@@ -165,7 +166,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Hitilafu: $e'), backgroundColor: AppColors.error));
+            content: Text('${context.tr('error_prefix')}: $e'), backgroundColor: AppColors.error));
       }
     }
   }
@@ -173,7 +174,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.primary,
         elevation: 0,
@@ -182,8 +183,8 @@ class _PostJobScreenState extends State<PostJobScreen> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Post Kazi Mpya',
-            style: TextStyle(
+        title: Text(context.tr('post_job_new'),
+            style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
                 fontSize: 20)),
@@ -214,7 +215,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
               ),
               child: Row(
                 children: [
-                  _buildStep(0, 'Maelezo'),
+                  _buildStep(0, context.tr('step_details')),
                   Expanded(
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 10),
@@ -222,12 +223,12 @@ class _PostJobScreenState extends State<PostJobScreen> {
                       decoration: BoxDecoration(
                         color: _currentStep >= 1
                             ? AppColors.primary
-                            : const Color(0xFFE2E8F0),
+                            : AppColors.grey200,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                   ),
-                  _buildStep(1, 'Eneo & Post'),
+                  _buildStep(1, context.tr('step_location_post')),
                 ],
               ),
             ),
@@ -279,7 +280,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                 : Text(
                     '${step + 1}',
                     style: TextStyle(
-                      color: isActive ? Colors.white : const Color(0xFF64748B),
+                      color: isActive ? Colors.white : AppColors.textSecondary,
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
                     ),
@@ -291,7 +292,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
           label,
           style: TextStyle(
             fontSize: 14,
-            color: isActive ? AppColors.primary : const Color(0xFF64748B),
+            color: isActive ? AppColors.primary : AppColors.textSecondary,
             fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
           ),
         ),
@@ -307,15 +308,15 @@ class _PostJobScreenState extends State<PostJobScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 10),
-          const Text('Unahitaji msaidizi gani?',
-              style: TextStyle(
+          Text(context.tr('post_need_help'),
+              style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w900,
-                  color: Color(0xFF1E293B),
+                  color: AppColors.textPrimary,
                   letterSpacing: -0.5)),
           const SizedBox(height: 5),
-          const Text('Jaza taarifa hizi ili mafundi wa karibu waanze kuomba.',
-              style: TextStyle(color: Color(0xFF64748B), fontSize: 14)),
+          Text(context.tr('post_fill_details'),
+              style: const TextStyle(color: AppColors.textSecondary, fontSize: 14)),
           const SizedBox(height: 30),
 
           // Image Picker
@@ -325,9 +326,9 @@ class _PostJobScreenState extends State<PostJobScreen> {
               height: 200,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
+                color: AppColors.background,
                 borderRadius: BorderRadius.circular(30),
-                border: Border.all(color: const Color(0xFFF1F5F9), width: 2),
+                border: Border.all(color: AppColors.surfaceLight, width: 2),
                 image: _selectedImage != null
                     ? DecorationImage(
                         image: kIsWeb
@@ -350,9 +351,9 @@ class _PostJobScreenState extends State<PostJobScreen> {
                               size: 30, color: AppColors.primary),
                         ),
                         const SizedBox(height: 12),
-                        const Text('Ongeza Picha (Optional)',
-                            style: TextStyle(
-                                color: Color(0xFF64748B),
+                        Text(context.tr('add_image_optional'),
+                            style: const TextStyle(
+                                color: AppColors.textSecondary,
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold)),
                       ],
@@ -375,29 +376,29 @@ class _PostJobScreenState extends State<PostJobScreen> {
 
           const SizedBox(height: 35),
 
-          _buildInputLabel('Kichwa cha Kazi'),
+          _buildInputLabel(context.tr('enter_job_title')),
           _buildTextField(
             controller: _titleController,
-            hint: 'Mfano: Napata fundi bomba wa kurekebisha sinki',
+            hint: context.tr('post_title_hint'),
             icon: Icons.edit_note_rounded,
             validator: (v) =>
-                v!.isEmpty ? 'Tafadhali weka kichwa cha kazi' : null,
+                v!.isEmpty ? context.tr('job_title_error') : null,
           ),
 
           const SizedBox(height: 25),
-          _buildInputLabel('Kategoria ya Kazi'),
+          _buildInputLabel(context.tr('select_category')),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
             decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
+                color: AppColors.background,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFFF1F5F9))),
+                border: Border.all(color: AppColors.surfaceLight)),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<models.Category>(
                 isExpanded: true,
                 value: _selectedCategory,
-                hint: const Text('Chagua Kategoria...',
-                    style: TextStyle(color: Color(0xFF94A3B8), fontSize: 14)),
+                hint: Text('${context.tr('select_category')}...',
+                    style: const TextStyle(color: AppColors.textLight, fontSize: 14)),
                 items: categories
                     .map((c) => DropdownMenuItem(
                         value: c,
@@ -411,31 +412,31 @@ class _PostJobScreenState extends State<PostJobScreen> {
           ),
 
           const SizedBox(height: 25),
-          _buildInputLabel('Dau / Bajeti Yako (TZS)'),
+          _buildInputLabel(context.tr('your_budget')),
           _buildTextField(
             controller: _priceController,
-            hint: 'Mfano: 20,000',
+            hint: context.tr('post_budget_hint'),
             icon: Icons.payments_rounded,
             keyboardType: TextInputType.number,
-            validator: (v) => v!.isEmpty ? 'Weka bajeti' : null,
+            validator: (v) => v!.isEmpty ? context.tr('budget_error') : null,
           ),
 
           const SizedBox(height: 25),
-          _buildInputLabel('Maelezo ya Kazi'),
+          _buildInputLabel(context.tr('additional_details')),
           Container(
             padding: const EdgeInsets.all(15),
             decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
+                color: AppColors.background,
                 borderRadius: BorderRadius.circular(25),
-                border: Border.all(color: const Color(0xFFF1F5F9))),
+                border: Border.all(color: AppColors.surfaceLight)),
             child: TextFormField(
               controller: _descController,
               maxLines: 5,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                   border: InputBorder.none,
-                  hintText: 'Elezea kazi kwa undani zaidi hapa...',
-                  hintStyle: TextStyle(color: Color(0xFF94A3B8), fontSize: 14)),
-              validator: (v) => v!.isEmpty ? 'Elezea kazi yako' : null,
+                  hintText: context.tr('post_description_hint'),
+                  hintStyle: const TextStyle(color: AppColors.textLight, fontSize: 14)),
+              validator: (v) => v!.isEmpty ? context.tr('post_description_error') : null,
             ),
           ),
           const SizedBox(height: 40),
@@ -449,16 +450,16 @@ class _PostJobScreenState extends State<PostJobScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 10),
-        const Text('Eneo la Kazi',
-            style: TextStyle(
+        Text(context.tr('location_title'),
+            style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w900,
-                color: Color(0xFF1E293B),
+                color: AppColors.textPrimary,
                 letterSpacing: -0.5)),
         const SizedBox(height: 5),
-        const Text(
-            'Tunatumia GPS yako kutambua eneo ili mafundi wa karibu zaidi waone kazi yako.',
-            style: TextStyle(color: Color(0xFF64748B), fontSize: 14)),
+        Text(
+            context.tr('post_location_help'),
+            style: const TextStyle(color: AppColors.textSecondary, fontSize: 14)),
         const SizedBox(height: 30),
 
         // Location Card
@@ -466,7 +467,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
           width: double.infinity,
           padding: const EdgeInsets.all(25),
           decoration: BoxDecoration(
-            color: const Color(0xFF1E293B),
+            color: AppColors.textPrimary,
             borderRadius: BorderRadius.circular(30),
             boxShadow: [
               BoxShadow(
@@ -489,23 +490,23 @@ class _PostJobScreenState extends State<PostJobScreen> {
                         : const Color(0xFFF97316)),
               ),
               const SizedBox(height: 20),
-              Text(_lat != null ? 'ENEO LIMETAMBULIWA' : 'INATAFUTA ENEO...',
+              Text(_lat != null ? context.tr('location_detected').toUpperCase() : context.tr('post_location_searching').toUpperCase(),
                   style: const TextStyle(
                       fontWeight: FontWeight.w900,
                       color: Colors.white,
                       fontSize: 14,
                       letterSpacing: 1)),
               const SizedBox(height: 8),
-              Text(_addressText ?? 'Tafadhali ruhusu GPS kwanza',
+              Text(_addressText ?? context.tr('post_allow_gps'),
                   style: const TextStyle(color: Colors.white60, fontSize: 13),
                   textAlign: TextAlign.center),
               const SizedBox(height: 20),
               OutlinedButton.icon(
                 onPressed: _detectLocation,
                 icon: const Icon(Icons.refresh_rounded, size: 16),
-                label: const Text('RUDIA KUTAFUTA',
+                label: Text(context.tr('post_retry_location'),
                     style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
+                        const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
                 style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.white70,
                     side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
@@ -524,13 +525,13 @@ class _PostJobScreenState extends State<PostJobScreen> {
         _buildNearbyWorkersCard(),
 
         const SizedBox(height: 30),
-        _buildInputLabel('Namba ya Mawasiliano'),
+        _buildInputLabel(context.tr('phone_number')),
         _buildTextField(
           controller: _phoneController,
           hint: '07XXXXXXXX',
           icon: Icons.phone_android_rounded,
           keyboardType: TextInputType.phone,
-          validator: (v) => v!.isEmpty ? 'Weka namba ya simu' : null,
+          validator: (v) => v!.isEmpty ? context.tr('phone_error') : null,
         ),
         const SizedBox(height: 30),
       ],
@@ -547,9 +548,9 @@ class _PostJobScreenState extends State<PostJobScreen> {
           borderRadius: BorderRadius.circular(25),
           border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
         ),
-        child: const Row(
+        child: Row(
           children: [
-            SizedBox(
+            const SizedBox(
               width: 24,
               height: 24,
               child: CircularProgressIndicator(
@@ -557,12 +558,12 @@ class _PostJobScreenState extends State<PostJobScreen> {
                 color: AppColors.primary,
               ),
             ),
-            SizedBox(width: 15),
+            const SizedBox(width: 15),
             Expanded(
               child: Text(
-                'Inatafuta wafanyakazi karibu nawe...',
+                context.tr('post_searching_workers'),
                 style: TextStyle(
-                  color: Color(0xFF64748B),
+                  color: AppColors.textSecondary,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -607,19 +608,19 @@ class _PostJobScreenState extends State<PostJobScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Hakuna Wafanyakazi Karibu',
-                        style: TextStyle(
+                      Text(
+                        context.tr('post_no_workers_nearby'),
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
-                          color: Color(0xFF1E293B),
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        _nearbyWorkersMessage ?? 'Unaweza kuendelea lakini muda wa kupata mfanyakazi unaweza kuwa mrefu.',
+                        _nearbyWorkersMessage ?? context.tr('post_continue_anyway'),
                         style: const TextStyle(
-                          color: Color(0xFF64748B),
+                          color: AppColors.textSecondary,
                           fontSize: 12,
                         ),
                       ),
@@ -668,18 +669,18 @@ class _PostJobScreenState extends State<PostJobScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Wafanyakazi $_nearbyWorkerCount Wamepatikana!',
+                        '$_nearbyWorkerCount ${context.tr('post_workers_found')}',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
-                          color: Color(0xFF1E293B),
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        _nearbyWorkersMessage ?? 'Kazi yako itaonekana haraka!',
+                        _nearbyWorkersMessage ?? context.tr('post_job_visible_soon'),
                         style: const TextStyle(
-                          color: Color(0xFF64748B),
+                          color: AppColors.textSecondary,
                           fontSize: 12,
                         ),
                       ),
@@ -728,7 +729,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
             ),
             const SizedBox(height: 2),
             Text(
-              'ndani $label',
+              '${context.tr('post_within_km')} $label',
               style: TextStyle(
                 fontSize: 10,
                 color: color.withValues(alpha: 0.8),
@@ -747,7 +748,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
         child: Text(label,
             style: const TextStyle(
                 fontWeight: FontWeight.w900,
-                color: Color(0xFF1E293B),
+                color: AppColors.textPrimary,
                 fontSize: 14)));
   }
 
@@ -760,19 +761,19 @@ class _PostJobScreenState extends State<PostJobScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),
+          color: AppColors.background,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFFF1F5F9))),
+          border: Border.all(color: AppColors.surfaceLight)),
       child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
         validator: validator,
         style: const TextStyle(fontWeight: FontWeight.bold),
         decoration: InputDecoration(
-          prefixIcon: Icon(icon, size: 20, color: const Color(0xFF94A3B8)),
+          prefixIcon: Icon(icon, size: 20, color: AppColors.textLight),
           hintText: hint,
           hintStyle: const TextStyle(
-              color: Color(0xFF94A3B8),
+              color: AppColors.textLight,
               fontSize: 14,
               fontWeight: FontWeight.normal),
           border: InputBorder.none,
@@ -804,13 +805,13 @@ class _PostJobScreenState extends State<PostJobScreen> {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
+                  color: AppColors.surfaceLight,
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: const Icon(
                   Icons.arrow_back_ios_new_rounded,
                   size: 20,
-                  color: Color(0xFF1E293B),
+                  color: AppColors.textPrimary,
                 ),
               ),
             ),
@@ -842,7 +843,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                       ),
                     )
                   : Text(
-                      _currentStep == 0 ? 'ENDELEA' : 'POST KAZI SASA',
+                      _currentStep == 0 ? context.tr('post_continue_btn').toUpperCase() : context.tr('post_job_btn').toUpperCase(),
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,

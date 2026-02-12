@@ -229,11 +229,11 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: _commentType == 'comment' 
-                            ? [const Color(0xFF3B82F6), const Color(0xFF1D4ED8)]
-                            : _commentType == 'offer'
+                          colors: _commentType == 'comment'
+                              ? [const Color(0xFF3B82F6), const Color(0xFF1D4ED8)]
+                              : _commentType == 'offer'
                               ? [const Color(0xFF22C55E), const Color(0xFF16A34A)]
-                              : [const Color(0xFFF97316), const Color(0xFFEA580C)],
+                              : [AppColors.walletAccent, const Color(0xFFEA580C)],
                         ),
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -260,7 +260,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                                 fontSize: 20,
                                 fontWeight: FontWeight.w900,
                                 letterSpacing: -0.5,
-                                color: Color(0xFF1E293B))),
+                                color: AppColors.textPrimary)),
                           const SizedBox(height: 4),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -271,7 +271,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                             child: Text(
                               'Bei: TZS ${_formatNumber(_job?.price ?? 0)}',
                               style: const TextStyle(
-                                color: Color(0xFFF97316),
+                                color: AppColors.walletAccent,
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -306,12 +306,12 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                           decoration: BoxDecoration(
                             color: _commentType == 'comment' 
                               ? const Color(0xFFDBEAFE) 
-                              : const Color(0xFFF8FAFC),
+                              : AppColors.background,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: _commentType == 'comment' 
                                 ? const Color(0xFF3B82F6) 
-                                : const Color(0xFFE2E8F0),
+                                : AppColors.grey200,
                               width: _commentType == 'comment' ? 2 : 1,
                             ),
                           ),
@@ -320,7 +320,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                               Icon(Icons.chat_bubble_outline_rounded,
                                 color: _commentType == 'comment' 
                                   ? const Color(0xFF3B82F6) 
-                                  : const Color(0xFF94A3B8),
+                                  : AppColors.textLight,
                                 size: 22),
                               const SizedBox(height: 4),
                               Text('Maoni',
@@ -329,7 +329,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                                   fontWeight: FontWeight.w700,
                                   color: _commentType == 'comment' 
                                     ? const Color(0xFF3B82F6) 
-                                    : const Color(0xFF64748B),
+                                    : AppColors.textSecondary,
                                 )),
                             ],
                           ),
@@ -349,12 +349,12 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                           decoration: BoxDecoration(
                             color: _commentType == 'application' 
                               ? const Color(0xFFFFF7ED) 
-                              : const Color(0xFFF8FAFC),
+                              : AppColors.background,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: _commentType == 'application' 
-                                ? const Color(0xFFF97316) 
-                                : const Color(0xFFE2E8F0),
+                                ? AppColors.walletAccent 
+                                : AppColors.grey200,
                               width: _commentType == 'application' ? 2 : 1,
                             ),
                           ),
@@ -362,8 +362,8 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                             children: [
                               Icon(Icons.work_outline_rounded,
                                 color: _commentType == 'application' 
-                                  ? const Color(0xFFF97316) 
-                                  : const Color(0xFF94A3B8),
+                                  ? AppColors.walletAccent 
+                                  : AppColors.textLight,
                                 size: 22),
                               const SizedBox(height: 4),
                               Text('Omba Kazi',
@@ -371,8 +371,8 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
                                   color: _commentType == 'application' 
-                                    ? const Color(0xFFF97316) 
-                                    : const Color(0xFF64748B),
+                                    ? AppColors.walletAccent 
+                                    : AppColors.textSecondary,
                                 )),
                             ],
                           ),
@@ -392,12 +392,12 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                           decoration: BoxDecoration(
                             color: _commentType == 'offer' 
                               ? const Color(0xFFDCFCE7) 
-                              : const Color(0xFFF8FAFC),
+                              : AppColors.background,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: _commentType == 'offer' 
                                 ? const Color(0xFF22C55E) 
-                                : const Color(0xFFE2E8F0),
+                                : AppColors.grey200,
                               width: _commentType == 'offer' ? 2 : 1,
                             ),
                           ),
@@ -406,7 +406,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                               Icon(Icons.monetization_on_rounded,
                                 color: _commentType == 'offer' 
                                   ? const Color(0xFF22C55E) 
-                                  : const Color(0xFF94A3B8),
+                                  : AppColors.textLight,
                                 size: 22),
                               const SizedBox(height: 4),
                               Text('Bei Tofauti',
@@ -415,7 +415,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                                   fontWeight: FontWeight.w700,
                                   color: _commentType == 'offer' 
                                     ? const Color(0xFF22C55E) 
-                                    : const Color(0xFF64748B),
+                                    : AppColors.textSecondary,
                                 )),
                             ],
                           ),
@@ -441,9 +441,9 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                 const SizedBox(height: 8),
                 Container(
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF8FAFC),
+                    color: AppColors.background,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                    border: Border.all(color: AppColors.grey200),
                   ),
                   child: TextField(
                     controller: _applicationController,
@@ -453,7 +453,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                         : _commentType == 'offer'
                           ? 'Eleza kwanini bei hii ni sawa...'
                           : 'Andika maelezo ya kwanini wewe ni bora...',
-                      hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
+                      hintStyle: const TextStyle(color: AppColors.textLight, fontSize: 14),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(16),
                     ),
@@ -482,7 +482,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF1E293B),
+                        color: AppColors.textPrimary,
                       ),
                       decoration: InputDecoration(
                         prefixIcon: Container(
@@ -560,7 +560,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                         ? const Color(0xFF3B82F6)
                         : _commentType == 'offer'
                           ? const Color(0xFF22C55E)
-                          : const Color(0xFFF97316),
+                          : AppColors.walletAccent,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 18),
                       shape: RoundedRectangleBorder(
@@ -578,7 +578,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                   child: TextButton(
                     onPressed: () => Navigator.pop(context),
                     child: const Text('Ghairi',
-                        style: TextStyle(color: Color(0xFF64748B), fontWeight: FontWeight.w600)),
+                        style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
                   ),
                 ),
               ],
@@ -733,7 +733,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                         children: [
                           const Text('DAU LA KAZI',
                               style: TextStyle(
-                                  color: Color(0xFF94A3B8),
+                                  color: AppColors.textLight,
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 1)),
@@ -743,7 +743,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                             style: const TextStyle(
                                 fontSize: 28,
                                 fontWeight: FontWeight.w900,
-                                color: Color(0xFF1E293B)),
+                                color: AppColors.textPrimary),
                           ),
                         ],
                       ),
@@ -766,7 +766,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                       style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w900,
-                          color: Color(0xFF1E293B))),
+                          color: AppColors.textPrimary)),
                   const SizedBox(height: 15),
                   Text(
                     job.description ?? 'Hakuna maelezo ya ziada.',
@@ -781,7 +781,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                       style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w900,
-                          color: Color(0xFF1E293B))),
+                          color: AppColors.textPrimary)),
                   const SizedBox(height: 15),
                   
                   // Map Widget showing job location
@@ -930,9 +930,9 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF8FAFC),
+                        color: AppColors.background,
                         borderRadius: BorderRadius.circular(25),
-                        border: Border.all(color: const Color(0xFFF1F5F9)),
+                        border: Border.all(color: AppColors.surfaceLight),
                       ),
                       child: Row(
                         children: [
@@ -983,9 +983,9 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),
+          color: AppColors.background,
           borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: const Color(0xFFF1F5F9))),
+          border: Border.all(color: AppColors.surfaceLight)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -993,7 +993,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
           const SizedBox(width: 8),
           Text(text,
               style: const TextStyle(
-                  color: Color(0xFF1E293B),
+                  color: AppColors.textPrimary,
                   fontSize: 12,
                   fontWeight: FontWeight.bold)),
         ],
@@ -1007,7 +1007,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
       padding: const EdgeInsets.all(25),
       margin: const EdgeInsets.only(bottom: 35),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: AppColors.textPrimary,
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
@@ -1105,13 +1105,13 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        border: Border.all(color: AppColors.surfaceLight),
       ),
       child: Row(
         children: [
           CircleAvatar(
             radius: 30,
-            backgroundColor: const Color(0xFFF1F5F9),
+            backgroundColor: AppColors.surfaceLight,
             backgroundImage: job.userPhotoUrl != null
                 ? NetworkImage(job.userPhotoUrl!)
                 : null,
@@ -1133,11 +1133,11 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                     style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
-                        color: Color(0xFF1E293B))),
+                        color: AppColors.textPrimary)),
                 const Text('Mteja Aliyethibitishwa',
                     style: TextStyle(
                         fontSize: 13,
-                        color: Color(0xFF94A3B8),
+                        color: AppColors.textLight,
                         fontWeight: FontWeight.w500)),
               ],
             ),
@@ -1187,7 +1187,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                 style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
-                    color: Color(0xFF1E293B))),
+                    color: AppColors.textPrimary)),
           ],
         ),
         const SizedBox(height: 25),
@@ -1200,7 +1200,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                     size: 60, color: Colors.blue[50]),
                 const SizedBox(height: 15),
                 const Text('Bado hakuna mafundi walioomba.',
-                    style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13)),
+                    style: TextStyle(color: AppColors.textLight, fontSize: 13)),
               ],
             ),
           )
@@ -1241,7 +1241,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                         style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w900,
-                            color: Color(0xFF1E293B))),
+                            color: AppColors.textPrimary)),
                     Text('Umeomba kazi hii',
                         style: TextStyle(
                             fontSize: 12,
@@ -1262,7 +1262,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
               style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w900,
-                  color: Color(0xFF1E293B))),
+                  color: AppColors.textPrimary)),
           const SizedBox(height: 16),
           ...otherComments.map((comment) => _buildOtherCommentItem(comment)),
         ],
@@ -1276,7 +1276,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF8FAFC),
+                    color: AppColors.background,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Icon(Icons.chat_bubble_outline_rounded,
@@ -1285,13 +1285,13 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                 const SizedBox(height: 15),
                 const Text('Bado hakuna maombi',
                     style: TextStyle(
-                      color: Color(0xFF64748B), 
+                      color: AppColors.textSecondary, 
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     )),
                 const SizedBox(height: 6),
                 const Text('Kuwa wa kwanza kuomba kazi hii!',
-                    style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12)),
+                    style: TextStyle(color: AppColors.textLight, fontSize: 12)),
               ],
             ),
           ),
@@ -1330,14 +1330,14 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
               const Spacer(),
               Text(
                 timeago.format(comment.createdAt ?? DateTime.now(), locale: 'sw'),
-                style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
               ),
             ],
           ),
           const SizedBox(height: 12),
           Text(comment.message,
               style: const TextStyle(
-                  fontSize: 14, color: Color(0xFF1E293B), height: 1.5)),
+                  fontSize: 14, color: AppColors.textPrimary, height: 1.5)),
           if (comment.proposedPrice != null) ...[
             const SizedBox(height: 12),
             Container(
@@ -1375,16 +1375,16 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: AppColors.grey200),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CircleAvatar(
             radius: 18,
-            backgroundColor: const Color(0xFFE2E8F0),
+            backgroundColor: AppColors.grey200,
             backgroundImage: comment.userPhoto != null 
               ? NetworkImage(comment.userPhoto!) 
               : null,
@@ -1394,7 +1394,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                     ? comment.userName![0].toUpperCase() 
                     : 'W',
                   style: const TextStyle(
-                    color: Color(0xFF64748B),
+                    color: AppColors.textSecondary,
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                   ),
@@ -1412,18 +1412,18 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                         style: const TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 13,
-                            color: Color(0xFF1E293B))),
+                            color: AppColors.textPrimary)),
                     const Spacer(),
                     Text(
                       timeago.format(comment.createdAt ?? DateTime.now(), locale: 'sw'),
-                      style: const TextStyle(fontSize: 10, color: Color(0xFF94A3B8)),
+                      style: const TextStyle(fontSize: 10, color: AppColors.textLight),
                     ),
                   ],
                 ),
                 const SizedBox(height: 6),
                 Text(comment.message,
                     style: const TextStyle(
-                        fontSize: 13, color: Color(0xFF64748B), height: 1.4),
+                        fontSize: 13, color: AppColors.textSecondary, height: 1.4),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis),
               ],
@@ -1441,7 +1441,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        border: Border.all(color: AppColors.surfaceLight),
         boxShadow: [
           BoxShadow(
               color: Colors.black.withValues(alpha: 0.02),
@@ -1456,7 +1456,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
             children: [
               CircleAvatar(
                 radius: 22,
-                backgroundColor: const Color(0xFFF1F5F9),
+                backgroundColor: AppColors.surfaceLight,
                 child: Text(comment.userName?[0] ?? 'W',
                     style: const TextStyle(
                         color: AppColors.primary,
@@ -1472,12 +1472,12 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                         style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
-                            color: Color(0xFF1E293B))),
+                            color: AppColors.textPrimary)),
                     Text(
                         timeago.format(comment.createdAt ?? DateTime.now(),
                             locale: 'sw'),
                         style: const TextStyle(
-                            fontSize: 12, color: Color(0xFF94A3B8))),
+                            fontSize: 12, color: AppColors.textLight)),
                   ],
                 ),
               ),
@@ -1530,7 +1530,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
         child: ElevatedButton(
           onPressed: _showApplicationDialog,
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFFF97316),
+            backgroundColor: AppColors.walletAccent,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 20),
             shape:
@@ -1609,7 +1609,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
       case 'cancelled':
         return const Color(0xFFEF4444);
       default:
-        return const Color(0xFFF97316);
+        return AppColors.walletAccent;
     }
   }
 }

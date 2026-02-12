@@ -91,7 +91,7 @@ class _WorkerActiveJobScreenState extends State<WorkerActiveJobScreen> {
               ),
               const SizedBox(height: 20),
               const Text('Hakuna kazi inayofanyika sasa',
-                  style: TextStyle(color: Color(0xFF64748B), fontSize: 16)),
+                  style: TextStyle(color: AppColors.textSecondary, fontSize: 16)),
             ],
           ),
         ),
@@ -99,7 +99,7 @@ class _WorkerActiveJobScreenState extends State<WorkerActiveJobScreen> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       body: CustomScrollView(
         slivers: [
           // PREMIUM ORANGE HEADER
@@ -173,7 +173,7 @@ class _WorkerActiveJobScreenState extends State<WorkerActiveJobScreen> {
             child: Container(
               transform: Matrix4.translationValues(0, -30, 0),
               decoration: const BoxDecoration(
-                color: Color(0xFFF8FAFC),
+                color: AppColors.background,
                 borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(35),
                     topRight: Radius.circular(35)),
@@ -187,7 +187,7 @@ class _WorkerActiveJobScreenState extends State<WorkerActiveJobScreen> {
                       style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1E293B))),
+                          color: AppColors.textPrimary)),
                   const SizedBox(height: 15),
                   Container(
                     padding: const EdgeInsets.all(15),
@@ -224,7 +224,7 @@ class _WorkerActiveJobScreenState extends State<WorkerActiveJobScreen> {
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 17,
-                                      color: Color(0xFF1E293B))),
+                                      color: AppColors.textPrimary)),
                               Text(job.addressText ?? 'Eneo halijatajwa',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -295,7 +295,7 @@ class _WorkerActiveJobScreenState extends State<WorkerActiveJobScreen> {
                             style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF1E293B))),
+                                color: AppColors.textPrimary)),
                         const SizedBox(height: 10),
                         const Text('Ingiza kodi uliyopewa na mteja',
                             style: TextStyle(
@@ -304,7 +304,7 @@ class _WorkerActiveJobScreenState extends State<WorkerActiveJobScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF8FAFC),
+                            color: AppColors.background,
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(color: const Color(0xFFF1F5F9)),
                           ),
@@ -317,7 +317,7 @@ class _WorkerActiveJobScreenState extends State<WorkerActiveJobScreen> {
                                 fontSize: 32,
                                 fontWeight: FontWeight.w900,
                                 letterSpacing: 10,
-                                color: Color(0xFF1E293B)),
+                                color: AppColors.textPrimary),
                             decoration: const InputDecoration(
                               counterText: "",
                               hintText: '0000',

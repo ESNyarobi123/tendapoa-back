@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/constants/app_constants.dart';
 import 'storage_service.dart';
 
@@ -45,10 +46,14 @@ class ApiService {
   }
 
   Future<Map<String, String>> _getHeaders({bool requiresAuth = true}) async {
-    final headers = {
+    final headers = <String, String>{
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     };
+    // Global Accept-Language so backend returns title/description/labels in user's language
+    final prefs = await SharedPreferences.getInstance();
+    final lang = prefs.getString(AppConstants.languageKey) ?? 'sw';
+    headers['Accept-Language'] = lang;
     if (requiresAuth) {
       final token = await _storage.getToken();
       if (token != null) {

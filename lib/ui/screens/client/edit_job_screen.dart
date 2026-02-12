@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/constants.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/router/app_router.dart';
 import '../../../data/models/models.dart';
 import '../../../data/services/job_service.dart';
@@ -76,8 +77,8 @@ class _EditJobScreenState extends State<EditJobScreen> {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Hitilafu: $e'),
-            backgroundColor: const Color(0xFFEF4444),
+            content: Text('${context.tr('error_prefix')} $e'),
+            backgroundColor: AppColors.error,
           ),
         );
       }
@@ -122,8 +123,8 @@ class _EditJobScreenState extends State<EditJobScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Hitilafu: $e'),
-            backgroundColor: const Color(0xFFEF4444),
+            content: Text('${context.tr('error_prefix')} $e'),
+            backgroundColor: AppColors.error,
           ),
         );
       }
@@ -179,9 +180,9 @@ class _EditJobScreenState extends State<EditJobScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (_lat == null || _lng == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Tafadhali chagua eneo la kazi kwenye ramani'),
-          backgroundColor: Color(0xFFEF4444),
+        SnackBar(
+          content: Text(context.tr('select_job_location')),
+          backgroundColor: AppColors.error,
         ),
       );
       return;
@@ -191,8 +192,8 @@ class _EditJobScreenState extends State<EditJobScreen> {
     if (newPrice < widget.job.price) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Huwezi kupunguza bei. Bei ya sasa ni TZS ${_formatPrice(widget.job.price.toDouble())}'),
-          backgroundColor: const Color(0xFFEF4444),
+          content: Text('${context.tr('price_cannot_decrease')} ${_formatPrice(widget.job.price.toDouble())}'),
+          backgroundColor: AppColors.error,
         ),
       );
       return;
@@ -221,8 +222,8 @@ class _EditJobScreenState extends State<EditJobScreen> {
         if (result['payment_required'] == true) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(result['message'] ?? 'Malipo ya ziada yanahitajika'),
-              backgroundColor: const Color(0xFFF59E0B),
+              content: Text(result['message'] ?? context.tr('extra_payment_required')),
+              backgroundColor: AppColors.warning,
             ),
           );
           // Navigate to payment wait screen
@@ -234,8 +235,8 @@ class _EditJobScreenState extends State<EditJobScreen> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(result['message'] ?? 'Kazi imebadilishwa!'),
-              backgroundColor: const Color(0xFF22C55E),
+              content: Text(result['message'] ?? context.tr('job_updated')),
+              backgroundColor: AppColors.success,
             ),
           );
           Navigator.pop(context, true);
@@ -245,8 +246,8 @@ class _EditJobScreenState extends State<EditJobScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Hitilafu: $e'),
-            backgroundColor: const Color(0xFFEF4444),
+            content: Text('${context.tr('error_prefix')} $e'),
+            backgroundColor: AppColors.error,
           ),
         );
       }
@@ -267,13 +268,13 @@ class _EditJobScreenState extends State<EditJobScreen> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                color: AppColors.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(Icons.delete_outline_rounded, color: Color(0xFFEF4444)),
+              child: const Icon(Icons.delete_outline_rounded, color: AppColors.error),
             ),
             const SizedBox(width: 12),
-            const Text('Futa Kazi?'),
+            Text(context.tr('confirm_delete_title')),
           ],
         ),
         content: Column(
@@ -281,23 +282,23 @@ class _EditJobScreenState extends State<EditJobScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Una uhakika unataka kufuta kazi hii?',
+              context.tr('confirm_delete_job'),
               style: TextStyle(color: Colors.grey[700]),
             ),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFFF1F5F9),
+                color: AppColors.surfaceLight,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.info_outline, color: Color(0xFF64748B), size: 20),
+                  const Icon(Icons.info_outline, color: AppColors.textSecondary, size: 20),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'Kama kazi ililipiwa, pesa itarudishwa kwenye wallet yako.',
+                      context.tr('refund_note'),
                       style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     ),
                   ),
@@ -309,16 +310,16 @@ class _EditJobScreenState extends State<EditJobScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Hapana', style: TextStyle(color: Color(0xFF64748B))),
+            child: Text(context.tr('cancel'), style: const TextStyle(color: AppColors.textSecondary)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFEF4444),
+              backgroundColor: AppColors.error,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            child: const Text('Ndio, Futa'),
+            child: Text(context.tr('yes_delete')),
           ),
         ],
       ),
@@ -336,8 +337,8 @@ class _EditJobScreenState extends State<EditJobScreen> {
         
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(result['message'] ?? 'Kazi imefutwa!'),
-            backgroundColor: const Color(0xFF22C55E),
+            content: Text(result['message'] ?? context.tr('job_deleted')),
+            backgroundColor: AppColors.success,
           ),
         );
         Navigator.pop(context, true);
@@ -346,8 +347,8 @@ class _EditJobScreenState extends State<EditJobScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Hitilafu: $e'),
-            backgroundColor: const Color(0xFFEF4444),
+            content: Text('${context.tr('error_prefix')} $e'),
+            backgroundColor: AppColors.error,
           ),
         );
       }
@@ -371,7 +372,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
     final canDelete = widget.job.status == 'posted' || widget.job.status == 'pending_payment';
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       body: CustomScrollView(
         slivers: [
           // App Bar
@@ -398,9 +399,9 @@ class _EditJobScreenState extends State<EditJobScreen> {
                 ),
             ],
             flexibleSpace: FlexibleSpaceBar(
-              title: const Text(
-                'Hariri Kazi',
-                style: TextStyle(
+              title: Text(
+                context.tr('edit_job_title'),
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
@@ -434,19 +435,19 @@ class _EditJobScreenState extends State<EditJobScreen> {
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF59E0B).withValues(alpha: 0.1),
+                          color: AppColors.warning.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.lock_outline_rounded, size: 50, color: Color(0xFFF59E0B)),
+                        child: const Icon(Icons.lock_outline_rounded, size: 50, color: AppColors.warning),
                       ),
                       const SizedBox(height: 20),
-                      const Text(
-                        'Huwezi Kuhariri',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      Text(
+                        context.tr('cannot_edit'),
+                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        'Kazi hii haiwezi kuhaririwa kwa sababu imeanza au imekamilika.',
+                        context.tr('cannot_edit_reason'),
                         textAlign: TextAlign.center,
                         style: TextStyle(color: Colors.grey[600]),
                       ),
@@ -476,33 +477,33 @@ class _EditJobScreenState extends State<EditJobScreen> {
                           const SizedBox(height: 25),
 
                           // Title
-                          _buildSectionTitle('Kichwa cha Kazi', Icons.title_rounded),
+                          _buildSectionTitle(context.tr('edit_section_title'), Icons.title_rounded),
                           const SizedBox(height: 10),
                           _buildTextField(
                             controller: _titleController,
-                            hint: 'Mfano: Fundi Bomba Anahitajika',
-                            validator: (v) => v?.isEmpty == true ? 'Weka kichwa' : null,
+                            hint: context.tr('edit_title_hint'),
+                            validator: (v) => v?.isEmpty == true ? context.tr('edit_title_required') : null,
                           ),
                           const SizedBox(height: 25),
 
                           // Category
-                          _buildSectionTitle('Kategoria', Icons.category_rounded),
+                          _buildSectionTitle(context.tr('edit_section_category'), Icons.category_rounded),
                           const SizedBox(height: 10),
                           _buildCategoryDropdown(),
                           const SizedBox(height: 25),
 
                           // Price
-                          _buildSectionTitle('Bei (TZS)', Icons.payments_rounded),
+                          _buildSectionTitle(context.tr('edit_section_price'), Icons.payments_rounded),
                           const SizedBox(height: 10),
                           _buildTextField(
                             controller: _priceController,
-                            hint: 'Mfano: 25000',
+                            hint: context.tr('edit_price_hint'),
                             keyboardType: TextInputType.number,
-                            prefixIcon: const Icon(Icons.attach_money_rounded, color: Color(0xFF94A3B8)),
+                            prefixIcon: const Icon(Icons.attach_money_rounded, color: AppColors.textLight),
                             validator: (v) {
-                              if (v?.isEmpty == true) return 'Weka bei';
+                              if (v?.isEmpty == true) return context.tr('edit_price_required');
                               final price = int.tryParse(v!.replaceAll(',', ''));
-                              if (price == null || price < 500) return 'Bei lazima iwe TZS 500+';
+                              if (price == null || price < 500) return context.tr('edit_price_min');
                               return null;
                             },
                           ),
@@ -516,12 +517,12 @@ class _EditJobScreenState extends State<EditJobScreen> {
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.info_outline, color: Color(0xFFF59E0B), size: 18),
+                                const Icon(Icons.info_outline, color: AppColors.warning, size: 18),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    'Bei ya sasa: TZS ${_formatPrice(widget.job.price.toDouble())}. Unaweza kuongeza tu, si kupunguza.',
-                                    style: const TextStyle(fontSize: 12, color: Color(0xFF92400E)),
+                                    '${context.tr('edit_current_price_prefix')}${_formatPrice(widget.job.price.toDouble())}${context.tr('edit_current_price_suffix')}',
+                                    style: const TextStyle(fontSize: 12, color: AppColors.warningDark),
                                   ),
                                 ),
                               ],
@@ -530,11 +531,11 @@ class _EditJobScreenState extends State<EditJobScreen> {
                           const SizedBox(height: 25),
 
                           // Description
-                          _buildSectionTitle('Maelezo', Icons.description_rounded),
+                          _buildSectionTitle(context.tr('edit_section_description'), Icons.description_rounded),
                           const SizedBox(height: 10),
                           _buildTextField(
                             controller: _descriptionController,
-                            hint: 'Eleza kazi kwa undani...',
+                            hint: context.tr('edit_description_hint'),
                             maxLines: 4,
                           ),
                           const SizedBox(height: 30),
@@ -562,14 +563,14 @@ class _EditJobScreenState extends State<EditJobScreen> {
                                         strokeWidth: 2.5,
                                       ),
                                     )
-                                  : const Row(
+                                  : Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Icon(Icons.save_rounded),
-                                        SizedBox(width: 10),
+                                        const Icon(Icons.save_rounded),
+                                        const SizedBox(width: 10),
                                         Text(
-                                          'HIFADHI MABADILIKO',
-                                          style: TextStyle(
+                                          context.tr('save_changes'),
+                                          style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16,
                                           ),
@@ -621,10 +622,10 @@ class _EditJobScreenState extends State<EditJobScreen> {
                 children: [
                   const Icon(Icons.location_on_rounded, color: Colors.white),
                   const SizedBox(width: 10),
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'Eneo la Kazi',
-                      style: TextStyle(
+                      context.tr('location_title'),
+                      style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -651,9 +652,9 @@ class _EditJobScreenState extends State<EditJobScreen> {
                           else
                             const Icon(Icons.my_location_rounded, size: 14, color: Color(0xFF059669)),
                           const SizedBox(width: 6),
-                          const Text(
-                            'Eneo Langu',
-                            style: TextStyle(
+                          Text(
+                            context.tr('edit_my_location'),
+                            style: const TextStyle(
                               color: Color(0xFF059669),
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -724,30 +725,30 @@ class _EditJobScreenState extends State<EditJobScreen> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF1F5F9),
+                      color: AppColors.surfaceLight,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(Icons.pin_drop_rounded, color: Color(0xFF64748B), size: 20),
+                    child: const Icon(Icons.pin_drop_rounded, color: AppColors.textSecondary, size: 20),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Anwani',
-                          style: TextStyle(
+                        Text(
+                          context.tr('edit_address'),
+                          style: const TextStyle(
                             fontSize: 11,
-                            color: Color(0xFF94A3B8),
+                            color: AppColors.textLight,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          _addressText ?? 'Bonyeza ramani kuchagua eneo',
+                          _addressText ?? context.tr('edit_address_placeholder'),
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
-                            color: _addressText != null ? const Color(0xFF1E293B) : const Color(0xFF94A3B8),
+                            color: _addressText != null ? AppColors.textPrimary : AppColors.textLight,
                           ),
                         ),
                       ],
@@ -769,7 +770,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('Picha ya Kazi', Icons.image_rounded),
+        _buildSectionTitle(context.tr('edit_section_image'), Icons.image_rounded),
         const SizedBox(height: 10),
         GestureDetector(
           onTap: _pickImage,
@@ -777,9 +778,9 @@ class _EditJobScreenState extends State<EditJobScreen> {
             height: 180,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: const Color(0xFFF1F5F9),
+              color: AppColors.surfaceLight,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              border: Border.all(color: AppColors.grey200),
               image: hasNewImage
                   ? DecorationImage(
                       image: FileImage(File(_newImage!.path)),
@@ -805,9 +806,9 @@ class _EditJobScreenState extends State<EditJobScreen> {
                         child: const Icon(Icons.add_photo_alternate_rounded, size: 32, color: AppColors.primary),
                       ),
                       const SizedBox(height: 12),
-                      const Text(
-                        'Bonyeza kuongeza picha',
-                        style: TextStyle(color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                      Text(
+                        context.tr('edit_tap_add_photo'),
+                        style: const TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w500),
                       ),
                     ],
                   )
@@ -822,14 +823,14 @@ class _EditJobScreenState extends State<EditJobScreen> {
                             color: Colors.black.withValues(alpha: 0.7),
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.edit_rounded, color: Colors.white, size: 16),
-                              SizedBox(width: 6),
+                              const Icon(Icons.edit_rounded, color: Colors.white, size: 16),
+                              const SizedBox(width: 6),
                               Text(
-                                'Badilisha',
-                                style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                                context.tr('edit_change_photo'),
+                                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
                               ),
                             ],
                           ),
@@ -853,7 +854,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
           style: const TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF1E293B),
+            color: AppColors.textPrimary,
           ),
         ),
       ],
@@ -875,17 +876,17 @@ class _EditJobScreenState extends State<EditJobScreen> {
       validator: validator,
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+        hintStyle: const TextStyle(color: AppColors.textLight),
         prefixIcon: prefixIcon,
         filled: true,
         fillColor: Colors.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+          borderSide: const BorderSide(color: AppColors.grey200),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+          borderSide: const BorderSide(color: AppColors.grey200),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
@@ -893,7 +894,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFEF4444)),
+          borderSide: const BorderSide(color: AppColors.error),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
@@ -906,14 +907,14 @@ class _EditJobScreenState extends State<EditJobScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: AppColors.grey200),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<int>(
           value: _selectedCategoryId,
           isExpanded: true,
-          hint: const Text('Chagua kategoria', style: TextStyle(color: Color(0xFF94A3B8))),
-          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF94A3B8)),
+          hint: Text(context.tr('edit_select_category'), style: const TextStyle(color: AppColors.textLight)),
+          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textLight),
           items: _categories.map((cat) {
             return DropdownMenuItem<int>(
               value: cat.id,

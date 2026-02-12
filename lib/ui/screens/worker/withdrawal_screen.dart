@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../../../core/constants/constants.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../data/services/wallet_service.dart';
 
 class WithdrawalScreen extends StatefulWidget {
@@ -82,7 +83,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
     final totalRequired = amount + _withdrawalFee;
 
     if (totalRequired > widget.currentBalance) {
-      _showErrorSnackBar('Salio lako halitoshi. Unahitaji TZS ${NumberFormat('#,###').format(totalRequired)} (pamoja na makato)');
+      _showErrorSnackBar('${context.tr('withdrawal_insufficient')} ${NumberFormat('#,###').format(totalRequired)}');
       return;
     }
 
@@ -101,9 +102,9 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
       }
     } catch (e) {
       if (mounted) {
-        String errorMessage = 'Imeshindikana kutuma ombi';
-        if (e.toString().contains('halitoshi')) {
-          errorMessage = 'Salio lako halitoshi kulipia kiasi unachotoa pamoja na makato';
+        String errorMessage = context.tr('withdrawal_failed_submit');
+        if (e.toString().contains('halitoshi') || e.toString().toLowerCase().contains('insufficient')) {
+          errorMessage = '${context.tr('withdrawal_insufficient')} ${NumberFormat('#,###').format(totalRequired)}';
         }
         _showErrorSnackBar(errorMessage);
       }
@@ -132,26 +133,26 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                 ),
                 child: const Icon(
                   Icons.check_circle,
-                  color: Color(0xFF22C55E),
+                  color: AppColors.success,
                   size: 50,
                 ),
               ),
               const SizedBox(height: 24),
-              const Text(
-                'Ombi Limetumwa! 🎉',
-                style: TextStyle(
+              Text(
+                context.tr('withdrawal_success_title'),
+                style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E293B),
+                  color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 12),
               Text(
-                'Ombi lako la kutoa TZS ${NumberFormat('#,###').format(amount)} limewasilishwa kwa mafanikio.',
+                '${context.tr('withdrawal_success_body')} ${NumberFormat('#,###').format(amount)}.',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 14,
-                  color: Color(0xFF64748B),
+                  color: AppColors.textSecondary,
                   height: 1.5,
                 ),
               ),
@@ -162,14 +163,14 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                   color: const Color(0xFFFEF3C7),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.info_outline, color: Color(0xFFF59E0B), size: 20),
-                    SizedBox(width: 8),
+                    const Icon(Icons.info_outline, color: Color(0xFFF59E0B), size: 20),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Subiri uthibitisho wa Admin. Pesa itatumwa ndani ya masaa 24.',
-                        style: TextStyle(
+                        context.tr('withdrawal_success_footer'),
+                        style: const TextStyle(
                           fontSize: 12,
                           color: Color(0xFF92400E),
                         ),
@@ -187,16 +188,16 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                     Navigator.pop(context, true); // Return to dashboard with refresh flag
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF22C55E),
+                    backgroundColor: AppColors.success,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  child: const Text(
-                    'SAWA',
-                    style: TextStyle(
+                  child: Text(
+                    context.tr('withdrawal_ok_btn'),
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -220,7 +221,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
             Expanded(child: Text(message)),
           ],
         ),
-        backgroundColor: const Color(0xFFEF4444),
+        backgroundColor: AppColors.error,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
@@ -237,7 +238,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
           SliverAppBar(
             expandedHeight: 200,
             pinned: true,
-            backgroundColor: const Color(0xFFF97316),
+            backgroundColor: AppColors.walletAccent,
             leading: IconButton(
               onPressed: () => Navigator.pop(context),
               icon: Container(
@@ -253,7 +254,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
               background: Container(
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Color(0xFFF97316), Color(0xFFEA580C)],
+                    colors: [AppColors.walletAccent, AppColors.walletAccentDark],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -283,9 +284,9 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
-                                    'SALIO LAKO',
-                                    style: TextStyle(
+                                  Text(
+                                    context.tr('dash_balance_label'),
+                                    style: const TextStyle(
                                       color: Colors.white70,
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
@@ -324,17 +325,17 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Title
-                    const Text(
-                      'Toa Pesa',
-                      style: TextStyle(
+                    Text(
+                      context.tr('withdrawal_title'),
+                      style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF1E293B),
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Jaza fomu hii kutoa pesa kwenye simu yako',
+                      context.tr('withdrawal_subtitle'),
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[600],
@@ -343,7 +344,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                     const SizedBox(height: 24),
 
                     // Amount Field
-                    _buildSectionTitle('Kiasi cha Kutoa', Icons.money),
+                    _buildSectionTitle(context.tr('withdrawal_amount_section'), Icons.money),
                     const SizedBox(height: 12),
                     TextFormField(
                       controller: _amountController,
@@ -351,18 +352,18 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       onChanged: (_) => setState(() {}),
                       decoration: InputDecoration(
-                        hintText: 'Weka kiasi (mf. 10000)',
+                        hintText: context.tr('withdrawal_amount_hint'),
                         prefixIcon: Container(
                           margin: const EdgeInsets.all(12),
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF97316).withOpacity(0.1),
+                            color: AppColors.walletAccent.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Text(
                             'TZS',
                             style: TextStyle(
-                              color: Color(0xFFF97316),
+                              color: AppColors.walletAccent,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -371,24 +372,24 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                          borderSide: const BorderSide(color: AppColors.grey200),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                          borderSide: const BorderSide(color: AppColors.grey200),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: Color(0xFFF97316), width: 2),
+                          borderSide: const BorderSide(color: AppColors.walletAccent, width: 2),
                         ),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Tafadhali weka kiasi';
+                          return context.tr('withdrawal_amount_required');
                         }
                         final amount = int.tryParse(value) ?? 0;
                         if (amount < _minWithdrawal) {
-                          return 'Kiasi cha chini ni TZS ${NumberFormat('#,###').format(_minWithdrawal)}';
+                          return '${context.tr('min_withdrawal_error')} (TZS ${NumberFormat('#,###').format(_minWithdrawal)})';
                         }
                         return null;
                       },
@@ -406,9 +407,9 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
-                                'Kiasi cha chini:',
-                                style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                              Text(
+                                context.tr('withdrawal_min_label'),
+                                style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
                               ),
                               Text(
                                 'TZS ${NumberFormat('#,###').format(_minWithdrawal)}',
@@ -420,13 +421,13 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
-                                'Makato ya huduma:',
-                                style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                              Text(
+                                context.tr('withdrawal_fee_label'),
+                                style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
                               ),
                               Text(
                                 'TZS ${NumberFormat('#,###').format(_withdrawalFee)}',
-                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFFEF4444)),
+                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.error),
                               ),
                             ],
                           ),
@@ -435,13 +436,13 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text(
-                                  'Utapokea:',
-                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF1E293B)),
+                                Text(
+                                  context.tr('withdrawal_you_receive'),
+                                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
                                 ),
                                 Text(
                                   'TZS ${NumberFormat('#,###').format(_netAmount)}',
-                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF22C55E)),
+                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.success),
                                 ),
                               ],
                             ),
@@ -452,7 +453,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                     const SizedBox(height: 24),
 
                     // Network Selection
-                    _buildSectionTitle('Chagua Mtandao', Icons.sim_card),
+                    _buildSectionTitle(context.tr('withdrawal_network_section'), Icons.sim_card),
                     const SizedBox(height: 12),
                     Wrap(
                       spacing: 10,
@@ -468,7 +469,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                               color: isSelected ? (network['color'] as Color).withOpacity(0.1) : Colors.white,
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                color: isSelected ? network['color'] as Color : const Color(0xFFE2E8F0),
+                                color: isSelected ? network['color'] as Color : AppColors.grey200,
                                 width: isSelected ? 2 : 1,
                               ),
                               boxShadow: isSelected
@@ -491,7 +492,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                    color: isSelected ? network['color'] as Color : const Color(0xFF64748B),
+                                    color: isSelected ? network['color'] as Color : AppColors.textSecondary,
                                   ),
                                 ),
                                 if (isSelected) ...[
@@ -507,36 +508,36 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                     const SizedBox(height: 24),
 
                     // Phone Number
-                    _buildSectionTitle('Nambari ya Simu', Icons.phone),
+                    _buildSectionTitle(context.tr('withdrawal_phone_section'), Icons.phone),
                     const SizedBox(height: 12),
                     TextFormField(
                       controller: _phoneController,
                       keyboardType: TextInputType.phone,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       decoration: InputDecoration(
-                        hintText: '07XXXXXXXX',
-                        prefixIcon: const Icon(Icons.phone_android, color: Color(0xFF64748B)),
+                        hintText: context.tr('withdrawal_phone_hint'),
+                        prefixIcon: const Icon(Icons.phone_android, color: AppColors.textSecondary),
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                          borderSide: const BorderSide(color: AppColors.grey200),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                          borderSide: const BorderSide(color: AppColors.grey200),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: Color(0xFFF97316), width: 2),
+                          borderSide: const BorderSide(color: AppColors.walletAccent, width: 2),
                         ),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Tafadhali weka nambari ya simu';
+                          return context.tr('withdrawal_phone_required');
                         }
                         if (value.length < 10) {
-                          return 'Nambari ya simu si sahihi';
+                          return context.tr('withdrawal_phone_invalid');
                         }
                         return null;
                       },
@@ -544,35 +545,35 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                     const SizedBox(height: 24),
 
                     // Registered Name
-                    _buildSectionTitle('Jina Lililosajiliwa', Icons.person),
+                    _buildSectionTitle(context.tr('withdrawal_name_section'), Icons.person),
                     const SizedBox(height: 12),
                     TextFormField(
                       controller: _nameController,
                       textCapitalization: TextCapitalization.words,
                       decoration: InputDecoration(
-                        hintText: 'Jina linaloonekana kwenye M-Pesa/Tigo Pesa',
-                        prefixIcon: const Icon(Icons.badge, color: Color(0xFF64748B)),
+                        hintText: context.tr('withdrawal_name_hint'),
+                        prefixIcon: const Icon(Icons.badge, color: AppColors.textSecondary),
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                          borderSide: const BorderSide(color: AppColors.grey200),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                          borderSide: const BorderSide(color: AppColors.grey200),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: Color(0xFFF97316), width: 2),
+                          borderSide: const BorderSide(color: AppColors.walletAccent, width: 2),
                         ),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Tafadhali weka jina lililosajiliwa';
+                          return context.tr('withdrawal_name_required');
                         }
                         if (value.length < 2) {
-                          return 'Jina ni fupi sana';
+                          return context.tr('withdrawal_name_short');
                         }
                         return null;
                       },
@@ -585,7 +586,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                       child: ElevatedButton(
                         onPressed: _isLoading ? null : _submitWithdrawal,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFF97316),
+                          backgroundColor: AppColors.walletAccent,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 18),
                           shape: RoundedRectangleBorder(
@@ -602,14 +603,14 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                                   color: Colors.white,
                                 ),
                               )
-                            : const Row(
+                            : Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.send, size: 20),
-                                  SizedBox(width: 8),
+                                  const Icon(Icons.send, size: 20),
+                                  const SizedBox(width: 8),
                                   Text(
-                                    'TUMA OMBI LA KUTOA PESA',
-                                    style: TextStyle(
+                                    context.tr('withdrawal_submit_btn'),
+                                    style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -637,9 +638,9 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  'Muhimu!',
-                                  style: TextStyle(
+                                Text(
+                                  context.tr('withdrawal_important_note'),
+                                  style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                     color: Color(0xFF92400E),
@@ -647,7 +648,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  'Hakikisha nambari ya simu na jina ni sahihi. Pesa itatumwa ndani ya masaa 24 baada ya uthibitisho wa Admin.',
+                                  context.tr('withdrawal_note_body'),
                                   style: TextStyle(
                                     fontSize: 13,
                                     color: Colors.amber[900],
@@ -667,19 +668,19 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
           ),
 
           // Withdrawal History Section
-          const SliverToBoxAdapter(
+          SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
               child: Row(
                 children: [
-                  Icon(Icons.history, color: Color(0xFF64748B), size: 20),
-                  SizedBox(width: 8),
+                  const Icon(Icons.history, color: AppColors.textSecondary, size: 20),
+                  const SizedBox(width: 8),
                   Text(
-                    'Historia ya Kutoa Pesa',
-                    style: TextStyle(
+                    context.tr('withdrawal_history_title'),
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ],
@@ -693,7 +694,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                   child: Center(
                     child: Padding(
                       padding: EdgeInsets.all(40),
-                      child: CircularProgressIndicator(color: Color(0xFFF97316)),
+                      child: CircularProgressIndicator(color: AppColors.walletAccent),
                     ),
                   ),
                 )
@@ -705,14 +706,14 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                          border: Border.all(color: AppColors.grey200),
                         ),
                         child: Column(
                           children: [
                             Icon(Icons.history, size: 48, color: Colors.grey[300]),
                             const SizedBox(height: 16),
                             Text(
-                              'Hakuna historia ya kutoa pesa',
+                              context.tr('withdrawal_no_history'),
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey[500],
@@ -738,14 +739,14 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
   Widget _buildSectionTitle(String title, IconData icon) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: const Color(0xFF64748B)),
+        Icon(icon, size: 18, color: AppColors.textSecondary),
         const SizedBox(width: 8),
         Text(
           title,
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF1E293B),
+            color: AppColors.textPrimary,
           ),
         ),
       ],
@@ -768,21 +769,21 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
 
     switch (status) {
       case 'paid':
-        statusColor = const Color(0xFF22C55E);
+        statusColor = AppColors.success;
         statusBgColor = const Color(0xFFDCFCE7);
-        statusText = 'Imelipwa';
+        statusText = context.tr('withdrawal_status_paid');
         statusIcon = Icons.check_circle;
         break;
       case 'rejected':
-        statusColor = const Color(0xFFEF4444);
+        statusColor = AppColors.error;
         statusBgColor = const Color(0xFFFEE2E2);
-        statusText = 'Imekataliwa';
+        statusText = context.tr('withdrawal_status_rejected');
         statusIcon = Icons.cancel;
         break;
       default:
         statusColor = const Color(0xFFF59E0B);
         statusBgColor = const Color(0xFFFEF3C7);
-        statusText = 'Inasubiri';
+        statusText = context.tr('withdrawal_status_pending');
         statusIcon = Icons.hourglass_empty;
     }
 
@@ -798,7 +799,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: AppColors.grey200),
       ),
       child: Row(
         children: [
@@ -828,7 +829,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E293B),
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -836,7 +837,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                   '$account • ${networkInfo['label']}',
                   style: const TextStyle(
                     fontSize: 13,
-                    color: Color(0xFF64748B),
+                    color: AppColors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -844,7 +845,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                   '${createdAt.day}/${createdAt.month}/${createdAt.year}',
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Color(0xFF94A3B8),
+                    color: AppColors.textLight,
                   ),
                 ),
               ],

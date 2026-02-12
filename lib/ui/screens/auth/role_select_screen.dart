@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/constants/constants.dart';
+import '../../../core/localization/app_localizations.dart';
 
 class RoleSelectScreen extends StatelessWidget {
   const RoleSelectScreen({super.key});
@@ -8,42 +9,37 @@ class RoleSelectScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surface,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
+          padding: AppSpacing.screenPaddingLarge,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 50),
-              const Text('Chagua Aina \nya Akaunti',
-                  style: TextStyle(
-                      fontSize: 34,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
-                      height: 1.1)),
-              const SizedBox(height: 15),
-              const Text(
-                  'Niambie namna ungependa kutumia Tendapoa ili tusaidie vizuri.',
-                  style: TextStyle(
-                      fontSize: 15, color: Color(0xFF64748B), height: 1.5)),
-              const SizedBox(height: 50),
+              AppSpacing.verticalXxl,
+              Text(context.tr('role_select_title'),
+                  style: AppTextStyles.h1.copyWith(fontSize: 34, height: 1.1)),
+              AppSpacing.verticalMd,
+              Text(
+                  context.tr('role_select_subtitle'),
+                  style: AppTextStyles.bodyLarge.copyWith(color: AppColors.textSecondary, height: 1.5)),
+              AppSpacing.verticalXxl,
               _buildRoleCard(
                 context,
-                title: 'Natafuta Huduma',
-                subtitle: 'Natafuta mafundi bomba, walimu, n.k.',
+                title: context.tr('role_muhitaji_title'),
+                subtitle: context.tr('role_muhitaji_desc'),
                 icon: Icons.person_search_rounded,
-                color: const Color(0xFF1E40AF),
+                color: AppColors.primaryDark,
                 onTap: () => Navigator.pushNamed(context, '/register',
                     arguments: {'role': 'muhitaji'}),
               ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.1, end: 0),
               const SizedBox(height: 20),
               _buildRoleCard(
                 context,
-                title: 'Natoa Huduma',
-                subtitle: 'Mimi ni fundi/mtaalamu natafuta kazi.',
+                title: context.tr('role_mfanyakazi_title'),
+                subtitle: context.tr('role_mfanyakazi_desc'),
                 icon: Icons.construction_rounded,
-                color: const Color(0xFFF97316),
+                color: AppColors.walletAccent,
                 onTap: () => Navigator.pushNamed(context, '/register',
                     arguments: {'role': 'mfanyakazi'}),
               ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.1, end: 0),
@@ -52,15 +48,13 @@ class RoleSelectScreen extends StatelessWidget {
                 child: TextButton(
                   onPressed: () => Navigator.pushNamed(context, '/login'),
                   child: RichText(
-                    text: const TextSpan(
-                      style: TextStyle(color: Color(0xFF64748B), fontSize: 14),
+                    text: TextSpan(
+                      style: AppTextStyles.bodyLarge.copyWith(color: AppColors.textSecondary),
                       children: [
-                        TextSpan(text: 'Tayari una akaunti? '),
+                        TextSpan(text: context.tr('welcome_have_account')),
                         TextSpan(
-                            text: 'Ingia hapa',
-                            style: TextStyle(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.bold)),
+                            text: context.tr('welcome_login_link'),
+                            style: AppTextStyles.link.copyWith(decoration: TextDecoration.none)),
                       ],
                     ),
                   ),
@@ -89,7 +83,7 @@ class RoleSelectScreen extends StatelessWidget {
         padding: const EdgeInsets.all(25),
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: AppSpacing.borderRadius2xl,
           border: Border.all(color: color.withValues(alpha: 0.1), width: 1.5),
         ),
         child: Row(
@@ -97,23 +91,17 @@ class RoleSelectScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(
-                  color: color, borderRadius: BorderRadius.circular(20)),
-              child: Icon(icon, color: Colors.white, size: 30),
+                  color: color, borderRadius: AppSpacing.borderRadiusLg),
+              child: Icon(icon, color: AppColors.textWhite, size: 30),
             ),
-            const SizedBox(width: 20),
+            AppSpacing.horizontalMd,
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title,
-                      style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF1E293B))),
-                  const SizedBox(height: 5),
-                  Text(subtitle,
-                      style: const TextStyle(
-                          fontSize: 13, color: Color(0xFF64748B))),
+                  Text(title, style: AppTextStyles.h3),
+                  AppSpacing.verticalXs,
+                  Text(subtitle, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
                 ],
               ),
             ),

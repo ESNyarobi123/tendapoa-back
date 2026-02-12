@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../../core/constants/constants.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/router/app_router.dart';
 import '../../../data/models/models.dart';
 import '../../../providers/providers.dart';
@@ -42,11 +43,11 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
           WorkerDashboardScreen(),
         ],
       ),
-      bottomNavigationBar: _buildBottomNav(),
+      bottomNavigationBar: _buildBottomNav(context),
     );
   }
 
-  Widget _buildBottomNav() {
+  Widget _buildBottomNav(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -64,10 +65,10 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(Icons.home_rounded, 'Nyumbani', 0),
-              _buildNavItem(Icons.work_outline_rounded, 'Kazi Zangu', 1),
-              _buildNavItem(Icons.chat_bubble_outline_rounded, 'Meseji', 2),
-              _buildNavItem(Icons.grid_view_rounded, 'Dashibodi', 3),
+              _buildNavItem(context, Icons.home_rounded, context.tr('nyumbani_nav'), 0),
+              _buildNavItem(context, Icons.work_outline_rounded, context.tr('kazi_zangu_nav'), 1),
+              _buildNavItem(context, Icons.chat_bubble_outline_rounded, context.tr('inbox_nav'), 2),
+              _buildNavItem(context, Icons.grid_view_rounded, context.tr('dash_nav'), 3),
             ],
           ),
         ),
@@ -75,7 +76,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label, int index) {
+  Widget _buildNavItem(BuildContext context, IconData icon, String label, int index) {
     final isSelected = _currentIndex == index;
     return GestureDetector(
       onTap: () => setState(() => _currentIndex = index),
@@ -91,7 +92,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
           children: [
             Icon(
               icon,
-              color: isSelected ? Colors.white : const Color(0xFF94A3B8),
+              color: isSelected ? Colors.white : AppColors.textLight,
               size: 22,
             ),
             if (isSelected) ...[
@@ -365,7 +366,7 @@ class _HomeFeedTabState extends State<_HomeFeedTab> {
                               children: [
                                 const Icon(
                                   Icons.search,
-                                  color: Color(0xFF94A3B8),
+                                  color: AppColors.textLight,
                                   size: 22,
                                 ),
                                 const SizedBox(width: 12),
@@ -375,7 +376,7 @@ class _HomeFeedTabState extends State<_HomeFeedTab> {
                                     decoration: const InputDecoration(
                                       hintText: 'Tafuta kazi (mf. usafi, bomba...',
                                       hintStyle: TextStyle(
-                                        color: Color(0xFF94A3B8),
+                                        color: AppColors.textLight,
                                         fontSize: 14,
                                       ),
                                       border: InputBorder.none,
@@ -474,7 +475,7 @@ class _HomeFeedTabState extends State<_HomeFeedTab> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF1E293B),
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     GestureDetector(
@@ -578,7 +579,7 @@ class _HomeFeedTabState extends State<_HomeFeedTab> {
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF1E293B),
+            color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 2),
@@ -586,7 +587,7 @@ class _HomeFeedTabState extends State<_HomeFeedTab> {
           label,
           style: const TextStyle(
             fontSize: 11,
-            color: Color(0xFF64748B),
+            color: AppColors.textSecondary,
           ),
         ),
       ],
@@ -610,7 +611,7 @@ class _HomeFeedTabState extends State<_HomeFeedTab> {
       distanceTextColor = const Color(0xFFF59E0B);
     } else {
       distanceBgColor = const Color(0xFFF1F5F9);
-      distanceTextColor = const Color(0xFF64748B);
+      distanceTextColor = AppColors.textSecondary;
     }
 
     final distanceLabel = distanceInfo?.label ?? 
@@ -670,7 +671,7 @@ class _HomeFeedTabState extends State<_HomeFeedTab> {
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF1E293B),
+                            color: AppColors.textPrimary,
                             height: 1.3,
                           ),
                         ),
@@ -781,7 +782,7 @@ class _HomeFeedTabState extends State<_HomeFeedTab> {
                           job.userName ?? 'Mteja',
                           style: const TextStyle(
                             fontSize: 11,
-                            color: Color(0xFF64748B),
+                            color: AppColors.textSecondary,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),

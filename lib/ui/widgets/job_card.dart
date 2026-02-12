@@ -23,9 +23,9 @@ class JobCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        border: Border.all(color: AppColors.surfaceLight),
         boxShadow: [
           BoxShadow(
               color: Colors.black.withValues(alpha: 0.04),
@@ -76,7 +76,7 @@ class JobCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 8),
                         decoration: BoxDecoration(
-                            color: const Color(0xFFF97316),
+                            color: AppColors.walletAccent,
                             borderRadius: BorderRadius.circular(15),
                             boxShadow: [
                               BoxShadow(
@@ -85,7 +85,7 @@ class JobCard extends StatelessWidget {
                             ]),
                         child: Text('TZS ${job.price}',
                             style: const TextStyle(
-                                color: Colors.white,
+                                color: AppColors.textWhite,
                                 fontWeight: FontWeight.w900,
                                 fontSize: 13)),
                       ),
@@ -99,11 +99,11 @@ class JobCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.9),
+                              color: AppColors.surface.withValues(alpha: 0.9),
                               borderRadius: BorderRadius.circular(10)),
                           child: Text(job.categoryName!,
                               style: const TextStyle(
-                                  color: Color(0xFF1E293B),
+                                  color: AppColors.textPrimary,
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold)),
                         ),
@@ -121,7 +121,7 @@ class JobCard extends StatelessWidget {
                           style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF1E293B)),
+                              color: AppColors.textPrimary),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 12),
@@ -129,7 +129,7 @@ class JobCard extends StatelessWidget {
                         children: [
                           CircleAvatar(
                             radius: 12,
-                            backgroundColor: const Color(0xFFF1F5F9),
+                            backgroundColor: AppColors.surfaceLight,
                             child: Text(
                                 job.userName?.isNotEmpty == true
                                     ? job.userName![0]
@@ -142,7 +142,7 @@ class JobCard extends StatelessWidget {
                           const SizedBox(width: 8),
                           Text(job.userName ?? 'Mteja',
                               style: const TextStyle(
-                                  color: Color(0xFF64748B),
+                                  color: AppColors.textSecondary,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500)),
                           const Spacer(),
@@ -170,7 +170,7 @@ class JobCard extends StatelessWidget {
                     child: Row(
                       children: [
                         const Icon(Icons.warning_amber_rounded,
-                            color: Color(0xFFF97316), size: 18),
+                            color: AppColors.walletAccent, size: 18),
                         const SizedBox(width: 10),
                         const Expanded(
                             child: Text('Inasubiri Malipo',
