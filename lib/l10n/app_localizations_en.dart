@@ -1594,49 +1594,4 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get withdrawal_status_pending => 'Pending';
-
-  @override
-  String get organization_title => 'Organization';
-
-  @override
-  String get organization_name => 'Organization Name';
-
-  @override
-  String get organization_name_hint => 'e.g. TendaPoa Ltd';
-
-  @override
-  String get organization_email => 'Contact Email';
-
-  @override
-  String get organization_email_hint => 'support@tendapoa.com';
-
-  @override
-  String get organization_phone => 'Contact Phone';
-
-  @override
-  String get organization_phone_hint => 'e.g. +255 700 000 000';
-
-  @override
-  String get organization_address => 'Address';
-
-  @override
-  String get organization_address_hint => 'Physical address or location';
-
-  @override
-  String get organization_website => 'Website';
-
-  @override
-  String get organization_website_hint => 'https://tendapoa.com';
-
-  @override
-  String get organization_about => 'About Us';
-
-  @override
-  String get organization_about_hint => 'Short description of the organization';
-
-  @override
-  String get organization_details => 'Organization Details';
-
-  @override
-  String get organization_save => 'Save Organization';
 }

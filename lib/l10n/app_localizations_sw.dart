@@ -1596,49 +1596,4 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get withdrawal_status_pending => 'Inasubiri';
-
-  @override
-  String get organization_title => 'Shirika';
-
-  @override
-  String get organization_name => 'Jina la Shirika';
-
-  @override
-  String get organization_name_hint => 'Mfano: TendaPoa Ltd';
-
-  @override
-  String get organization_email => 'Barua Pepe ya Mawasiliano';
-
-  @override
-  String get organization_email_hint => 'support@tendapoa.com';
-
-  @override
-  String get organization_phone => 'Simu ya Mawasiliano';
-
-  @override
-  String get organization_phone_hint => 'Mfano: +255 700 000 000';
-
-  @override
-  String get organization_address => 'Anwani';
-
-  @override
-  String get organization_address_hint => 'Anwani halisi au mahali';
-
-  @override
-  String get organization_website => 'Tovuti';
-
-  @override
-  String get organization_website_hint => 'https://tendapoa.com';
-
-  @override
-  String get organization_about => 'Kuhusu Sisi';
-
-  @override
-  String get organization_about_hint => 'Maelezo mafupi ya shirika';
-
-  @override
-  String get organization_details => 'Taarifa za Shirika';
-
-  @override
-  String get organization_save => 'Hifadhi Shirika';
 }

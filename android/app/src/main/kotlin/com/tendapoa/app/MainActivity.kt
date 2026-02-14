@@ -1,4 +1,4 @@
-package com.example.tendapoa
+package com.tendapoa.app
 
 import io.flutter.embedding.android.FlutterActivity
 
