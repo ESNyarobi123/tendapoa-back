@@ -89,13 +89,16 @@ class _EditJobScreenState extends State<EditJobScreen> {
     setState(() => _isLoadingLocation = true);
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!mounted) return;
       if (!serviceEnabled) {
         throw Exception(context.tr('location_service_disabled'));
       }
 
       LocationPermission permission = await Geolocator.checkPermission();
+      if (!mounted) return;
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
+        if (!mounted) return;
         if (permission == LocationPermission.denied) {
           throw Exception(context.tr('location_permission_denied'));
         }
@@ -108,6 +111,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
+      if (!mounted) return;
 
       setState(() {
         _lat = position.latitude;
@@ -226,11 +230,11 @@ class _EditJobScreenState extends State<EditJobScreen> {
               backgroundColor: AppColors.warning,
             ),
           );
-          // Navigate to payment wait screen
+          // Navigate to payment wait screen (USSD) inapohitajika baada ya uhariri
           Navigator.pushReplacementNamed(
             context,
             AppRouter.paymentWait,
-            arguments: widget.job,
+            arguments: {'job': widget.job},
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -283,23 +287,29 @@ class _EditJobScreenState extends State<EditJobScreen> {
           children: [
             Text(
               context.tr('confirm_delete_job'),
-              style: TextStyle(color: Colors.grey[700]),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.surfaceLight,
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.45),
+                ),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.info_outline, color: AppColors.textSecondary, size: 20),
+                  Icon(Icons.info_outline, color: Theme.of(context).colorScheme.onSurfaceVariant, size: 20),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       context.tr('refund_note'),
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
                 ],
@@ -368,11 +378,12 @@ class _EditJobScreenState extends State<EditJobScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final canEdit = widget.job.status == 'posted' || widget.job.status == 'assigned';
     final canDelete = widget.job.status == 'posted' || widget.job.status == 'pending_payment';
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: scheme.surface,
       body: CustomScrollView(
         slivers: [
           // App Bar
@@ -380,37 +391,41 @@ class _EditJobScreenState extends State<EditJobScreen> {
             expandedHeight: 120,
             floating: false,
             pinned: true,
-            backgroundColor: AppColors.primary,
+            backgroundColor: scheme.primary,
+            foregroundColor: scheme.onPrimary,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+              icon: Icon(Icons.arrow_back_rounded, color: scheme.onPrimary),
               onPressed: () => Navigator.pop(context),
             ),
             actions: [
               if (canDelete)
                 IconButton(
                   icon: _isDeleting
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 20,
                           height: 20,
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                          child: CircularProgressIndicator(
+                            color: scheme.onPrimary,
+                            strokeWidth: 2,
+                          ),
                         )
-                      : const Icon(Icons.delete_outline_rounded, color: Colors.white),
+                      : Icon(Icons.delete_outline_rounded, color: scheme.onPrimary),
                   onPressed: _isDeleting ? null : _deleteJob,
                 ),
             ],
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
                 context.tr('edit_job_title'),
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: scheme.onPrimary,
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
                 ),
               ),
               background: Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Color(0xFF1E3A8A), AppColors.primary],
+                    colors: [const Color(0xFF1E3A8A), scheme.primary],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -421,8 +436,8 @@ class _EditJobScreenState extends State<EditJobScreen> {
 
           // Content
           if (_isLoading)
-            const SliverFillRemaining(
-              child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
+            SliverFillRemaining(
+              child: Center(child: CircularProgressIndicator(color: scheme.primary)),
             )
           else if (!canEdit)
             SliverFillRemaining(
@@ -435,21 +450,29 @@ class _EditJobScreenState extends State<EditJobScreen> {
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: AppColors.warning.withValues(alpha: 0.1),
+                          color: scheme.surfaceContainerHighest,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.lock_outline_rounded, size: 50, color: AppColors.warning),
+                        child: Icon(
+                          Icons.lock_outline_rounded,
+                          size: 50,
+                          color: scheme.onSurfaceVariant,
+                        ),
                       ),
                       const SizedBox(height: 20),
                       Text(
                         context.tr('cannot_edit'),
-                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: scheme.onSurface,
+                        ),
                       ),
                       const SizedBox(height: 10),
                       Text(
                         context.tr('cannot_edit_reason'),
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.grey[600]),
+                        style: TextStyle(color: scheme.onSurfaceVariant),
                       ),
                     ],
                   ),
@@ -499,7 +522,10 @@ class _EditJobScreenState extends State<EditJobScreen> {
                             controller: _priceController,
                             hint: context.tr('edit_price_hint'),
                             keyboardType: TextInputType.number,
-                            prefixIcon: const Icon(Icons.attach_money_rounded, color: AppColors.textLight),
+                            prefixIcon: Icon(
+                              Icons.attach_money_rounded,
+                              color: scheme.onSurfaceVariant,
+                            ),
                             validator: (v) {
                               if (v?.isEmpty == true) return context.tr('edit_price_required');
                               final price = int.tryParse(v!.replaceAll(',', ''));
@@ -512,17 +538,24 @@ class _EditJobScreenState extends State<EditJobScreen> {
                             margin: const EdgeInsets.only(top: 8),
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFEF3C7),
+                              color: scheme.tertiaryContainer,
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.info_outline, color: AppColors.warning, size: 18),
+                                Icon(
+                                  Icons.info_outline,
+                                  color: scheme.onTertiaryContainer,
+                                  size: 18,
+                                ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
                                     '${context.tr('edit_current_price_prefix')}${_formatPrice(widget.job.price.toDouble())}${context.tr('edit_current_price_suffix')}',
-                                    style: const TextStyle(fontSize: 12, color: AppColors.warningDark),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: scheme.onTertiaryContainer,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -546,8 +579,8 @@ class _EditJobScreenState extends State<EditJobScreen> {
                             child: ElevatedButton(
                               onPressed: _isSaving ? null : _saveJob,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primary,
-                                foregroundColor: Colors.white,
+                                backgroundColor: scheme.primary,
+                                foregroundColor: scheme.onPrimary,
                                 padding: const EdgeInsets.symmetric(vertical: 18),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
@@ -555,24 +588,25 @@ class _EditJobScreenState extends State<EditJobScreen> {
                                 elevation: 0,
                               ),
                               child: _isSaving
-                                  ? const SizedBox(
+                                  ? SizedBox(
                                       width: 24,
                                       height: 24,
                                       child: CircularProgressIndicator(
-                                        color: Colors.white,
+                                        color: scheme.onPrimary,
                                         strokeWidth: 2.5,
                                       ),
                                     )
                                   : Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        const Icon(Icons.save_rounded),
+                                        Icon(Icons.save_rounded, color: scheme.onPrimary),
                                         const SizedBox(width: 10),
                                         Text(
                                           context.tr('save_changes'),
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16,
+                                            color: scheme.onPrimary,
                                           ),
                                         ),
                                       ],
@@ -594,6 +628,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
   }
 
   Widget _buildMapSection() {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -692,20 +727,20 @@ class _EditJobScreenState extends State<EditJobScreen> {
                           height: 50,
                           child: Container(
                             decoration: BoxDecoration(
-                              color: AppColors.primary,
+                              color: scheme.primary,
                               shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 3),
+                              border: Border.all(color: scheme.onPrimary, width: 3),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primary.withValues(alpha: 0.4),
+                                  color: scheme.primary.withValues(alpha: 0.4),
                                   blurRadius: 10,
                                   spreadRadius: 2,
                                 ),
                               ],
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.work_rounded,
-                              color: Colors.white,
+                              color: scheme.onPrimary,
                               size: 24,
                             ),
                           ),
@@ -719,16 +754,20 @@ class _EditJobScreenState extends State<EditJobScreen> {
             // Address Display
             Container(
               padding: const EdgeInsets.all(16),
-              color: Colors.white,
+              color: scheme.surfaceContainerHighest,
               child: Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: AppColors.surfaceLight,
+                      color: scheme.surfaceContainerHigh,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(Icons.pin_drop_rounded, color: AppColors.textSecondary, size: 20),
+                    child: Icon(
+                      Icons.pin_drop_rounded,
+                      color: scheme.onSurfaceVariant,
+                      size: 20,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -737,9 +776,9 @@ class _EditJobScreenState extends State<EditJobScreen> {
                       children: [
                         Text(
                           context.tr('edit_address'),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
-                            color: AppColors.textLight,
+                            color: scheme.onSurfaceVariant,
                           ),
                         ),
                         const SizedBox(height: 2),
@@ -748,7 +787,9 @@ class _EditJobScreenState extends State<EditJobScreen> {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
-                            color: _addressText != null ? AppColors.textPrimary : AppColors.textLight,
+                            color: _addressText != null
+                                ? scheme.onSurface
+                                : scheme.onSurfaceVariant,
                           ),
                         ),
                       ],
@@ -764,6 +805,7 @@ class _EditJobScreenState extends State<EditJobScreen> {
   }
 
   Widget _buildImageSection() {
+    final scheme = Theme.of(context).colorScheme;
     final hasExistingImage = widget.job.imageUrl != null;
     final hasNewImage = _newImage != null;
 
@@ -778,9 +820,9 @@ class _EditJobScreenState extends State<EditJobScreen> {
             height: 180,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
+              color: scheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.grey200),
+              border: Border.all(color: scheme.outlineVariant),
               image: hasNewImage
                   ? DecorationImage(
                       image: FileImage(File(_newImage!.path)),
@@ -800,15 +842,22 @@ class _EditJobScreenState extends State<EditJobScreen> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.1),
+                          color: scheme.primary.withValues(alpha: 0.12),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.add_photo_alternate_rounded, size: 32, color: AppColors.primary),
+                        child: Icon(
+                          Icons.add_photo_alternate_rounded,
+                          size: 32,
+                          color: scheme.primary,
+                        ),
                       ),
                       const SizedBox(height: 12),
                       Text(
                         context.tr('edit_tap_add_photo'),
-                        style: const TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w500),
+                        style: TextStyle(
+                          color: scheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ],
                   )
@@ -845,16 +894,17 @@ class _EditJobScreenState extends State<EditJobScreen> {
   }
 
   Widget _buildSectionTitle(String title, IconData icon) {
+    final scheme = Theme.of(context).colorScheme;
     return Row(
       children: [
-        Icon(icon, size: 20, color: AppColors.primary),
+        Icon(icon, size: 20, color: scheme.primary),
         const SizedBox(width: 8),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: scheme.onSurface,
           ),
         ),
       ],
@@ -869,32 +919,35 @@ class _EditJobScreenState extends State<EditJobScreen> {
     Widget? prefixIcon,
     String? Function(String?)? validator,
   }) {
+    final scheme = Theme.of(context).colorScheme;
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
       keyboardType: keyboardType,
       validator: validator,
+      style: TextStyle(color: scheme.onSurface),
+      cursorColor: scheme.primary,
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: AppColors.textLight),
+        hintStyle: TextStyle(color: scheme.onSurfaceVariant),
         prefixIcon: prefixIcon,
         filled: true,
-        fillColor: Colors.white,
+        fillColor: scheme.surfaceContainerHighest,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.grey200),
+          borderSide: BorderSide(color: scheme.outlineVariant),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.grey200),
+          borderSide: BorderSide(color: scheme.outlineVariant),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+          borderSide: BorderSide(color: scheme.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.error),
+          borderSide: BorderSide(color: scheme.error),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
@@ -902,19 +955,28 @@ class _EditJobScreenState extends State<EditJobScreen> {
   }
 
   Widget _buildCategoryDropdown() {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: scheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.grey200),
+        border: Border.all(color: scheme.outlineVariant),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<int>(
           value: _selectedCategoryId,
           isExpanded: true,
-          hint: Text(context.tr('edit_select_category'), style: const TextStyle(color: AppColors.textLight)),
-          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textLight),
+          dropdownColor: scheme.surfaceContainerHigh,
+          style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w500),
+          hint: Text(
+            context.tr('edit_select_category'),
+            style: TextStyle(color: scheme.onSurfaceVariant),
+          ),
+          icon: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: scheme.onSurfaceVariant,
+          ),
           items: _categories.map((cat) {
             return DropdownMenuItem<int>(
               value: cat.id,
@@ -923,17 +985,17 @@ class _EditJobScreenState extends State<EditJobScreen> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
+                      color: scheme.primary.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
                       _getCategoryIcon(cat.name),
                       size: 18,
-                      color: AppColors.primary,
+                      color: scheme.primary,
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Text(cat.name),
+                  Text(cat.name, style: TextStyle(color: scheme.onSurface)),
                 ],
               ),
             );

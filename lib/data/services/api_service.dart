@@ -93,6 +93,8 @@ class ApiService {
     } on FormatException catch (e) {
       print('FormatException: $e');
       throw ApiException('Jibu la server si sahihi.');
+    } on ApiException {
+      rethrow;
     } catch (e) {
       print('Unknown Error: $e');
       throw ApiException('Hitilafu: ${e.toString()}');
@@ -130,6 +132,8 @@ class ApiService {
     } on FormatException catch (e) {
       print('FormatException: $e');
       throw ApiException('Jibu la server si sahihi.');
+    } on ApiException {
+      rethrow;
     } catch (e) {
       print('Unknown Error: $e');
       throw ApiException('Hitilafu: ${e.toString()}');
@@ -160,6 +164,8 @@ class ApiService {
     } on HandshakeException catch (e) {
       print('HandshakeException (SSL): $e');
       throw ApiException('Tatizo la SSL. Wasiliana na msaada.');
+    } on ApiException {
+      rethrow;
     } catch (e) {
       print('Unknown Error: $e');
       throw ApiException('Hitilafu: ${e.toString()}');

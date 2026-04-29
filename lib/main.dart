@@ -4,10 +4,10 @@ import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'core/constants/constants.dart';
-import 'core/theme/app_theme.dart';
+import 'core/constants/app_constants.dart';
 import 'core/router/app_router.dart';
 import 'core/localization/app_localizations.dart';
+import 'core/theme/tendapoa_material_themes.dart';
 import 'data/services/storage_service.dart';
 import 'providers/providers.dart';
 
@@ -20,9 +20,10 @@ void main() async {
   // Load saved language so app shows correct locale from first frame
   final prefs = await SharedPreferences.getInstance();
   final savedLang = prefs.getString(AppConstants.languageKey);
-  final initialLocale = (savedLang != null && (savedLang == 'en' || savedLang == 'sw'))
-      ? Locale(savedLang)
-      : const Locale('sw');
+  final initialLocale =
+      (savedLang != null && (savedLang == 'en' || savedLang == 'sw'))
+          ? Locale(savedLang)
+          : const Locale('sw');
 
   // Register Swahili locale for timeago
   timeago.setLocaleMessages(
@@ -34,16 +35,6 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-
-  // Set system UI overlay style
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-      systemNavigationBarColor: AppColors.surface,
-      systemNavigationBarIconBrightness: Brightness.dark,
-    ),
-  );
 
   runApp(TendapoaApp(initialLocale: initialLocale));
 }
@@ -61,16 +52,29 @@ class TendapoaApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AppProvider()),
         ChangeNotifierProvider(create: (_) => WorkerProvider()),
         ChangeNotifierProvider(create: (_) => ClientProvider()),
-        ChangeNotifierProvider(create: (_) => SettingsProvider(initialLocale: initialLocale)),
+        ChangeNotifierProvider(
+            create: (_) => SettingsProvider(initialLocale: initialLocale)),
       ],
       child: Consumer<SettingsProvider>(
         builder: (context, settings, child) {
           return MaterialApp(
             title: 'Tendapoa',
             debugShowCheckedModeBanner: false,
-            theme: AppTheme.lightTheme,
+            themeMode: settings.themeMode,
+            theme: TendapoaMaterialThemes.light(),
+            darkTheme: TendapoaMaterialThemes.dark(),
             locale: settings.locale,
             supportedLocales: AppLocalizations.supportedLocales,
+            localeResolutionCallback: (deviceLocale, supported) {
+              if (deviceLocale != null) {
+                for (final loc in supported) {
+                  if (loc.languageCode == deviceLocale.languageCode) {
+                    return loc;
+                  }
+                }
+              }
+              return supported.isNotEmpty ? supported.first : const Locale('sw');
+            },
             localizationsDelegates: const [
               AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,
@@ -80,6 +84,23 @@ class TendapoaApp extends StatelessWidget {
             initialRoute: AppRouter.splash,
             onGenerateRoute: AppRouter.generateRoute,
             builder: (context, child) {
+              final theme = Theme.of(context);
+              final cs = theme.colorScheme;
+              final brightness = theme.brightness;
+              SystemChrome.setSystemUIOverlayStyle(
+                SystemUiOverlayStyle(
+                  statusBarColor: Colors.transparent,
+                  statusBarIconBrightness: brightness == Brightness.dark
+                      ? Brightness.light
+                      : Brightness.dark,
+                  systemNavigationBarColor: cs.surface,
+                  systemNavigationBarIconBrightness:
+                      brightness == Brightness.dark
+                          ? Brightness.light
+                          : Brightness.dark,
+                ),
+              );
+
               final mediaQueryData = MediaQuery.of(context);
               final constrainedTextScaleFactor =
                   mediaQueryData.textScaler.clamp(
@@ -89,8 +110,9 @@ class TendapoaApp extends StatelessWidget {
 
               return MediaQuery(
                 data: mediaQueryData.copyWith(
-                    textScaler: constrainedTextScaleFactor),
-                child: child!,
+                  textScaler: constrainedTextScaleFactor,
+                ),
+                child: child ?? const SizedBox.shrink(),
               );
             },
           );

@@ -11,6 +11,7 @@ class AppRouter {
   static const String login = '/login';
   static const String register = '/register';
   static const String clientHome = '/client-home';
+  static const String clientDashboard = '/client-dashboard';
   static const String workerHome = '/worker-home';
   static const String postJob = '/post-job';
   static const String chatList = '/chat-list';
@@ -25,6 +26,14 @@ class AppRouter {
   static const String paymentWait = '/payment-wait';
   static const String editJob = '/edit-job';
   static const String editProfile = '/edit-profile';
+  static const String forgotPassword = '/forgot-password';
+  static const String depositWait = '/deposit-wait';
+  static const String clientApplications = '/client-applications';
+  static const String clientCategoryFeed = '/client-category-feed';
+  static const String fundEscrow = '/fund-escrow';
+  static const String workerMyApplications = '/worker-my-applications';
+  static const String workerPostJob = '/worker-post-job';
+  static const String workerDashboard = '/worker-dashboard';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -40,6 +49,8 @@ class AppRouter {
         return _buildRoute(const RegisterScreen(), settings);
       case clientHome:
         return _buildRoute(const ClientHomeScreen(), settings);
+      case clientDashboard:
+        return _buildRoute(const ClientDashboardScreen(), settings);
       case workerHome:
         return _buildRoute(const WorkerHomeScreen(), settings);
       case postJob:
@@ -74,7 +85,13 @@ class AppRouter {
       case workerJobs:
         return _buildRoute(const WorkerJobsScreen(), settings);
       case workerActiveJob:
-        return _buildRoute(const WorkerActiveJobScreen(), settings);
+        final waArgs = settings.arguments as Map<String, dynamic>?;
+        return _buildRoute(
+          WorkerActiveJobScreen(
+            initialJob: waArgs?['job'] as Job?,
+          ),
+          settings,
+        );
       case settingsPage:
         return _buildRoute(const SettingsScreen(), settings);
       case paymentWait:
@@ -121,6 +138,48 @@ class AppRouter {
         );
       case editProfile:
         return _buildRoute(const EditProfileScreen(), settings);
+      case forgotPassword:
+        return _buildRoute(const ForgotPasswordScreen(), settings);
+      case depositWait:
+        final args = settings.arguments as Map<String, dynamic>?;
+        return _buildRoute(
+          DepositWaitScreen(
+            transactionId: args?['transactionId'] as int? ?? 0,
+            amount: args?['amount'] as int? ?? 0,
+          ),
+          settings,
+        );
+      case clientApplications:
+        return _buildRoute(const ClientApplicationsScreen(), settings);
+      case clientCategoryFeed:
+        final catArgs = settings.arguments as Map<String, dynamic>?;
+        final category = catArgs?['category'] as Category?;
+        if (category == null) {
+          return _buildRoute(
+            const Scaffold(body: Center(child: Text('Invalid category'))),
+            settings,
+          );
+        }
+        return _buildRoute(
+          ClientCategoryFeedScreen(category: category),
+          settings,
+        );
+      case fundEscrow:
+        final fundArgs = settings.arguments as Map<String, dynamic>?;
+        final fundJob = fundArgs?['job'] as Job?;
+        if (fundJob == null) {
+          return _buildRoute(
+            const Scaffold(body: Center(child: Text('Invalid job'))),
+            settings,
+          );
+        }
+        return _buildRoute(FundEscrowScreen(job: fundJob), settings);
+      case workerMyApplications:
+        return _buildRoute(const WorkerMyApplicationsScreen(), settings);
+      case workerDashboard:
+        return _buildRoute(const WorkerDashboardScreen(), settings);
+      case workerPostJob:
+        return _buildRoute(const WorkerPostJobScreen(), settings);
       default:
         return _buildRoute(
             const Scaffold(body: Center(child: Text('Route not found'))),

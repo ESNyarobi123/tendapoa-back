@@ -89,14 +89,17 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
     
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!mounted) return;
       if (!serviceEnabled) {
         _showLocationError(context.tr('register_location_disabled'));
         return;
       }
 
       LocationPermission permission = await Geolocator.checkPermission();
+      if (!mounted) return;
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
+        if (!mounted) return;
         if (permission == LocationPermission.denied) {
           _showLocationError(context.tr('register_location_denied'));
           return;
@@ -111,6 +114,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
+      if (!mounted) return;
 
       setState(() {
         _lat = position.latitude;
@@ -124,7 +128,9 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
         _showSuccessSnackBar('${context.tr('register_location_success')} 📍');
       }
     } catch (e) {
-      _showLocationError('${context.tr('register_location_failed')}: $e');
+      if (mounted) {
+        _showLocationError('${context.tr('register_location_failed')}: $e');
+      }
     } finally {
       if (mounted) {
         setState(() => _isLoadingLocation = false);
@@ -354,8 +360,9 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    final surface = Theme.of(context).colorScheme.surface;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: surface,
       body: CustomScrollView(
         slivers: [
           // Animated Header
@@ -369,7 +376,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
               icon: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
@@ -406,9 +413,9 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(25),
-                              border: Border.all(color: Colors.white.withOpacity(0.3)),
+                              border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -461,7 +468,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                     ? context.tr('register_subtitle_mfanyakazi')
                                     : context.tr('register_subtitle_muhitaji'),
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: Colors.white.withValues(alpha: 0.9),
                                   fontSize: 15,
                                 ),
                               ),
@@ -481,9 +488,9 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
             child: Transform.translate(
               offset: const Offset(0, -25),
               child: Container(
-                decoration: const BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                decoration: BoxDecoration(
+                  color: surface,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(24, 35, 24, 40),
@@ -609,9 +616,9 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                         Container(
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: _themeColor.withOpacity(0.05),
+                            color: _themeColor.withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: _themeColor.withOpacity(0.1)),
+                            border: Border.all(color: _themeColor.withValues(alpha: 0.1)),
                           ),
                           child: Row(
                             children: [
@@ -622,7 +629,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                   context.tr('register_terms_notice'),
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: _themeColor.withOpacity(0.8),
+                                    color: _themeColor.withValues(alpha: 0.8),
                                   ),
                                 ),
                               ),
@@ -735,7 +742,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -749,7 +756,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: _themeColor.withOpacity(0.1),
+                  color: _themeColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, size: 20, color: _themeColor),
@@ -785,8 +792,8 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
         boxShadow: [
           BoxShadow(
             color: _locationDetected 
-                ? const Color(0xFF22C55E).withOpacity(0.1)
-                : Colors.black.withOpacity(0.04),
+                ? const Color(0xFF22C55E).withValues(alpha: 0.1)
+                : Colors.black.withValues(alpha: 0.04),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -801,8 +808,8 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: _locationDetected 
-                      ? const Color(0xFF22C55E).withOpacity(0.1)
-                      : _themeColor.withOpacity(0.1),
+                      ? const Color(0xFF22C55E).withValues(alpha: 0.1)
+                      : _themeColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -1014,15 +1021,16 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
     List<TextInputFormatter>? inputFormatters,
     String? Function(String?)? validator,
   }) {
+    final cs = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF475569),
+            color: cs.onSurfaceVariant,
           ),
         ),
         const SizedBox(height: 8),
@@ -1039,21 +1047,22 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
             }
           },
           validator: validator,
-          style: const TextStyle(fontSize: 15, color: AppColors.textPrimary),
+          style: TextStyle(fontSize: 15, color: cs.onSurface),
+          cursorColor: _themeColor,
           decoration: InputDecoration(
-            prefixIcon: Icon(icon, size: 20, color: _themeColor.withOpacity(0.7)),
+            prefixIcon: Icon(icon, size: 20, color: _themeColor.withValues(alpha: 0.85)),
             suffixIcon: suffix,
             hintText: hint,
-            hintStyle: const TextStyle(color: Color(0xFFCBD5E1), fontSize: 14),
+            hintStyle: TextStyle(color: cs.onSurfaceVariant, fontSize: 14),
             filled: true,
-            fillColor: AppColors.background,
+            fillColor: cs.surfaceContainerHighest,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: AppColors.grey200),
+              borderSide: BorderSide(color: cs.outlineVariant),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: AppColors.grey200),
+              borderSide: BorderSide(color: cs.outlineVariant),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),

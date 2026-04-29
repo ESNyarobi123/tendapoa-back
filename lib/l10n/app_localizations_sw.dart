@@ -565,6 +565,10 @@ class AppLocalizationsSw extends AppLocalizations {
   String get success_application_sent => 'Ombi lako limetumwa!';
 
   @override
+  String get worker_apply_pending_status =>
+      'Umeomba kazi hii tayari. Subiri mteja achague.';
+
+  @override
   String get job_accepted_success => 'Umeikubali kazi hii.';
 
   @override
@@ -892,6 +896,36 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get apply_job_dialog_title => 'Omba Kazi Hii';
+
+  @override
+  String get worker_apply_title => 'Omba kufanya kazi hii';
+
+  @override
+  String get worker_apply_lead =>
+      'Baada ya kuwasilisha utafuatilia hali (counter, kuchaguliwa, n.k.) kwenye Maombi yangu. Hutaona maombi ya wafanyakazi wengine hapa.';
+
+  @override
+  String get worker_apply_budget_label => 'Bei unayopendekeza (TZS)';
+
+  @override
+  String worker_apply_client_budget(Object amount) {
+    return 'Bajeti ya mteja: $amount TZS';
+  }
+
+  @override
+  String get worker_apply_message_label => 'Ujumbe — kwa nini uchaguliwe?';
+
+  @override
+  String get worker_apply_eta_label => 'Muda wa kukamilisha (hiari)';
+
+  @override
+  String get worker_apply_eta_hint => 'Mfano: siku 2';
+
+  @override
+  String get worker_apply_submit => 'Wasilisha ombi';
+
+  @override
+  String get worker_apply_my_applications => 'Maombi yangu';
 
   @override
   String get bid_hint => 'Andika bei yako na maelezo mafupi...';
@@ -1596,4 +1630,222 @@ class AppLocalizationsSw extends AppLocalizations {
 
   @override
   String get withdrawal_status_pending => 'Inasubiri';
+
+  @override
+  String get deposit_title => 'Weka Pesa';
+
+  @override
+  String get deposit_amount_label => 'Kiasi cha kuweka';
+
+  @override
+  String get deposit_min_error => 'Kiasi cha chini ni TZS 1,000';
+
+  @override
+  String get deposit_ussd_info =>
+      'Utapokea ombi la USSD kwenye simu yako. Ingiza PIN yako kuthibitisha.';
+
+  @override
+  String get deposit_submit_btn => 'Weka Pesa';
+
+  @override
+  String get deposit_status_processing => 'INAENDELEA';
+
+  @override
+  String get deposit_status_done => 'IMEFANIKIWA';
+
+  @override
+  String get deposit_status_failed => 'IMESHINDIKANA';
+
+  @override
+  String get deposit_waiting_msg => 'Angalia simu yako uthibitishe malipo';
+
+  @override
+  String get deposit_success_msg => 'Pesa imeingia kwenye akaunti yako!';
+
+  @override
+  String get deposit_timeout_msg => 'Muda umekwisha. Jaribu tena.';
+
+  @override
+  String get deposit_success_redirect => 'Unarudishwa...';
+
+  @override
+  String get deposit_step_phone => 'Simu';
+
+  @override
+  String get deposit_step_pin => 'PIN';
+
+  @override
+  String get deposit_step_confirm => 'Thibitisha';
+
+  @override
+  String get go_back_btn => 'Rudi';
+
+  @override
+  String get forgot_title => 'Umesahau Neno Siri?';
+
+  @override
+  String get forgot_email_subtitle =>
+      'Ingiza barua pepe yako na tutakutumia msimbo wa OTP kubadilisha neno siri.';
+
+  @override
+  String get forgot_email_label => 'Barua Pepe';
+
+  @override
+  String get forgot_email_hint => 'mfano@email.com';
+
+  @override
+  String get forgot_enter_valid_email => 'Ingiza barua pepe sahihi';
+
+  @override
+  String get forgot_send_otp_btn => 'Tuma Msimbo wa OTP';
+
+  @override
+  String get forgot_otp_title => 'Thibitisha OTP';
+
+  @override
+  String get forgot_otp_subtitle => 'Tumetuma msimbo wa tarakimu 6 kwenye';
+
+  @override
+  String get forgot_enter_6_digits => 'Ingiza tarakimu zote 6';
+
+  @override
+  String get forgot_verify_btn => 'Thibitisha OTP';
+
+  @override
+  String get forgot_resend_in => 'Tuma tena baada ya';
+
+  @override
+  String get forgot_resend_otp => 'Tuma OTP Tena';
+
+  @override
+  String get forgot_otp_resent => 'OTP mpya imetumwa!';
+
+  @override
+  String get forgot_new_pw_title => 'Neno Siri Jipya';
+
+  @override
+  String get forgot_new_pw_subtitle =>
+      'Weka neno siri jipya lenye angalau herufi 8.';
+
+  @override
+  String get forgot_new_pw_label => 'Neno Siri Jipya';
+
+  @override
+  String get forgot_confirm_pw_label => 'Thibitisha Neno Siri';
+
+  @override
+  String get forgot_password_min_8 =>
+      'Neno siri lazima liwe na herufi 8 au zaidi';
+
+  @override
+  String get forgot_passwords_no_match => 'Maneno siri hayalingani';
+
+  @override
+  String get forgot_reset_btn => 'Badilisha Neno Siri';
+
+  @override
+  String get forgot_success_title => 'Imefanikiwa!';
+
+  @override
+  String get forgot_success_subtitle =>
+      'Neno siri lako limebadilishwa. Sasa unaweza kuingia na neno siri jipya.';
+
+  @override
+  String get forgot_go_login => 'Ingia Sasa';
+
+  @override
+  String get change_password_now => 'Badili sasa';
+
+  @override
+  String get settings_edit_profile_subtitle => 'Picha, jina na simu';
+
+  @override
+  String get settings_quick_access => 'UFIKIAJI WA HARAKA';
+
+  @override
+  String get settings_app_permissions => 'Ruhusa za programu';
+
+  @override
+  String get settings_permissions_subtitle =>
+      'Mipangilio ya mfumo: eneo na arifa';
+
+  @override
+  String get fees_policy_subtitle => 'Jinsi ada na malipo yanavyofanya kazi';
+
+  @override
+  String get privacy_policy_subtitle =>
+      'Jinsi tunavyokusanya na kutumia data yako';
+
+  @override
+  String get terms_subtitle => 'Masharti ya matumizi';
+
+  @override
+  String get settings_role_client => 'Akaunti ya mteja';
+
+  @override
+  String get settings_role_worker => 'Akaunti ya mfanyakazi';
+
+  @override
+  String get settings_my_applications_worker => 'Maombi yangu ya kazi';
+
+  @override
+  String get settings_wallet_open_subtitle => 'Malipo na salio';
+
+  @override
+  String get settings_worker_inbox_client => 'Maombi kutoka kwa wafanyakazi';
+
+  @override
+  String get settings_notifications_subtitle =>
+      'Arifa za kazi na ujumbe. Zimehifadhiwa kwenye simu tu.';
+
+  @override
+  String get drawer_section_menu => 'Menyu';
+
+  @override
+  String get drawer_sub_map => 'Tazama kazi kwenye ramani';
+
+  @override
+  String get drawer_sub_wallet => 'Salio, kuongeza na kutoa pesa';
+
+  @override
+  String get drawer_sub_notifications => 'Arifa za kazi na ujumbe';
+
+  @override
+  String get drawer_sub_inbox_client => 'Chagua mfanyakazi kwa kazi zako';
+
+  @override
+  String get drawer_sub_my_apps => 'Fuatilia maombi yako ya kazi';
+
+  @override
+  String get drawer_sub_post_worker => 'Tangaza huduma unayotoa';
+
+  @override
+  String get drawer_sub_settings => 'Mandhari, lugha na akaunti';
+
+  @override
+  String get drawer_sub_dashboard => 'Mapato, salio na shughuli';
+
+  @override
+  String get drawer_sub_dashboard_client =>
+      'Muhtasari wa kazi, pochi na malipo';
+
+  @override
+  String get worker_nav_maombi => 'Maombi';
+
+  @override
+  String get client_nav_worker_apps => 'Maombi';
+
+  @override
+  String get dash_attention_title => 'Kinachohitaji hatua';
+
+  @override
+  String get dash_empty_earnings => 'Bado hakuna historia ya mapato.';
+
+  @override
+  String get dash_empty_withdrawals => 'Bado hakuna historia ya kutoa pesa.';
+
+  @override
+  String app_version_line(String version, String build_number) {
+    return 'Toleo $version · Ujenzi $build_number';
+  }
 }

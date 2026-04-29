@@ -21,12 +21,13 @@ class JobCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: cs.surfaceContainerLow,
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: AppColors.surfaceLight),
+        border: Border.all(color: cs.outlineVariant),
         boxShadow: [
           BoxShadow(
               color: Colors.black.withValues(alpha: 0.04),
@@ -100,11 +101,11 @@ class JobCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                              color: AppColors.surface.withValues(alpha: 0.9),
+                              color: cs.surfaceContainerHighest.withValues(alpha: 0.95),
                               borderRadius: BorderRadius.circular(10)),
                           child: Text(job.categoryName!,
-                              style: const TextStyle(
-                                  color: AppColors.textPrimary,
+                              style: TextStyle(
+                                  color: cs.onSurface,
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold)),
                         ),
@@ -119,10 +120,10 @@ class JobCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(job.title,
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary),
+                              color: cs.onSurface),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 12),
@@ -130,7 +131,7 @@ class JobCard extends StatelessWidget {
                         children: [
                           CircleAvatar(
                             radius: 12,
-                            backgroundColor: AppColors.surfaceLight,
+                            backgroundColor: cs.surfaceContainerHighest,
                             child: Text(
                                 job.userName?.isNotEmpty == true
                                     ? job.userName![0]
@@ -142,8 +143,8 @@ class JobCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           Text(job.userName ?? 'Mteja',
-                              style: const TextStyle(
-                                  color: AppColors.textSecondary,
+                              style: TextStyle(
+                                  color: cs.onSurfaceVariant,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500)),
                           const Spacer(),

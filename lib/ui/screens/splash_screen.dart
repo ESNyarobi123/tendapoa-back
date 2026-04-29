@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/constants.dart';
 import '../../core/localization/app_localizations.dart';
@@ -18,10 +19,16 @@ class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
   late AnimationController _pulseController;
   late AnimationController _rotateController;
+  String _versionLabel = '';
 
   @override
   void initState() {
     super.initState();
+    PackageInfo.fromPlatform().then((info) {
+      if (mounted) {
+        setState(() => _versionLabel = '${info.version} (${info.buildNumber})');
+      }
+    });
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
@@ -80,82 +87,98 @@ class _SplashScreenState extends State<SplashScreen>
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // Animated background circles
-            ...List.generate(3, (index) {
-              return Positioned(
-                top: index == 0 ? -100 : (index == 1 ? 200 : null),
-                bottom: index == 2 ? -80 : null,
-                left: index == 1 ? -50 : null,
-                right: index == 0 ? -30 : (index == 2 ? -40 : null),
-                child: AnimatedBuilder(
-                  animation: _rotateController,
-                  builder: (context, child) {
-                    return Transform.rotate(
-                      angle: _rotateController.value * 2 * math.pi * (index.isEven ? 1 : -1),
-                      child: Container(
-                        width: 200 + (index * 50),
-                        height: 200 + (index * 50),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.03 + (index * 0.01)),
-                            width: 1,
-                          ),
-                        ),
+            // Mandhari inayobadilika: jenga kwenye layer moja (RepaintBoundary + orbs waliounganishwa)
+            RepaintBoundary(
+              child: Stack(
+                fit: StackFit.expand,
+                clipBehavior: Clip.none,
+                children: [
+                  ...List.generate(3, (index) {
+                    return Positioned(
+                      top: index == 0 ? -100 : (index == 1 ? 200 : null),
+                      bottom: index == 2 ? -80 : null,
+                      left: index == 1 ? -50 : null,
+                      right: index == 0 ? -30 : (index == 2 ? -40 : null),
+                      child: AnimatedBuilder(
+                        animation: _rotateController,
+                        builder: (context, child) {
+                          return Transform.rotate(
+                            angle: _rotateController.value *
+                                2 *
+                                math.pi *
+                                (index.isEven ? 1 : -1),
+                            child: Container(
+                              width: 200 + (index * 50),
+                              height: 200 + (index * 50),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white
+                                      .withValues(alpha: 0.03 + (index * 0.01)),
+                                  width: 1,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     );
-                  },
-                ),
-              );
-            }),
-
-            // Glowing orbs
-            Positioned(
-              top: 100,
-              right: 50,
-              child: AnimatedBuilder(
-                animation: _pulseController,
-                builder: (context, child) {
-                  return Container(
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.3 + (_pulseController.value * 0.4)),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          blurRadius: 20,
-                          spreadRadius: 5,
-                        ),
-                      ],
+                  }),
+                  Positioned.fill(
+                    child: AnimatedBuilder(
+                      animation: _pulseController,
+                      builder: (context, _) {
+                        final pulse = _pulseController.value;
+                        return Stack(
+                          fit: StackFit.expand,
+                          clipBehavior: Clip.none,
+                          children: [
+                            Positioned(
+                              top: 100,
+                              right: 50,
+                              child: Container(
+                                width: 8,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: Colors.white
+                                      .withValues(alpha: 0.3 + (pulse * 0.4)),
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.white.withValues(alpha: 0.2),
+                                      blurRadius: 20,
+                                      spreadRadius: 5,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              bottom: 150,
+                              left: 40,
+                              child: Container(
+                                width: 6,
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  color: Colors.blue
+                                      .withValues(alpha: 0.4 + (pulse * 0.3)),
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.blue.withValues(alpha: 0.3),
+                                      blurRadius: 15,
+                                      spreadRadius: 3,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
-            ),
-            Positioned(
-              bottom: 150,
-              left: 40,
-              child: AnimatedBuilder(
-                animation: _pulseController,
-                builder: (context, child) {
-                  return Container(
-                    width: 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: Colors.blue.withValues(alpha: 0.4 + (_pulseController.value * 0.3)),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.blue.withValues(alpha: 0.3),
-                          blurRadius: 15,
-                          spreadRadius: 3,
-                        ),
-                      ],
-                    ),
-                  );
-                },
+                  ),
+                ],
               ),
             ),
 
@@ -222,6 +245,13 @@ class _SplashScreenState extends State<SplashScreen>
                         child: Image.asset(
                           'assets/images/tendalogo.jpg',
                           fit: BoxFit.cover,
+                          // Punguza ukubwa wa decode (picha kubwa = RAM/CPU zaidi)
+                          cacheWidth: (128 *
+                                  MediaQuery.devicePixelRatioOf(context))
+                              .round(),
+                          cacheHeight: (128 *
+                                  MediaQuery.devicePixelRatioOf(context))
+                              .round(),
                           errorBuilder: (c, e, s) => Container(
                             decoration: const BoxDecoration(
                               gradient: LinearGradient(
@@ -247,7 +277,13 @@ class _SplashScreenState extends State<SplashScreen>
                       curve: Curves.easeOutBack,
                       begin: const Offset(0.5, 0.5),
                     )
-                    .fadeIn(duration: 600.ms),
+                    .fadeIn(duration: 600.ms)
+                    .then()
+                    .shimmer(
+                      duration: 2200.ms,
+                      color: Colors.white.withValues(alpha: 0.12),
+                      angle: 0.35,
+                    ),
 
                 const SizedBox(height: 35),
 
@@ -294,7 +330,12 @@ class _SplashScreenState extends State<SplashScreen>
                 )
                     .animate()
                     .fadeIn(delay: 600.ms, duration: 500.ms)
-                    .slideY(begin: 0.3, curve: Curves.easeOut),
+                    .slideY(begin: 0.3, curve: Curves.easeOut)
+                    .then(delay: 400.ms)
+                    .shimmer(
+                      duration: 2000.ms,
+                      color: Colors.white.withValues(alpha: 0.18),
+                    ),
               ],
             ),
 
@@ -306,69 +347,68 @@ class _SplashScreenState extends State<SplashScreen>
               child: Column(
                 children: [
                   // Custom loading indicator
-                  SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Outer ring
-                        AnimatedBuilder(
-                          animation: _rotateController,
-                          builder: (context, child) {
-                            return Transform.rotate(
-                              angle: _rotateController.value * 2 * math.pi,
-                              child: Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.white.withValues(alpha: 0.1),
-                                    width: 2,
+                  RepaintBoundary(
+                    child: SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: AnimatedBuilder(
+                        animation: Listenable.merge(
+                            [_rotateController, _pulseController]),
+                        builder: (context, _) {
+                          final pulse = _pulseController.value;
+                          return Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Transform.rotate(
+                                angle: _rotateController.value * 2 * math.pi,
+                                child: Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Colors.white.withValues(
+                                          alpha: 0.1),
+                                      width: 2,
+                                    ),
                                   ),
-                                ),
-                                child: Align(
-                                  alignment: Alignment.topCenter,
-                                  child: Container(
-                                    width: 8,
-                                    height: 8,
-                                    decoration: const BoxDecoration(
-                                      color: Colors.white,
-                                      shape: BoxShape.circle,
+                                  child: Align(
+                                    alignment: Alignment.topCenter,
+                                    child: Container(
+                                      width: 8,
+                                      height: 8,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.circle,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            );
-                          },
-                        ),
-                        // Inner dot
-                        AnimatedBuilder(
-                          animation: _pulseController,
-                          builder: (context, child) {
-                            return Container(
-                              width: 10 + (_pulseController.value * 4),
-                              height: 10 + (_pulseController.value * 4),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.3),
-                                shape: BoxShape.circle,
+                              Container(
+                                width: 10 + (pulse * 4),
+                                height: 10 + (pulse * 4),
+                                decoration: BoxDecoration(
+                                  color:
+                                      Colors.white.withValues(alpha: 0.3),
+                                  shape: BoxShape.circle,
+                                ),
                               ),
-                            );
-                          },
-                        ),
-                      ],
+                            ],
+                          );
+                        },
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
-                  // Version
+                  // Version (halisi kutoka build)
                   Text(
-                    'v1.0.0',
+                    _versionLabel.isEmpty ? '…' : _versionLabel,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.3),
+                      color: Colors.white.withValues(alpha: 0.35),
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
-                      letterSpacing: 2,
+                      letterSpacing: 1.2,
                     ),
                   ),
                 ],

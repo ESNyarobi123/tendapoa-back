@@ -128,6 +128,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
   Future<void> _submitJob() async {
     if (_lat == null || _lng == null) {
       await _detectLocation();
+      if (!mounted) return;
       if (_lat == null || _lng == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -153,15 +154,18 @@ class _PostJobScreenState extends State<PostJobScreen> {
           );
 
       if (mounted) {
-        // Find the job in the updated list or parse from response if available
-        // Assuming loadMyJobs was called inside postJob provider method
-        final clientProvider = context.read<ClientProvider>();
-        final newJob = clientProvider.myJobs.firstWhere(
-            (j) => j.title == _titleController.text,
-            orElse: () => clientProvider.myJobs.first);
-
-        Navigator.pushReplacementNamed(context, AppRouter.paymentWait,
-            arguments: {'job': newJob});
+        // Posting is free; pay after worker selection (Job Details → fund escrow). PaymentWait is for USSD after that flow.
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(context.tr('job_posted_message')),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          AppRouter.clientHome,
+          (route) => false,
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -173,21 +177,26 @@ class _PostJobScreenState extends State<PostJobScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: scheme.surface,
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
+        backgroundColor: scheme.primary,
+        foregroundColor: scheme.onPrimary,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: scheme.onPrimary),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(context.tr('post_job_new'),
-            style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 20)),
+        title: Text(
+          context.tr('post_job_new'),
+          style: TextStyle(
+            color: scheme.onPrimary,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
             bottomLeft: Radius.circular(30),
@@ -203,11 +212,12 @@ class _PostJobScreenState extends State<PostJobScreen> {
             child: Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: scheme.surfaceContainerLow,
                 borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.5)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
+                    color: Colors.black.withValues(alpha: 0.03),
                     blurRadius: 10,
                     offset: const Offset(0, 2),
                   ),
@@ -215,20 +225,20 @@ class _PostJobScreenState extends State<PostJobScreen> {
               ),
               child: Row(
                 children: [
-                  _buildStep(0, context.tr('step_details')),
+                  _buildStep(context, 0, context.tr('step_details')),
                   Expanded(
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 10),
                       height: 3,
                       decoration: BoxDecoration(
                         color: _currentStep >= 1
-                            ? AppColors.primary
-                            : AppColors.grey200,
+                            ? scheme.primary
+                            : scheme.outlineVariant,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                   ),
-                  _buildStep(1, context.tr('step_location_post')),
+                  _buildStep(context, 1, context.tr('step_location_post')),
                 ],
               ),
             ),
@@ -248,9 +258,10 @@ class _PostJobScreenState extends State<PostJobScreen> {
     );
   }
 
-  Widget _buildStep(int step, String label) {
-    bool isActive = _currentStep == step;
-    bool isDone = _currentStep > step;
+  Widget _buildStep(BuildContext context, int step, String label) {
+    final scheme = Theme.of(context).colorScheme;
+    final isActive = _currentStep == step;
+    final isDone = _currentStep > step;
     return Row(
       children: [
         Container(
@@ -258,16 +269,16 @@ class _PostJobScreenState extends State<PostJobScreen> {
           height: 32,
           decoration: BoxDecoration(
             color: isActive || isDone
-                ? AppColors.primary
-                : const Color(0xFFEEF2FF),
+                ? scheme.primary
+                : scheme.surfaceContainerHighest,
             shape: BoxShape.circle,
             border: isActive
-                ? Border.all(color: Colors.white, width: 2)
-                : null,
+                ? Border.all(color: scheme.onPrimary, width: 2)
+                : Border.all(color: scheme.outlineVariant),
             boxShadow: isActive
                 ? [
                     BoxShadow(
-                      color: AppColors.primary.withOpacity(0.4),
+                      color: scheme.primary.withValues(alpha: 0.35),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -276,11 +287,13 @@ class _PostJobScreenState extends State<PostJobScreen> {
           ),
           child: Center(
             child: isDone
-                ? const Icon(Icons.check, color: Colors.white, size: 16)
+                ? Icon(Icons.check, color: scheme.onPrimary, size: 16)
                 : Text(
                     '${step + 1}',
                     style: TextStyle(
-                      color: isActive ? Colors.white : AppColors.textSecondary,
+                      color: isActive
+                          ? scheme.onPrimary
+                          : scheme.onSurfaceVariant,
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
                     ),
@@ -292,7 +305,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
           label,
           style: TextStyle(
             fontSize: 14,
-            color: isActive ? AppColors.primary : AppColors.textSecondary,
+            color: isActive ? scheme.primary : scheme.onSurfaceVariant,
             fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
           ),
         ),
@@ -302,21 +315,27 @@ class _PostJobScreenState extends State<PostJobScreen> {
 
   Widget _buildStepOne() {
     final categories = context.watch<AppProvider>().categories;
+    final cs = Theme.of(context).colorScheme;
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 10),
-          Text(context.tr('post_need_help'),
-              style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.textPrimary,
-                  letterSpacing: -0.5)),
+          Text(
+            context.tr('post_need_help'),
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w900,
+              color: cs.onSurface,
+              letterSpacing: -0.5,
+            ),
+          ),
           const SizedBox(height: 5),
-          Text(context.tr('post_fill_details'),
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+          Text(
+            context.tr('post_fill_details'),
+            style: TextStyle(color: cs.onSurfaceVariant, fontSize: 14),
+          ),
           const SizedBox(height: 30),
 
           // Image Picker
@@ -326,9 +345,9 @@ class _PostJobScreenState extends State<PostJobScreen> {
               height: 200,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: AppColors.background,
+                color: cs.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(30),
-                border: Border.all(color: AppColors.surfaceLight, width: 2),
+                border: Border.all(color: cs.outlineVariant, width: 2),
                 image: _selectedImage != null
                     ? DecorationImage(
                         image: kIsWeb
@@ -345,17 +364,25 @@ class _PostJobScreenState extends State<PostJobScreen> {
                       children: [
                         Container(
                           padding: const EdgeInsets.all(15),
-                          decoration: const BoxDecoration(
-                              color: Colors.white, shape: BoxShape.circle),
-                          child: const Icon(Icons.camera_alt_rounded,
-                              size: 30, color: AppColors.primary),
+                          decoration: BoxDecoration(
+                            color: cs.surfaceContainerHigh,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.camera_alt_rounded,
+                            size: 30,
+                            color: cs.primary,
+                          ),
                         ),
                         const SizedBox(height: 12),
-                        Text(context.tr('add_image_optional'),
-                            style: const TextStyle(
-                                color: AppColors.textSecondary,
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold)),
+                        Text(
+                          context.tr('add_image_optional'),
+                          style: TextStyle(
+                            color: cs.onSurfaceVariant,
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ],
                     )
                   : Align(
@@ -363,11 +390,15 @@ class _PostJobScreenState extends State<PostJobScreen> {
                       child: Padding(
                         padding: const EdgeInsets.all(15),
                         child: CircleAvatar(
-                          backgroundColor: Colors.white,
+                          backgroundColor: cs.surfaceContainerHigh,
                           child: IconButton(
-                              icon: const Icon(Icons.edit_rounded,
-                                  size: 20, color: AppColors.primary),
-                              onPressed: _pickImage),
+                            icon: Icon(
+                              Icons.edit_rounded,
+                              size: 20,
+                              color: cs.primary,
+                            ),
+                            onPressed: _pickImage,
+                          ),
                         ),
                       ),
                     ),
@@ -387,28 +418,35 @@ class _PostJobScreenState extends State<PostJobScreen> {
 
           const SizedBox(height: 25),
           _buildInputLabel(context.tr('select_category')),
-          Container(
+          Builder(
+            builder: (ctx) {
+              final cs = Theme.of(ctx).colorScheme;
+              return Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
             decoration: BoxDecoration(
-                color: AppColors.background,
+                color: cs.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.surfaceLight)),
+                border: Border.all(color: cs.outlineVariant)),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<models.Category>(
                 isExpanded: true,
                 value: _selectedCategory,
+                dropdownColor: cs.surfaceContainerHigh,
                 hint: Text('${context.tr('select_category')}...',
-                    style: const TextStyle(color: AppColors.textLight, fontSize: 14)),
+                    style: TextStyle(color: cs.onSurfaceVariant, fontSize: 14)),
                 items: categories
                     .map((c) => DropdownMenuItem(
                         value: c,
                         child: Text(c.name,
-                            style:
-                                const TextStyle(fontWeight: FontWeight.bold))))
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: cs.onSurface))))
                     .toList(),
                 onChanged: (v) => setState(() => _selectedCategory = v),
               ),
             ),
+          );
+            },
           ),
 
           const SizedBox(height: 25),
@@ -423,21 +461,28 @@ class _PostJobScreenState extends State<PostJobScreen> {
 
           const SizedBox(height: 25),
           _buildInputLabel(context.tr('additional_details')),
-          Container(
+          Builder(
+            builder: (ctx) {
+              final cs = Theme.of(ctx).colorScheme;
+              return Container(
             padding: const EdgeInsets.all(15),
             decoration: BoxDecoration(
-                color: AppColors.background,
+                color: cs.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(25),
-                border: Border.all(color: AppColors.surfaceLight)),
+                border: Border.all(color: cs.outlineVariant)),
             child: TextFormField(
               controller: _descController,
               maxLines: 5,
+              style: TextStyle(color: cs.onSurface, fontSize: 15),
+              cursorColor: cs.primary,
               decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: context.tr('post_description_hint'),
-                  hintStyle: const TextStyle(color: AppColors.textLight, fontSize: 14)),
+                  hintStyle: TextStyle(color: cs.onSurfaceVariant, fontSize: 14)),
               validator: (v) => v!.isEmpty ? context.tr('post_description_error') : null,
             ),
+          );
+            },
           ),
           const SizedBox(height: 40),
         ],
@@ -446,20 +491,26 @@ class _PostJobScreenState extends State<PostJobScreen> {
   }
 
   Widget _buildStepTwo() {
+    final cs = Theme.of(context).colorScheme;
+    final onCard = cs.onPrimary;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 10),
-        Text(context.tr('location_title'),
-            style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w900,
-                color: AppColors.textPrimary,
-                letterSpacing: -0.5)),
+        Text(
+          context.tr('location_title'),
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w900,
+            color: cs.onSurface,
+            letterSpacing: -0.5,
+          ),
+        ),
         const SizedBox(height: 5),
         Text(
-            context.tr('post_location_help'),
-            style: const TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+          context.tr('post_location_help'),
+          style: TextStyle(color: cs.onSurfaceVariant, fontSize: 14),
+        ),
         const SizedBox(height: 30),
 
         // Location Card
@@ -467,7 +518,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
           width: double.infinity,
           padding: const EdgeInsets.all(25),
           decoration: BoxDecoration(
-            color: AppColors.textPrimary,
+            color: cs.primary,
             borderRadius: BorderRadius.circular(30),
             boxShadow: [
               BoxShadow(
@@ -481,7 +532,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
               Container(
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
+                    color: onCard.withValues(alpha: 0.12),
                     shape: BoxShape.circle),
                 child: Icon(Icons.location_on_rounded,
                     size: 50,
@@ -490,26 +541,33 @@ class _PostJobScreenState extends State<PostJobScreen> {
                         : const Color(0xFFF97316)),
               ),
               const SizedBox(height: 20),
-              Text(_lat != null ? context.tr('location_detected').toUpperCase() : context.tr('post_location_searching').toUpperCase(),
-                  style: const TextStyle(
+              Text(
+                  _lat != null
+                      ? context.tr('location_detected').toUpperCase()
+                      : context.tr('post_location_searching').toUpperCase(),
+                  style: TextStyle(
                       fontWeight: FontWeight.w900,
-                      color: Colors.white,
+                      color: onCard,
                       fontSize: 14,
                       letterSpacing: 1)),
               const SizedBox(height: 8),
               Text(_addressText ?? context.tr('post_allow_gps'),
-                  style: const TextStyle(color: Colors.white60, fontSize: 13),
+                  style: TextStyle(
+                      color: onCard.withValues(alpha: 0.75),
+                      fontSize: 13),
                   textAlign: TextAlign.center),
               const SizedBox(height: 20),
               OutlinedButton.icon(
                 onPressed: _detectLocation,
-                icon: const Icon(Icons.refresh_rounded, size: 16),
+                icon: Icon(Icons.refresh_rounded, size: 16, color: onCard),
                 label: Text(context.tr('post_retry_location'),
-                    style:
-                        const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 11,
+                        color: onCard)),
                 style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.white70,
-                    side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+                    foregroundColor: onCard.withValues(alpha: 0.85),
+                    side: BorderSide(color: onCard.withValues(alpha: 0.25)),
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 12),
                     shape: RoundedRectangleBorder(
@@ -539,31 +597,32 @@ class _PostJobScreenState extends State<PostJobScreen> {
   }
 
   Widget _buildNearbyWorkersCard() {
+    final cs = Theme.of(context).colorScheme;
     if (_isCheckingWorkers) {
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.all(25),
         decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.05),
+          color: cs.primary.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(25),
-          border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+          border: Border.all(color: cs.primary.withValues(alpha: 0.15)),
         ),
         child: Row(
           children: [
-            const SizedBox(
+            SizedBox(
               width: 24,
               height: 24,
               child: CircularProgressIndicator(
                 strokeWidth: 2.5,
-                color: AppColors.primary,
+                color: cs.primary,
               ),
             ),
             const SizedBox(width: 15),
             Expanded(
               child: Text(
                 context.tr('post_searching_workers'),
-                style: const TextStyle(
-                  color: AppColors.textSecondary,
+                style: TextStyle(
+                  color: cs.onSurfaceVariant,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -610,17 +669,17 @@ class _PostJobScreenState extends State<PostJobScreen> {
                     children: [
                       Text(
                         context.tr('post_no_workers_nearby'),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
-                          color: AppColors.textPrimary,
+                          color: cs.onSurface,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         _nearbyWorkersMessage ?? context.tr('post_continue_anyway'),
-                        style: const TextStyle(
-                          color: AppColors.textSecondary,
+                        style: TextStyle(
+                          color: cs.onSurfaceVariant,
                           fontSize: 12,
                         ),
                       ),
@@ -670,17 +729,17 @@ class _PostJobScreenState extends State<PostJobScreen> {
                     children: [
                       Text(
                         '$_nearbyWorkerCount ${context.tr('post_workers_found')}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
-                          color: AppColors.textPrimary,
+                          color: cs.onSurface,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         _nearbyWorkersMessage ?? context.tr('post_job_visible_soon'),
-                        style: const TextStyle(
-                          color: AppColors.textSecondary,
+                        style: TextStyle(
+                          color: cs.onSurfaceVariant,
                           fontSize: 12,
                         ),
                       ),
@@ -743,13 +802,18 @@ class _PostJobScreenState extends State<PostJobScreen> {
   }
 
   Widget _buildInputLabel(String label) {
+    final cs = Theme.of(context).colorScheme;
     return Padding(
-        padding: const EdgeInsets.only(left: 10, bottom: 10),
-        child: Text(label,
-            style: const TextStyle(
-                fontWeight: FontWeight.w900,
-                color: AppColors.textPrimary,
-                fontSize: 14)));
+      padding: const EdgeInsets.only(left: 10, bottom: 10),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontWeight: FontWeight.w900,
+          color: cs.onSurface,
+          fontSize: 14,
+        ),
+      ),
+    );
   }
 
   Widget _buildTextField(
@@ -758,22 +822,27 @@ class _PostJobScreenState extends State<PostJobScreen> {
       required IconData icon,
       TextInputType? keyboardType,
       String? Function(String?)? validator}) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
-          color: AppColors.background,
+          color: cs.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.surfaceLight)),
+          border: Border.all(color: cs.outlineVariant)),
       child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
         validator: validator,
-        style: const TextStyle(fontWeight: FontWeight.bold),
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: cs.onSurface,
+        ),
+        cursorColor: cs.primary,
         decoration: InputDecoration(
-          prefixIcon: Icon(icon, size: 20, color: AppColors.textLight),
+          prefixIcon: Icon(icon, size: 20, color: cs.onSurfaceVariant),
           hintText: hint,
-          hintStyle: const TextStyle(
-              color: AppColors.textLight,
+          hintStyle: TextStyle(
+              color: cs.onSurfaceVariant,
               fontSize: 14,
               fontWeight: FontWeight.normal),
           border: InputBorder.none,
@@ -785,13 +854,14 @@ class _PostJobScreenState extends State<PostJobScreen> {
 
   Widget _buildBottomBar() {
     final isLoading = context.watch<ClientProvider>().isLoading;
+    final cs = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 15, 20, 30),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cs.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 20,
             offset: const Offset(0, -5),
           ),
@@ -805,13 +875,14 @@ class _PostJobScreenState extends State<PostJobScreen> {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceLight,
+                  color: cs.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: cs.outlineVariant),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.arrow_back_ios_new_rounded,
                   size: 20,
-                  color: AppColors.textPrimary,
+                  color: cs.onSurface,
                 ),
               ),
             ),
@@ -824,9 +895,11 @@ class _PostJobScreenState extends State<PostJobScreen> {
                   : (_currentStep == 0 ? _nextStep : _submitJob),
               style: ElevatedButton.styleFrom(
                 backgroundColor: _currentStep == 0
-                    ? AppColors.primary
+                    ? cs.primary
                     : const Color(0xFF22C55E),
-                foregroundColor: Colors.white,
+                foregroundColor: _currentStep == 0
+                    ? cs.onPrimary
+                    : Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 18),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
@@ -834,19 +907,24 @@ class _PostJobScreenState extends State<PostJobScreen> {
                 elevation: 0,
               ),
               child: isLoading
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 24,
                       height: 24,
                       child: CircularProgressIndicator(
-                        color: Colors.white,
+                        color: _currentStep == 0
+                            ? cs.onPrimary
+                            : Colors.white,
                         strokeWidth: 2,
                       ),
                     )
                   : Text(
                       _currentStep == 0 ? context.tr('post_continue_btn').toUpperCase() : context.tr('post_job_btn').toUpperCase(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
+                        color: _currentStep == 0
+                            ? cs.onPrimary
+                            : Colors.white,
                       ),
                     ),
             ),

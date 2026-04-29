@@ -1,3 +1,5 @@
+import 'job_application_model.dart';
+
 /// Job Model
 class Job {
   final int id;
@@ -19,11 +21,19 @@ class Job {
   final String? userPhone;
   final int? workerId;
   final String? workerName;
+  final String? workerPhotoUrl;
+  /// Mfanyakazi aliyechaguliwa kabla ya malipo (escrow)
+  final int? selectedWorkerId;
+  final String? selectedWorkerName;
+  final String? selectedWorkerPhotoUrl;
+  /// Kiasi kilichokubaliwa baada ya kuchagua mfanyakazi
+  final int? agreedAmount;
   final String? completionCode;
   final DateTime? createdAt;
   final double? distance;
   final DistanceInfo? distanceInfo;
   final List<JobComment>? comments;
+  final List<JobApplication>? applications;
 
   Job({
     required this.id,
@@ -45,11 +55,17 @@ class Job {
     this.userPhone,
     this.workerId,
     this.workerName,
+    this.workerPhotoUrl,
+    this.selectedWorkerId,
+    this.selectedWorkerName,
+    this.selectedWorkerPhotoUrl,
+    this.agreedAmount,
     this.completionCode,
     this.createdAt,
     this.distance,
     this.distanceInfo,
     this.comments,
+    this.applications,
   });
 
   factory Job.fromJson(Map<String, dynamic> json) {
@@ -90,6 +106,17 @@ class Job {
       userPhone: json['muhitaji']?['phone'] ?? json['user']?['phone'] ?? json['user_phone'],
       workerId: json['accepted_worker_id'] ?? json['worker_id'],
       workerName: json['accepted_worker']?['name'] ?? json['worker']?['name'] ?? json['worker_name'],
+      workerPhotoUrl: json['accepted_worker']?['profile_photo_url']?.toString() ??
+          json['worker']?['profile_photo_url']?.toString(),
+      selectedWorkerId: json['selected_worker_id'],
+      selectedWorkerName: json['selected_worker']?['name']?.toString(),
+      selectedWorkerPhotoUrl:
+          json['selected_worker']?['profile_photo_url']?.toString(),
+      agreedAmount: json['agreed_amount'] != null
+          ? (json['agreed_amount'] is String
+              ? int.tryParse(json['agreed_amount'])
+              : json['agreed_amount'] as int?)
+          : null,
       completionCode: json['completion_code'],
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'])
@@ -103,6 +130,11 @@ class Job {
               .map((c) => JobComment.fromJson(c))
               .toList()
           : null,
+      applications: json['applications'] != null
+          ? (json['applications'] as List)
+              .map((a) => JobApplication.fromJson(a as Map<String, dynamic>))
+              .toList()
+          : null,
     );
   }
 
@@ -113,6 +145,39 @@ class Job {
   bool get isAccepted => status == 'accepted' || status == 'in_progress' || status == 'assigned';
   bool get isCompleted => status == 'completed';
   bool get isCancelled => status == 'cancelled';
+
+  /// Kuna mfanyakazi aliyefungwa (aliyekubaliwa au aliyechaguliwa kabla ya malipo).
+  bool get hasWorkerOrSelection =>
+      workerId != null || selectedWorkerId != null;
+
+  /// Kazi bado inapokea maombi mapya (mfumo mpya).
+  bool get acceptsNewApplications =>
+      (status == 'open' || status == 'posted') &&
+      selectedWorkerId == null &&
+      workerId == null;
+
+  /// Mfanyakazi huyu tayari amewasilisha ombi (ikiwa API imerudisha `applications`).
+  bool workerHasApplication(int? workerUserId) {
+    if (workerUserId == null || applications == null) return false;
+    return applications!.any((a) => a.workerId == workerUserId);
+  }
+
+  int get displayAgreedOrPrice => agreedAmount ?? price;
+
+  String get effectiveWorkerDisplayName =>
+      workerName ?? selectedWorkerName ?? 'Mfanyakazi';
+
+  bool get isAwaitingPayment => status == 'awaiting_payment';
+  bool get isFunded => status == 'funded';
+  bool get isSubmitted => status == 'submitted' || status == 'ready_for_confirmation';
+
+  /// Mfanyakazi aliyeidhinishwa (baada ya escrow).
+  bool isAcceptedWorker(int? userId) =>
+      userId != null && workerId != null && workerId == userId;
+
+  /// Umechaguliwa, mteja bado hajalipa escrow.
+  bool isPendingEscrowAsSelectedWorker(int? userId) =>
+      userId != null && isAwaitingPayment && selectedWorkerId == userId;
 }
 
 /// Job Comment / Application

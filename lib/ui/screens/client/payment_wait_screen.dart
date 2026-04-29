@@ -22,11 +22,10 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
   final JobService _jobService = JobService();
   Timer? _pollingTimer;
   Timer? _countdownTimer;
-  int _secondsRemaining = 120; // 2 minutes
+  int _secondsRemaining = 120;
   bool _isSuccess = false;
   bool _isFailed = false;
   bool _isRetrying = false;
-  String _statusKey = 'payment_check_phone';
 
   late AnimationController _pulseController;
 
@@ -35,7 +34,7 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
     super.initState();
     _pulseController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 2000),
     )..repeat(reverse: true);
     _startPolling();
     _startCountdown();
@@ -54,10 +53,7 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
       if (!mounted || _isSuccess || _secondsRemaining == 0) {
         timer.cancel();
         if (_secondsRemaining == 0 && !_isSuccess && mounted) {
-          setState(() {
-            _isFailed = true;
-            _statusKey = 'payment_timeout';
-          });
+          setState(() => _isFailed = true);
         }
         return;
       }
@@ -66,47 +62,30 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
   }
 
   void _startPolling() {
-    // Poll immediately first
     _pollPaymentStatus();
-
-    _pollingTimer = Timer.periodic(const Duration(seconds: 4), (timer) async {
+    _pollingTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
       if (_isSuccess || _isFailed) {
         timer.cancel();
         return;
       }
-      await _pollPaymentStatus();
+      _pollPaymentStatus();
     });
   }
 
   Future<void> _pollPaymentStatus() async {
     try {
       final result = await _jobService.pollPayment(widget.job.id);
-      final done = result['done'] == true;
-
-      if (done) {
+      if (result['done'] == true && mounted) {
         _pollingTimer?.cancel();
         _countdownTimer?.cancel();
-
-        if (mounted) {
-          setState(() {
-            _isSuccess = true;
-            _statusKey = 'payment_success_msg';
-          });
-
-          // Refresh jobs
-          context.read<ClientProvider>().loadMyJobs(silent: true);
-
-          // Navigate to home after delay
-          Future.delayed(const Duration(seconds: 3), () {
-            if (mounted) {
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                AppRouter.clientHome,
-                (route) => false,
-              );
-            }
-          });
-        }
+        setState(() => _isSuccess = true);
+        context.read<ClientProvider>().loadMyJobs(silent: true);
+        Future.delayed(const Duration(seconds: 3), () {
+          if (mounted) {
+            Navigator.pushNamedAndRemoveUntil(
+                context, AppRouter.clientHome, (route) => false);
+          }
+        });
       }
     } catch (e) {
       debugPrint('Polling Error: $e');
@@ -117,17 +96,13 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
     setState(() {
       _isRetrying = true;
       _isFailed = false;
-      _statusKey = 'payment_retrying';
     });
-
     try {
       await _jobService.retryPayment(widget.job.id);
-
       if (mounted) {
         setState(() {
           _isRetrying = false;
           _secondsRemaining = 120;
-          _statusKey = 'payment_check_phone';
         });
         _startPolling();
         _startCountdown();
@@ -137,50 +112,66 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
         setState(() {
           _isRetrying = false;
           _isFailed = true;
-          _statusKey = 'payment_retry_failed';
         });
       }
     }
   }
 
   String get _formattedTime {
-    final minutes = (_secondsRemaining ~/ 60).toString().padLeft(2, '0');
-    final seconds = (_secondsRemaining % 60).toString().padLeft(2, '0');
-    return '$minutes:$seconds';
+    final m = (_secondsRemaining ~/ 60).toString().padLeft(2, '0');
+    final s = (_secondsRemaining % 60).toString().padLeft(2, '0');
+    return '$m:$s';
   }
+
+  String _formatPrice(int price) {
+    return price.toString().replaceAllMapped(
+        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
+  }
+
+  // ─── BUILD ──────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: scheme.surface,
       body: SafeArea(
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 30),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 28),
           child: Column(
             children: [
-              const SizedBox(height: 20),
-
-              // Close button (top right)
+              const SizedBox(height: 16),
               Align(
                 alignment: Alignment.topRight,
-                child: IconButton(
-                  onPressed: () => _showExitDialog(),
-                  icon: const Icon(Icons.close_rounded, color: Color(0xFF94A3B8)),
+                child: GestureDetector(
+                  onTap: _showExitDialog,
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: scheme.surfaceContainerHigh,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.close_rounded,
+                      color: scheme.onSurfaceVariant,
+                      size: 20,
+                    ),
+                  ),
                 ),
               ),
-
               const Spacer(),
-
-              // Main Content
-              _buildMainContent(),
-
+              _buildStatusIcon(),
+              const SizedBox(height: 32),
+              _buildStatusPill(),
+              const SizedBox(height: 16),
+              _buildStatusMessage(),
+              const SizedBox(height: 28),
+              if (!_isSuccess && !_isFailed) _buildTimer(),
+              if (!_isSuccess && !_isFailed) const SizedBox(height: 28),
+              _buildJobCard(),
               const Spacer(),
-
-              // Bottom Actions
               _buildBottomActions(),
-
-              const SizedBox(height: 40),
+              const SizedBox(height: 36),
             ],
           ),
         ),
@@ -188,248 +179,222 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
     );
   }
 
-  Widget _buildMainContent() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Animated Icon
-        _buildAnimatedIcon(),
+  // ─── STATUS ICON ────────────────────────────────────────────────────
 
-        const SizedBox(height: 40),
+  Widget _buildStatusIcon() {
+    const double size = 120;
 
-        // Status Label
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            color: _getStatusColor().withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Text(
-            _getStatusLabel(),
-            style: TextStyle(
-              fontSize: 12,
-              letterSpacing: 1.5,
-              fontWeight: FontWeight.w800,
-              color: _getStatusColor(),
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 20),
-
-        // Status Message
-        Text(
-          context.tr(_statusKey),
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-            height: 1.4,
-          ),
-        ),
-
-        const SizedBox(height: 30),
-
-        // Timer (only when waiting)
-        if (!_isSuccess && !_isFailed) _buildTimer(),
-
-        // Job Info Card
-        const SizedBox(height: 30),
-        _buildJobInfoCard(),
-      ],
-    );
-  }
-
-  Widget _buildAnimatedIcon() {
     if (_isSuccess) {
       return Container(
-        width: 140,
-        height: 140,
+        width: size,
+        height: size,
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [AppColors.success, Color(0xFF059669)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+              colors: [AppColors.success, Color(0xFF059669)]),
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: AppColors.success.withValues(alpha: 0.4),
-              blurRadius: 30,
-              offset: const Offset(0, 10),
-            ),
+                color: AppColors.success.withValues(alpha: 0.3),
+                blurRadius: 30,
+                offset: const Offset(0, 10)),
           ],
         ),
-        child: const Icon(Icons.check_rounded, size: 80, color: Colors.white)
-            .animate()
-            .scale(duration: 600.ms, curve: Curves.elasticOut),
-      ).animate().scale(begin: const Offset(0.5, 0.5), duration: 400.ms);
+        child: const Icon(Icons.check_rounded, size: 60, color: Colors.white),
+      )
+          .animate()
+          .scale(begin: const Offset(0.5, 0.5), duration: 500.ms)
+          .then()
+          .shimmer(duration: 800.ms);
     }
 
     if (_isFailed) {
       return Container(
-        width: 140,
-        height: 140,
+        width: size,
+        height: size,
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [AppColors.error, Color(0xFFDC2626)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+              colors: [AppColors.error, Color(0xFFDC2626)]),
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: AppColors.error.withValues(alpha: 0.4),
-              blurRadius: 30,
-              offset: const Offset(0, 10),
-            ),
+                color: AppColors.error.withValues(alpha: 0.3),
+                blurRadius: 30,
+                offset: const Offset(0, 10)),
           ],
         ),
-        child: const Icon(Icons.close_rounded, size: 80, color: Colors.white),
+        child: const Icon(Icons.close_rounded, size: 60, color: Colors.white),
       ).animate().shake(duration: 500.ms);
     }
 
-    // Waiting state with pulse animation
+    // Waiting — clean concentric pulse
+    final scheme = Theme.of(context).colorScheme;
     return AnimatedBuilder(
       animation: _pulseController,
-      builder: (context, child) {
+      builder: (_, __) {
+        final v = _pulseController.value;
         return Container(
-          width: 140,
-          height: 140,
+          width: size,
+          height: size,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: scheme.surfaceContainerHigh,
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.15 + (_pulseController.value * 0.15)),
-                blurRadius: 30 + (_pulseController.value * 20),
-                spreadRadius: _pulseController.value * 10,
+                color: scheme.primary.withValues(alpha: 0.08 + v * 0.12),
+                blurRadius: 25 + v * 20,
+                spreadRadius: v * 8,
               ),
             ],
           ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              // Outer ring
-              Container(
-                width: 130,
-                height: 130,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.2),
-                    width: 3,
-                  ),
-                ),
-              ),
-              // Inner content
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppColors.primary.withValues(alpha: 0.1),
-                      AppColors.primary.withValues(alpha: 0.05),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.phone_android_rounded,
-                  size: 50,
-                  color: AppColors.primary,
-                ),
-              ),
-            ],
+          child: Container(
+            margin: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(colors: [
+                scheme.primary.withValues(alpha: 0.12),
+                scheme.primary.withValues(alpha: 0.04),
+              ]),
+            ),
+            child: Icon(
+              Icons.phone_android_rounded,
+              size: 44,
+              color: scheme.primary,
+            ),
           ),
         );
       },
     );
   }
 
-  Widget _buildTimer() {
+  // ─── STATUS PILL ────────────────────────────────────────────────────
+
+  Widget _buildStatusPill() {
+    final scheme = Theme.of(context).colorScheme;
+    final color = _isSuccess
+        ? AppColors.success
+        : _isFailed
+            ? AppColors.error
+            : scheme.primary;
+    final label = _isSuccess
+        ? context.tr('payment_status_completed')
+        : _isFailed
+            ? context.tr('payment_status_failed')
+            : context.tr('payment_status_waiting');
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 5),
-          ),
-        ],
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.timer_outlined,
-            color: _secondsRemaining < 30 ? AppColors.error : AppColors.textSecondary,
-            size: 24,
-          ),
-          const SizedBox(width: 12),
-          Text(
-            _formattedTime,
-            style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.w900,
-              fontFamily: 'monospace',
-              color: _secondsRemaining < 30 ? AppColors.error : AppColors.textPrimary,
-              letterSpacing: 2,
-            ),
-          ),
-        ],
+      child: Text(label,
+          style: TextStyle(
+              fontSize: 11,
+              letterSpacing: 1.5,
+              fontWeight: FontWeight.w800,
+              color: color)),
+    );
+  }
+
+  // ─── STATUS MESSAGE ─────────────────────────────────────────────────
+
+  Widget _buildStatusMessage() {
+    final scheme = Theme.of(context).colorScheme;
+    final key = _isSuccess
+        ? 'payment_success_msg'
+        : _isFailed
+            ? 'payment_timeout'
+            : 'payment_check_phone';
+    return Text(
+      context.tr(key),
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+        color: scheme.onSurface,
+        height: 1.4,
       ),
     );
   }
 
-  Widget _buildJobInfoCard() {
+  // ─── TIMER ──────────────────────────────────────────────────────────
+
+  Widget _buildTimer() {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: scheme.outlineVariant),
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 15,
+              offset: const Offset(0, 4)),
+        ],
+      ),
+      child: Text(
+        _formattedTime,
+        style: TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.w900,
+          fontFamily: 'monospace',
+          letterSpacing: 3,
+          color:
+              _secondsRemaining < 30 ? scheme.error : scheme.onSurface,
+        ),
+      ),
+    );
+  }
+
+  // ─── JOB CARD ───────────────────────────────────────────────────────
+
+  Widget _buildJobCard() {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.grey200),
+        color: scheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: scheme.outlineVariant),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              color: scheme.primary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(Icons.work_outline_rounded, color: AppColors.primary, size: 24),
+            child: Icon(
+              Icons.work_outline_rounded,
+              color: scheme.primary,
+              size: 22,
+            ),
           ),
-          const SizedBox(width: 15),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   widget.job.title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: AppColors.textPrimary,
-                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: scheme.onSurface,
+                  ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 3),
                 Text(
                   'TZS ${_formatPrice(widget.job.price)}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
-                    color: AppColors.primary,
+                    color: scheme.primary,
                   ),
                 ),
               ],
@@ -440,61 +405,60 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
     );
   }
 
+  // ─── BOTTOM ACTIONS ─────────────────────────────────────────────────
+
   Widget _buildBottomActions() {
-    if (_isSuccess) {
-      return const SizedBox.shrink();
-    }
+    if (_isSuccess) return const SizedBox.shrink();
 
     if (_isFailed) {
+      final scheme = Theme.of(context).colorScheme;
       return Column(
         children: [
-          // Retry Button
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
               onPressed: _isRetrying ? null : _retryPayment,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 18),
+                backgroundColor: scheme.primary,
+                foregroundColor: scheme.onPrimary,
+                padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
+                    borderRadius: BorderRadius.circular(14)),
                 elevation: 0,
               ),
               child: _isRetrying
-                  ? const SizedBox(
-                      width: 24,
-                      height: 24,
+                  ? SizedBox(
+                      width: 22,
+                      height: 22,
                       child: CircularProgressIndicator(
-                        color: Colors.white,
+                        color: scheme.onPrimary,
                         strokeWidth: 2.5,
                       ),
                     )
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.refresh_rounded, size: 20),
-                        const SizedBox(width: 10),
+                        Icon(Icons.refresh_rounded, size: 20, color: scheme.onPrimary),
+                        const SizedBox(width: 8),
                         Text(
                           context.tr('payment_retry_btn'),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 15,
+                            color: scheme.onPrimary,
                           ),
                         ),
                       ],
                     ),
             ),
           ),
-          const SizedBox(height: 15),
-          // Cancel Button
+          const SizedBox(height: 12),
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
               context.tr('cancel_and_go_back'),
-              style: const TextStyle(
-                color: AppColors.textSecondary,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -503,82 +467,67 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
       );
     }
 
-    // Waiting state
+    // Waiting
+    final scheme = Theme.of(context).colorScheme;
     return Column(
       children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildStep(Icons.phone_android_rounded,
+                context.tr('payment_check_phone_label')),
+            _stepDivider(),
+            _buildStep(Icons.dialpad_rounded, context.tr('payment_enter_pin')),
+            _stepDivider(),
+            _buildStep(Icons.check_circle_outline_rounded,
+                context.tr('payment_confirm')),
+          ],
+        ),
+        const SizedBox(height: 14),
         Text(
           context.tr('payment_dont_close'),
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Colors.black.withValues(alpha: 0.4),
-            fontSize: 13,
-          ),
-        ),
-        const SizedBox(height: 20),
-        Row(
-          children: [
-            Expanded(
-              child: _buildInfoChip(Icons.phone_android_rounded, context.tr('payment_check_phone_label')),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _buildInfoChip(Icons.lock_outline_rounded, context.tr('payment_enter_pin')),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _buildInfoChip(Icons.check_circle_outline_rounded, context.tr('payment_confirm')),
-            ),
-          ],
+          style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 12),
         ),
       ],
     );
   }
 
-  Widget _buildInfoChip(IconData icon, String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.grey200),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, size: 20, color: AppColors.primary),
-          const SizedBox(height: 6),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
-            ),
+  Widget _buildStep(IconData icon, String label) {
+    final scheme = Theme.of(context).colorScheme;
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: scheme.surfaceContainerHighest,
+            shape: BoxShape.circle,
           ),
-        ],
-      ),
+          child: Icon(icon, size: 18, color: scheme.primary),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            color: scheme.onSurfaceVariant,
+          ),
+        ),
+      ],
     );
   }
 
-  Color _getStatusColor() {
-    if (_isSuccess) return AppColors.success;
-    if (_isFailed) return AppColors.error;
-    return AppColors.primary;
-  }
-
-  String _getStatusLabel() {
-    if (_isSuccess) return context.tr('payment_status_completed');
-    if (_isFailed) return context.tr('payment_status_failed');
-    return context.tr('payment_status_waiting');
-  }
-
-  String _formatPrice(int price) {
-    return price.toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]},',
-    );
+  Widget _stepDivider() {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+        width: 28,
+        height: 1,
+        margin: const EdgeInsets.only(bottom: 20),
+        color: scheme.outlineVariant);
   }
 
   void _showExitDialog() {
+    final scheme = Theme.of(context).colorScheme;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -587,16 +536,16 @@ class _PaymentWaitScreenState extends State<PaymentWaitScreen>
         content: Text(context.tr('payment_exit_message')),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(context.tr('continue_waiting')),
-          ),
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(context.tr('continue_waiting'))),
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(ctx); // Close dialog
-              Navigator.pop(context); // Close screen
+              Navigator.pop(ctx);
+              Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.textPrimary,
+              backgroundColor: scheme.primary,
+              foregroundColor: scheme.onPrimary,
             ),
             child: Text(context.tr('leave_btn')),
           ),

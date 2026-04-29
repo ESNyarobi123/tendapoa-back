@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../../../core/constants/constants.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/router/app_router.dart';
 import '../../../data/models/models.dart';
@@ -76,17 +75,19 @@ class _ChatListScreenState extends State<ChatListScreen> with WidgetsBindingObse
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: cs.surface,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: cs.surface,
+        foregroundColor: cs.onSurface,
         elevation: 0,
         centerTitle: true,
         automaticallyImplyLeading: false,
         title: Text(
           context.tr('chat'),
-          style: const TextStyle(
-            color: AppColors.textPrimary,
+          style: TextStyle(
+            color: cs.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -94,20 +95,20 @@ class _ChatListScreenState extends State<ChatListScreen> with WidgetsBindingObse
       ),
       body: RefreshIndicator(
         onRefresh: _loadConversations,
-        color: AppColors.primary,
+        color: cs.primary,
         child: _isLoading
-            ? const Center(
-                child: CircularProgressIndicator(color: AppColors.primary),
+            ? Center(
+                child: CircularProgressIndicator(color: cs.primary),
               )
             : _conversations.isEmpty
                 ? _buildEmptyState()
                 : ListView.separated(
                     padding: const EdgeInsets.all(16),
                     itemCount: _conversations.length,
-                    separatorBuilder: (_, __) => const Divider(
+                    separatorBuilder: (_, __) => Divider(
                       height: 1,
                       indent: 76,
-                      color: Color(0xFFE2E8F0),
+                      color: Theme.of(context).colorScheme.outlineVariant,
                     ),
                     itemBuilder: (context, index) {
                       return _buildConversationItem(_conversations[index]);
@@ -118,10 +119,11 @@ class _ChatListScreenState extends State<ChatListScreen> with WidgetsBindingObse
   }
 
   Widget _buildConversationItem(ChatConversation conversation) {
+    final cs = Theme.of(context).colorScheme;
     final otherUser = conversation.otherUser;
     final job = conversation.job;
     final hasUnread = conversation.unreadCount > 0;
-    
+
     return InkWell(
       onTap: () async {
         await Navigator.pushNamed(
@@ -135,7 +137,9 @@ class _ChatListScreenState extends State<ChatListScreen> with WidgetsBindingObse
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: hasUnread ? const Color(0xFFF0F9FF) : Colors.transparent,
+          color: hasUnread
+              ? cs.primary.withValues(alpha: 0.12)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -147,10 +151,10 @@ class _ChatListScreenState extends State<ChatListScreen> with WidgetsBindingObse
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFDBEAFE),
+                    color: cs.primaryContainer,
                     shape: BoxShape.circle,
-                    border: hasUnread 
-                      ? Border.all(color: AppColors.primary, width: 2)
+                    border: hasUnread
+                        ? Border.all(color: cs.primary, width: 2)
                       : null,
                     image: otherUser?.profilePhotoUrl != null
                         ? DecorationImage(
@@ -165,8 +169,8 @@ class _ChatListScreenState extends State<ChatListScreen> with WidgetsBindingObse
                             otherUser?.name.isNotEmpty == true
                                 ? otherUser!.name[0].toUpperCase()
                                 : 'U',
-                            style: const TextStyle(
-                              color: AppColors.primary,
+                            style: TextStyle(
+                              color: cs.primary,
                               fontWeight: FontWeight.bold,
                               fontSize: 20,
                             ),
@@ -214,7 +218,7 @@ class _ChatListScreenState extends State<ChatListScreen> with WidgetsBindingObse
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: hasUnread ? FontWeight.bold : FontWeight.w600,
-                            color: AppColors.textPrimary,
+                            color: cs.onSurface,
                           ),
                         ),
                       ),
@@ -245,8 +249,8 @@ class _ChatListScreenState extends State<ChatListScreen> with WidgetsBindingObse
                       fontSize: 14,
                       fontWeight: hasUnread ? FontWeight.w600 : FontWeight.normal,
                       color: hasUnread
-                          ? AppColors.textPrimary
-                          : const Color(0xFF94A3B8),
+                          ? cs.onSurface
+                          : cs.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -262,7 +266,8 @@ class _ChatListScreenState extends State<ChatListScreen> with WidgetsBindingObse
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: hasUnread ? FontWeight.bold : FontWeight.normal,
-                    color: hasUnread ? AppColors.primary : const Color(0xFF94A3B8),
+                    color:
+                        hasUnread ? cs.primary : cs.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -274,6 +279,7 @@ class _ChatListScreenState extends State<ChatListScreen> with WidgetsBindingObse
   }
 
   Widget _buildEmptyState() {
+    final cs = Theme.of(context).colorScheme;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -281,14 +287,14 @@ class _ChatListScreenState extends State<ChatListScreen> with WidgetsBindingObse
           Icon(
             Icons.chat_bubble_outline,
             size: 64,
-            color: Colors.grey[300],
+            color: cs.onSurfaceVariant,
           ),
           const SizedBox(height: 16),
           Text(
             context.tr('no_messages_found'),
             style: TextStyle(
               fontSize: 16,
-              color: Colors.grey[500],
+              color: cs.onSurface,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -297,7 +303,7 @@ class _ChatListScreenState extends State<ChatListScreen> with WidgetsBindingObse
             context.tr('no_messages_found_sub'),
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey[400],
+              color: cs.onSurfaceVariant,
             ),
           ),
         ],

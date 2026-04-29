@@ -64,7 +64,10 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
 
   Future<void> _handleAccept(Job job) async {
     setState(() => _isProcessing = true);
-    final success = await context.read<WorkerProvider>().acceptAssignedJob(job.id);
+    final w = context.read<WorkerProvider>();
+    final success = job.isFunded
+        ? await w.acceptFundedJob(job.id)
+        : await w.acceptAssignedJob(job.id);
     if (mounted) {
       setState(() => _isProcessing = false);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -99,7 +102,10 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
 
     if (confirm == true && mounted) {
       setState(() => _isProcessing = true);
-      final success = await context.read<WorkerProvider>().declineAssignedJob(job.id);
+      final w = context.read<WorkerProvider>();
+      final success = job.isFunded
+          ? await w.declineFundedJob(job.id)
+          : await w.declineAssignedJob(job.id);
       if (mounted) {
         setState(() => _isProcessing = false);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -117,12 +123,11 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
     final worker = context.watch<WorkerProvider>();
     // Use activeJobsFromAssigned for jobs already accepted (in_progress)
     final activeJobs = worker.activeJobsFromAssigned;
-    final activeJob = activeJobs.isNotEmpty ? activeJobs.first : null;
     // assignedJobs now only contains jobs with status='assigned' (need accept/decline)
     final assignedJobs = worker.assignedJobs;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: RefreshIndicator(
         onRefresh: () async {
           await worker.loadAssignedJobs();
@@ -189,7 +194,7 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
                               width: 45,
                               height: 45,
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
+                                color: Colors.white.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: const Icon(
@@ -205,7 +210,7 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
                     Text(
                       context.tr('no_active_jobs_sub'),
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                         fontSize: 14,
                       ),
                     ),
@@ -214,12 +219,33 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
               ),
             ),
 
-            // Active Job Card (Kazi Inayoendelea)
-            if (activeJob != null)
+            // Kazi zinazoendelea
+            if (activeJobs.isNotEmpty)
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-                  child: _buildActiveJobCard(context, activeJob),
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        activeJobs.length > 1
+                            ? 'Kazi zinazoendelea (${activeJobs.length})'
+                            : context.tr('active_job_title'),
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      ...activeJobs.map(
+                        (j) => Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: _buildActiveJobCard(context, j),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
 
@@ -233,11 +259,11 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFDBEAFE),
+                          color: Theme.of(context).colorScheme.primaryContainer,
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Icon(Icons.assignment_ind_rounded, 
-                          color: AppColors.primary, size: 20),
+                        child: Icon(Icons.assignment_ind_rounded,
+                          color: Theme.of(context).colorScheme.onPrimaryContainer, size: 20),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -246,17 +272,17 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
                           children: [
                             Text(
                               context.tr('selected_jobs_title'),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                             Text(
                               context.tr('selected_jobs_subtitle'),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
-                                color: AppColors.textSecondary,
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
                               ),
                             ),
                           ],
@@ -278,7 +304,7 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
             ],
 
             // Empty State
-            if (activeJob == null && assignedJobs.isEmpty)
+            if (activeJobs.isEmpty && assignedJobs.isEmpty)
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.all(20),
@@ -294,16 +320,20 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
   }
 
   Widget _buildAssignedJobCard(Job job) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.tpCardElevated,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.primary.withOpacity(0.2), width: 2),
+        border: Border.all(
+          color: Color.lerp(cs.primary, cs.outlineVariant, 0.55)!.withValues(alpha: 0.65),
+          width: 2,
+        ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.08),
+            color: context.tpShadowSoft,
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -344,7 +374,7 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
               if (job.createdAt != null)
                 Text(
                   _getTimeAgo(context, job.createdAt!),
-                  style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                  style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant),
                 ),
             ],
           ),
@@ -354,10 +384,10 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
           // Job Title & Price
           Text(
             job.title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: cs.onSurface,
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -371,7 +401,7 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFF7ED),
+                  color: AppColors.walletAccent.withValues(alpha: context.tpBrightness == Brightness.dark ? 0.22 : 0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
@@ -395,13 +425,13 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF1F5F9),
+                    color: context.tpMutedFill,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
                     job.categoryName!,
-                    style: const TextStyle(
-                      color: AppColors.textSecondary,
+                    style: TextStyle(
+                      color: cs.onSurfaceVariant,
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
@@ -419,7 +449,7 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFDBEAFE),
+                  color: cs.primaryContainer,
                   shape: BoxShape.circle,
                   image: job.userPhotoUrl != null
                       ? DecorationImage(
@@ -434,8 +464,8 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
                           job.userName?.isNotEmpty == true
                               ? job.userName![0].toUpperCase()
                               : 'M',
-                          style: const TextStyle(
-                            color: AppColors.primary,
+                          style: TextStyle(
+                            color: cs.onPrimaryContainer,
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
@@ -450,16 +480,16 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
                   children: [
                     Text(
                       job.userName ?? 'Mteja',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 13,
-                        color: AppColors.textPrimary,
+                        color: cs.onSurface,
                       ),
                     ),
                     if (job.addressText != null)
                       Text(
                         job.addressText!,
-                        style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                        style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -561,14 +591,16 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
   }
 
   Widget _buildActiveJobCard(BuildContext context, Job job) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.tpCardElevated,
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.35)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: context.tpShadowSoft,
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -586,13 +618,13 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
                   Container(
                     width: 40,
                     height: 40,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFDBEAFE),
+                    decoration: BoxDecoration(
+                      color: cs.primaryContainer,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.access_time,
-                      color: AppColors.primary,
+                      color: cs.onPrimaryContainer,
                       size: 20,
                     ),
                   ),
@@ -602,18 +634,18 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
                     children: [
                       Text(
                         context.tr('active_job_title'),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.textSecondary,
+                          color: cs.onSurfaceVariant,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         job.title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                          color: cs.onSurface,
                         ),
                       ),
                     ],
@@ -690,6 +722,7 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
   }
 
   Widget _buildEmptyNewJobs() {
+    final cs = Theme.of(context).colorScheme;
     return Column(
       children: [
         const SizedBox(height: 40),
@@ -697,13 +730,13 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
           width: 80,
           height: 80,
           decoration: BoxDecoration(
-            color: const Color(0xFFF1F5F9),
+            color: context.tpMutedFill,
             borderRadius: BorderRadius.circular(20),
           ),
           child: Icon(
             Icons.work_off_outlined,
             size: 40,
-            color: Colors.grey[400],
+            color: cs.onSurfaceVariant,
           ),
         ),
         const SizedBox(height: 20),
@@ -712,7 +745,7 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.grey[700],
+            color: cs.onSurface,
           ),
         ),
         const SizedBox(height: 8),
@@ -720,7 +753,7 @@ class _WorkerJobsScreenState extends State<WorkerJobsScreen> with WidgetsBinding
           context.tr('assigned_jobs_appear_here'),
           style: TextStyle(
             fontSize: 14,
-            color: Colors.grey[500],
+            color: cs.onSurfaceVariant,
           ),
         ),
       ],

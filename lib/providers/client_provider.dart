@@ -144,6 +144,23 @@ class ClientProvider extends ChangeNotifier {
     }
   }
 
+  /// Mfumo mpya: chagua ombi la `job_applications`.
+  Future<void> selectApplication(int jobId, int applicationId) async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      await _jobService.selectApplication(jobId, applicationId);
+      await loadMyJobs();
+      await loadDashboard();
+    } catch (e) {
+      _error = e.toString();
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   // Retry payment for a job
   Future<void> retryPayment(int jobId) async {
     await _jobService.retryPayment(jobId);
@@ -164,7 +181,9 @@ class ClientProvider extends ChangeNotifier {
 
     try {
       _dashboard = await _jobService.getClientDashboard();
-      // Also load wallet balance
+      if (_dashboard?.walletAvailable != null) {
+        _walletBalance = _dashboard!.walletAvailable!.toDouble();
+      }
       await loadWalletBalance();
       _isDashboardLoading = false;
       notifyListeners();
@@ -183,7 +202,8 @@ class ClientProvider extends ChangeNotifier {
 
     try {
       final data = await _walletService.getWalletBalance();
-      _walletBalance = data['balance'] ?? 0.0;
+      _walletBalance =
+          ((data['available_balance'] ?? data['balance'] ?? 0) as num).toDouble();
       _isWalletLoading = false;
       notifyListeners();
     } catch (e) {

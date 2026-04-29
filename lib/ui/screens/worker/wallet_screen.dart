@@ -5,6 +5,8 @@ import '../../../core/localization/app_localizations.dart';
 import '../../../data/models/models.dart';
 import '../../../data/services/services.dart';
 import '../../widgets/withdrawal_modal.dart';
+import '../../widgets/deposit_modal.dart';
+import '../client/deposit_wait_screen.dart';
 
 class WalletScreen extends StatefulWidget {
   const WalletScreen({super.key});
@@ -40,20 +42,22 @@ class _WalletScreenState extends State<WalletScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: cs.surface,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: cs.surface,
         elevation: 0,
         centerTitle: true,
+        foregroundColor: cs.onSurface,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded,
-              color: AppColors.textPrimary, size: 18),
+          icon: Icon(Icons.arrow_back_ios_new_rounded,
+              color: cs.onSurface, size: 18),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(context.tr('wallet_my_wallet'),
-            style: const TextStyle(
-                color: AppColors.textPrimary,
+            style: TextStyle(
+                color: cs.onSurface,
                 fontWeight: FontWeight.bold,
                 fontSize: 18)),
       ),
@@ -75,15 +79,18 @@ class _WalletScreenState extends State<WalletScreen> {
                       padding: const EdgeInsets.all(30),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
-                          colors: [AppColors.walletAccent, AppColors.walletAccentDark],
+                          colors: [
+                            AppColors.walletAccent,
+                            AppColors.walletAccentDark
+                          ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
                         borderRadius: BorderRadius.circular(30),
                         boxShadow: [
                           BoxShadow(
-                              color: AppColors.walletAccent
-                                  .withValues(alpha: 0.3),
+                              color:
+                                  AppColors.walletAccent.withValues(alpha: 0.3),
                               blurRadius: 20,
                               offset: const Offset(0, 10))
                         ],
@@ -109,8 +116,8 @@ class _WalletScreenState extends State<WalletScreen> {
                           const SizedBox(height: 30),
                           Row(
                             children: [
-                              _buildActionBtn(
-                                  context.tr('wallet_withdraw'), Icons.arrow_outward_rounded, () {
+                              _buildActionBtn(context.tr('wallet_withdraw'),
+                                  Icons.arrow_outward_rounded, () {
                                 showModalBottomSheet(
                                   context: context,
                                   isScrollControlled: true,
@@ -122,9 +129,29 @@ class _WalletScreenState extends State<WalletScreen> {
                                 );
                               }),
                               const SizedBox(width: 15),
-                              _buildActionBtn(context.tr('wallet_add_balance'), Icons.add_rounded,
-                                  () {
-                                // Logic for deposit
+                              _buildActionBtn(context.tr('wallet_add_balance'),
+                                  Icons.add_rounded, () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.transparent,
+                                  builder: (_) => DepositModal(
+                                    currentBalance: _wallet?.balance ?? 0,
+                                    onInitiated: (txnId) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => DepositWaitScreen(
+                                            transactionId: txnId,
+                                            amount: 0,
+                                          ),
+                                        ),
+                                      ).then((success) {
+                                        if (success == true) _loadWallet();
+                                      });
+                                    },
+                                  ),
+                                );
                               }),
                             ],
                           ),
@@ -139,14 +166,15 @@ class _WalletScreenState extends State<WalletScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(context.tr('wallet_payment_history'),
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary)),
+                                color: cs.onSurface)),
                         TextButton(
                             onPressed: () {},
                             child: Text(context.tr('wallet_view_all'),
-                                style: const TextStyle(color: AppColors.primary))),
+                                style:
+                                    const TextStyle(color: AppColors.primary))),
                       ],
                     ),
                     const SizedBox(height: 15),
@@ -158,10 +186,11 @@ class _WalletScreenState extends State<WalletScreen> {
                           children: [
                             const SizedBox(height: 40),
                             Icon(Icons.history_rounded,
-                                size: 48, color: Colors.grey[300]),
+                                size: 48, color: cs.onSurfaceVariant),
                             const SizedBox(height: 10),
                             Text(context.tr('wallet_no_history'),
-                                style: const TextStyle(color: AppColors.textLight)),
+                                style: TextStyle(
+                                    color: cs.onSurfaceVariant)),
                           ],
                         ),
                       )
@@ -206,21 +235,23 @@ class _WalletScreenState extends State<WalletScreen> {
 
   Widget _buildTransactionItem(Transaction t) {
     final isCredit = t.type == 'credit' || t.amount > 0;
+    final cs = Theme.of(context).colorScheme;
+    final creditBg = AppColors.success.withValues(
+        alpha: context.tpBrightness == Brightness.dark ? 0.28 : 0.14);
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.tpCardElevated,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.45)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color:
-                  isCredit ? const Color(0xFFDCFCE7) : const Color(0xFFF1F5F9),
+              color: isCredit ? creditBg : context.tpMutedFill,
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -228,7 +259,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   ? Icons.arrow_downward_rounded
                   : Icons.arrow_upward_rounded,
               color:
-                  isCredit ? const Color(0xFF15803D) : AppColors.textSecondary,
+                  isCredit ? AppColors.success : cs.onSurfaceVariant,
               size: 20,
             ),
           ),
@@ -237,18 +268,22 @@ class _WalletScreenState extends State<WalletScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(t.description ?? (isCredit ? context.tr('wallet_credit') : context.tr('wallet_debit')),
-                    style: const TextStyle(
+                Text(
+                    t.description ??
+                        (isCredit
+                            ? context.tr('wallet_credit')
+                            : context.tr('wallet_debit')),
+                    style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
-                        color: AppColors.textPrimary)),
+                        color: cs.onSurface)),
                 const SizedBox(height: 4),
                 Text(
                     t.createdAt != null
                         ? DateFormat('d MMM, yyyy').format(t.createdAt!)
                         : '',
-                    style: const TextStyle(
-                        color: AppColors.textLight, fontSize: 11)),
+                    style: TextStyle(
+                        color: cs.onSurfaceVariant, fontSize: 11)),
               ],
             ),
           ),

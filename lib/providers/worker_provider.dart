@@ -147,11 +147,67 @@ class WorkerProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> applyForJob(int jobId, String message, {int? bidAmount}) async {
+  /// Kazi `funded` (escrow) — tumia `/jobs/{id}/worker-accept`.
+  Future<bool> acceptFundedJob(int jobId) async {
+    try {
+      await _jobService.workerAcceptFundedJob(jobId);
+      await loadAssignedJobs();
+      await loadDashboard();
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Kazi `funded` — kataa na kurudisha escrow kwa mteja.
+  Future<bool> declineFundedJob(int jobId) async {
+    try {
+      await _jobService.workerDeclineFundedJob(jobId);
+      await loadAssignedJobs();
+      await loadDashboard();
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Tafuta kazi katika orodha za mfanyakazi (kwa skrini ya kazi hai).
+  Job? findWorkerJobById(int jobId) {
+    for (final j in activeJobsFromAssigned) {
+      if (j.id == jobId) return j;
+    }
+    for (final j in assignedJobs) {
+      if (j.id == jobId) return j;
+    }
+    for (final j in activeJobs) {
+      if (j.id == jobId) return j;
+    }
+    return null;
+  }
+
+  Future<void> applyForJob(
+    int jobId,
+    String message, {
+    int? bidAmount,
+    int? proposedAmount,
+  }) async {
     _isLoading = true;
     notifyListeners();
     try {
-      await _jobService.applyForJob(jobId, message, bidAmount: bidAmount);
+      final prop = proposedAmount ?? bidAmount;
+      if (prop != null && prop >= 1000) {
+        await _jobService.applyToJobApi(
+          jobId,
+          proposedAmount: prop,
+          message: message,
+        );
+      } else {
+        await _jobService.applyForJob(jobId, message, bidAmount: bidAmount);
+      }
       _isLoading = false;
       notifyListeners();
     } catch (e) {

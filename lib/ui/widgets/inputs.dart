@@ -27,10 +27,14 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppTextStyles.labelMedium),
+        Text(
+          label,
+          style: AppTextStyles.labelMedium.copyWith(color: cs.onSurface),
+        ),
         AppSpacing.verticalXs,
         TextFormField(
           controller: controller,
@@ -38,10 +42,15 @@ class CustomTextField extends StatelessWidget {
           obscureText: obscureText,
           validator: validator,
           maxLines: maxLines,
+          style: TextStyle(color: cs.onSurface),
+          cursorColor: cs.primary,
           decoration: InputDecoration(
             hintText: hint,
+            hintStyle: TextStyle(color: cs.onSurfaceVariant),
             prefixIcon: prefixIcon,
             suffixIcon: suffixIcon,
+            filled: true,
+            fillColor: cs.surfaceContainerHighest,
           ),
         ),
       ],

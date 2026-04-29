@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/constants.dart';
@@ -9,7 +10,9 @@ import '../../../data/services/services.dart';
 import '../../../providers/providers.dart';
 
 class WorkerActiveJobScreen extends StatefulWidget {
-  const WorkerActiveJobScreen({super.key});
+  const WorkerActiveJobScreen({super.key, this.initialJob});
+
+  final Job? initialJob;
 
   @override
   State<WorkerActiveJobScreen> createState() => _WorkerActiveJobScreenState();
@@ -17,25 +20,157 @@ class WorkerActiveJobScreen extends StatefulWidget {
 
 class _WorkerActiveJobScreenState extends State<WorkerActiveJobScreen> {
   final TextEditingController _codeController = TextEditingController();
+  final TextEditingController _notesController = TextEditingController();
   final JobService _jobService = JobService();
   bool _isLoading = false;
+  Job? _job;
 
-  Future<void> _completeJob(int jobId) async {
-    if (_codeController.text.isEmpty) {
+  @override
+  void initState() {
+    super.initState();
+    _job = widget.initialJob;
+    WidgetsBinding.instance.addPostFrameCallback((_) => _syncJob());
+  }
+
+  @override
+  void dispose() {
+    _codeController.dispose();
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  void _syncJob() {
+    final w = context.read<WorkerProvider>();
+    final id = widget.initialJob?.id ?? _job?.id;
+    Job? resolved = widget.initialJob ?? _job;
+    if (id != null) {
+      resolved = w.findWorkerJobById(id) ?? resolved;
+    }
+    resolved ??= w.activeJobsFromAssigned.isNotEmpty
+        ? w.activeJobsFromAssigned.first
+        : w.currentActiveJob;
+    if (mounted) setState(() => _job = resolved);
+  }
+
+  Future<void> _acceptFunded() async {
+    final job = _job;
+    if (job == null) return;
+    setState(() => _isLoading = true);
+    try {
+      final updated = await _jobService.workerAcceptFundedJob(job.id);
+      if (!mounted) return;
+      await context.read<WorkerProvider>().loadAssignedJobs();
+      if (!mounted) return;
+      await context.read<WorkerProvider>().loadDashboard();
+      if (!mounted) return;
+      setState(() => _job = updated);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.tr('job_accepted_success'))),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$e'), backgroundColor: AppColors.error),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _declineFunded() async {
+    final job = _job;
+    if (job == null) return;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(context.tr('decline_btn')),
+        content: const Text(
+          'Malipo ya escrow yatarudi kwa mteja na kazi itafunguliwa tena.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(context.tr('no').toUpperCase()),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(context.tr('decline_btn').toUpperCase()),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    setState(() => _isLoading = true);
+    try {
+      await _jobService.workerDeclineFundedJob(job.id);
+      if (!mounted) return;
+      await context.read<WorkerProvider>().loadAssignedJobs();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Umekataa kazi.')),
+      );
+      Navigator.pop(context);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$e'), backgroundColor: AppColors.error),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _submitCompletion() async {
+    final job = _job;
+    if (job == null) return;
+    setState(() => _isLoading = true);
+    try {
+      final updated = await _jobService.workerSubmitCompletion(
+        job.id,
+        notes: _notesController.text.trim().isEmpty
+            ? null
+            : _notesController.text.trim(),
+        code: _codeController.text.trim().isEmpty
+            ? null
+            : _codeController.text.trim(),
+      );
+      if (!mounted) return;
+      await context.read<WorkerProvider>().loadAssignedJobs();
+      if (!mounted) return;
+      await context.read<WorkerProvider>().loadDashboard();
+      if (!mounted) return;
+      setState(() => _job = updated);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Kazi imewasilishwa. Subiri mteja athibitishe.')),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$e'), backgroundColor: AppColors.error),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _legacyCompleteWithCode() async {
+    final job = _job;
+    if (job == null) return;
+    if (_codeController.text.trim().length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(context.tr('enter_code_error'))),
       );
       return;
     }
-
     setState(() => _isLoading = true);
     try {
-      await _jobService.completeJob(jobId, _codeController.text);
+      await _jobService.completeJob(job.id, _codeController.text.trim());
       if (!mounted) return;
-
       await context.read<WorkerProvider>().refreshAll();
       if (!mounted) return;
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(context.tr('job_completed_success'))),
       );
@@ -43,8 +178,7 @@ class _WorkerActiveJobScreenState extends State<WorkerActiveJobScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('Hitilafu: $e'), backgroundColor: AppColors.error),
+          SnackBar(content: Text('$e'), backgroundColor: AppColors.error),
         );
       }
     } finally {
@@ -61,20 +195,27 @@ class _WorkerActiveJobScreenState extends State<WorkerActiveJobScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final workerProvider = context.watch<WorkerProvider>();
-    final job = workerProvider.currentActiveJob;
+    context.watch<WorkerProvider>();
+    final job = _job;
 
     if (job == null) {
+      final cs = Theme.of(context).colorScheme;
       return Scaffold(
+        backgroundColor: cs.surface,
         appBar: AppBar(
-          title: Text(context.tr('active_job_title'),
-              style:
-                  const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-          backgroundColor: Colors.white,
+          title: Text(
+            context.tr('active_job_title'),
+            style: TextStyle(
+              color: cs.onSurface,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          backgroundColor: cs.surface,
+          foregroundColor: cs.onSurface,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                color: Colors.black, size: 20),
+            icon: Icon(Icons.arrow_back_ios_new_rounded,
+                color: cs.onSurface, size: 20),
             onPressed: () => Navigator.pop(context),
           ),
         ),
@@ -84,32 +225,49 @@ class _WorkerActiveJobScreenState extends State<WorkerActiveJobScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.all(30),
-                decoration: const BoxDecoration(
-                    color: Color(0xFFFFF7ED), shape: BoxShape.circle),
-                child: const Icon(Icons.work_history_rounded,
-                    size: 50, color: Color(0xFFF97316)),
+                decoration: BoxDecoration(
+                  color: AppColors.walletAccent.withValues(
+                      alpha: cs.brightness == Brightness.dark ? 0.22 : 0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.work_history_rounded,
+                  size: 50,
+                  color: AppColors.walletAccent,
+                ),
               ),
               const SizedBox(height: 20),
-              Text(context.tr('no_active_job_msg'),
-                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 16)),
+              Text(
+                context.tr('no_active_job_msg'),
+                style: TextStyle(
+                  color: cs.onSurfaceVariant,
+                  fontSize: 16,
+                ),
+              ),
             ],
           ),
         ),
       );
     }
 
+    final status = job.status;
+    final isFunded = job.isFunded;
+    final isInProgress = status == 'in_progress';
+    final isSubmitted = status == 'submitted';
+    final isLegacyConfirm = status == 'ready_for_confirmation';
+
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: cs.surface,
       body: CustomScrollView(
         slivers: [
-          // PREMIUM ORANGE HEADER
           SliverAppBar(
-            expandedHeight: 220,
+            expandedHeight: 200,
             pinned: true,
             backgroundColor: const Color(0xFFF97316),
             elevation: 0,
             leading: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8),
               child: CircleAvatar(
                 backgroundColor: Colors.black12,
                 child: IconButton(
@@ -128,240 +286,323 @@ class _WorkerActiveJobScreenState extends State<WorkerActiveJobScreen> {
                     end: Alignment.bottomRight,
                   ),
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 40),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 6),
-                      decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(20)),
-                      child: const Text('KAZI INAYOENDELEA',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1.5)),
-                    ),
-                    const SizedBox(height: 15),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 25),
-                      child: Text(job.title,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis),
-                    ),
-                    const SizedBox(height: 10),
-                    Text('TZS ${job.price}',
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w900)),
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          SliverToBoxAdapter(
-            child: Container(
-              transform: Matrix4.translationValues(0, -30, 0),
-              decoration: const BoxDecoration(
-                color: AppColors.background,
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(35),
-                    topRight: Radius.circular(35)),
-              ),
-              padding: const EdgeInsets.fromLTRB(25, 30, 25, 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // CLIENT CARD
-                  const Text('Mteja Wako',
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary)),
-                  const SizedBox(height: 15),
-                  Container(
-                    padding: const EdgeInsets.all(15),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(25),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.03),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4))
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 28,
-                          backgroundColor: const Color(0xFFF1F5F9),
-                          child: Text(
-                              job.userName?.isNotEmpty == true
-                                  ? job.userName![0]
-                                  : 'U',
-                              style: const TextStyle(
-                                  color: Color(0xFFEA580C),
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20)),
+                child: SafeArea(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 24),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
                         ),
-                        const SizedBox(width: 15),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(job.userName ?? context.tr('client_label'),
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 17,
-                                      color: AppColors.textPrimary)),
-                              Text(job.addressText ?? context.tr('no_location'),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                      fontSize: 13, color: Color(0xFF94A3B8))),
-                            ],
+                        decoration: BoxDecoration(
+                          color: Colors.white24,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          status.toUpperCase(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.2,
                           ),
                         ),
-                        _buildAction(Icons.message_rounded, AppColors.primary,
-                            () {
-                          Navigator.pushNamed(context, AppRouter.chatRoom,
-                              arguments: ChatConversation(
-                                  job: job,
-                                  otherUser: ChatUser(
-                                      id: job.userId ?? 0,
-                                      name: job.userName ?? 'Mteja',
-                                      phone: job.phone)));
-                        }),
-                        const SizedBox(width: 10),
-                        if (job.phone != null)
-                          _buildAction(
-                              Icons.phone_rounded,
-                              const Color(0xFF22C55E),
-                              () => _makePhoneCall(job.phone!)),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 35),
-
-                  // PROGRESS SECTION
-                  Row(
-                    children: [
-                      const Icon(Icons.info_outline_rounded,
-                          color: Color(0xFFF97316), size: 20),
-                      const SizedBox(width: 10),
-                      Expanded(
+                      ),
+                      const SizedBox(height: 12),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
                         child: Text(
-                          context.tr('give_code_instruction'),
+                          job.title,
+                          textAlign: TextAlign.center,
                           style: const TextStyle(
-                              color: Color(0xFF475569),
-                              fontSize: 13,
-                              height: 1.4),
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'TZS ${NumberFormat('#,###').format(job.price)}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
                         ),
                       ),
                     ],
                   ),
-
-                  const SizedBox(height: 35),
-
-                  // COMPLETION FORM
-                  Container(
-                    padding: const EdgeInsets.all(25),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(30),
-                      border: Border.all(color: const Color(0xFFF1F5F9)),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.02),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10))
-                      ],
+                ),
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Transform.translate(
+              offset: const Offset(0, -24),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: cs.surface,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                ),
+                padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      context.tr('client_label'),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: cs.onSurface,
+                      ),
                     ),
-                    child: Column(
-                      children: [
-                        Text(context.tr('complete_job_title'),
-                            style: const TextStyle(
-                                fontSize: 20,
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: context.tpCardElevated,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                            color: cs.outlineVariant.withValues(alpha: 0.35)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: context.tpShadowSoft,
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 26,
+                            backgroundColor: cs.primaryContainer,
+                            child: Text(
+                              job.userName?.isNotEmpty == true
+                                  ? job.userName![0]
+                                  : 'M',
+                              style: TextStyle(
+                                color: cs.onPrimaryContainer,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary)),
-                        const SizedBox(height: 10),
-                        Text(context.tr('enter_completion_code_title'),
-                            style: const TextStyle(
-                                color: Color(0xFF94A3B8), fontSize: 14)),
-                        const SizedBox(height: 30),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          decoration: BoxDecoration(
-                            color: AppColors.background,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: const Color(0xFFF1F5F9)),
-                          ),
-                          child: TextField(
-                            controller: _codeController,
-                            keyboardType: TextInputType.number,
-                            textAlign: TextAlign.center,
-                            maxLength: 6,
-                            style: const TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 10,
-                                color: AppColors.textPrimary),
-                            decoration: const InputDecoration(
-                              counterText: "",
-                              hintText: '0000',
-                              hintStyle: TextStyle(
-                                  color: Color(0xFFE2E8F0), letterSpacing: 10),
-                              border: InputBorder.none,
-                              contentPadding:
-                                  EdgeInsets.symmetric(vertical: 20),
+                                fontSize: 18,
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 30),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed:
-                                _isLoading ? null : () => _completeJob(job.id),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFF97316),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 18),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20)),
-                              elevation: 0,
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  job.userName ?? context.tr('client_label'),
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: cs.onSurface,
+                                  ),
+                                ),
+                                Text(
+                                  job.addressText ?? context.tr('no_location'),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: cs.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
                             ),
-                            child: _isLoading
-                                ? const SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: CircularProgressIndicator(
-                                        color: Colors.white, strokeWidth: 2))
-                                : const Text('THIBITISHA UKAMILISHAJI',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                        letterSpacing: 0.5)),
                           ),
-                        ),
-                      ],
+                          _iconAction(Icons.message_rounded, AppColors.primary,
+                              () {
+                            Navigator.pushNamed(
+                              context,
+                              AppRouter.chatRoom,
+                              arguments: {
+                                'conversation': ChatConversation(
+                                  job: job,
+                                  otherUser: ChatUser(
+                                    id: job.userId ?? 0,
+                                    name: job.userName ?? 'Mteja',
+                                    phone: job.phone,
+                                  ),
+                                ),
+                              },
+                            );
+                          }),
+                          if (job.phone != null) ...[
+                            const SizedBox(width: 8),
+                            _iconAction(
+                              Icons.phone_rounded,
+                              const Color(0xFF22C55E),
+                              () => _makePhoneCall(job.phone!),
+                            ),
+                          ],
+                        ],
+                      ),
                     ),
-                  ),
-
-                  const SizedBox(height: 50),
-                ],
+                    const SizedBox(height: 28),
+                    if (isFunded) ...[
+                      Text(
+                        'Mteja amelipa escrow. Kubali kuanza kazi, au kataa kurudisha malipo.',
+                        style: TextStyle(
+                          color: cs.onSurfaceVariant,
+                          height: 1.4,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: _isLoading ? null : _declineFunded,
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.red,
+                                side: const BorderSide(color: Colors.red),
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                              ),
+                              child: Text(context.tr('decline_btn')),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            flex: 2,
+                            child: FilledButton(
+                              onPressed: _isLoading ? null : _acceptFunded,
+                              style: FilledButton.styleFrom(
+                                backgroundColor: const Color(0xFF22C55E),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 14),
+                              ),
+                              child: const Text('Kubali kazi'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ] else if (isInProgress) ...[
+                      Text(
+                        'Wasilisha kazi ukiisha. Unaweza kuongeza maelezo; code ni hiari ikiwa ipo.',
+                        style: TextStyle(
+                          color: cs.onSurfaceVariant,
+                          height: 1.4,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: _notesController,
+                        maxLines: 3,
+                        decoration: const InputDecoration(
+                          labelText: 'Maelezo (hiari)',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _codeController,
+                        keyboardType: TextInputType.number,
+                        maxLength: 6,
+                        decoration: const InputDecoration(
+                          labelText: 'Code ya ukamilishaji (hiari)',
+                          border: OutlineInputBorder(),
+                          counterText: '',
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton(
+                          onPressed: _isLoading ? null : _submitCompletion,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: const Color(0xFFF97316),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          child: _isLoading
+                              ? const SizedBox(
+                                  height: 22,
+                                  width: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Text(
+                                  'Wasilisha kazi imekamilika',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                        ),
+                      ),
+                    ] else if (isSubmitted) ...[
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: cs.primaryContainer.withValues(alpha: 0.65),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                              color: cs.outlineVariant.withValues(alpha: 0.4)),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.hourglass_top_rounded,
+                                color: cs.primary),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'Umewasilisha kazi. Subiri mteja athibitishe malipo ya escrow.',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: cs.onSurface,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ] else if (isLegacyConfirm) ...[
+                      Text(
+                        context.tr('give_code_instruction'),
+                        style: TextStyle(
+                          color: cs.onSurfaceVariant,
+                          height: 1.4,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: _codeController,
+                        keyboardType: TextInputType.number,
+                        textAlign: TextAlign.center,
+                        maxLength: 6,
+                        decoration: const InputDecoration(
+                          labelText: 'Code',
+                          border: OutlineInputBorder(),
+                          counterText: '',
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton(
+                          onPressed: _isLoading ? null : _legacyCompleteWithCode,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          child: Text(context.tr('complete_job_title')),
+                        ),
+                      ),
+                    ] else ...[
+                      Text(
+                        'Hali: $status. Fungua maelezo ya kazi au wasiliana na mteja.',
+                        style: TextStyle(color: cs.onSurfaceVariant),
+                      ),
+                    ],
+                    const SizedBox(height: 40),
+                  ],
+                ),
               ),
             ),
           ),
@@ -370,16 +611,18 @@ class _WorkerActiveJobScreenState extends State<WorkerActiveJobScreen> {
     );
   }
 
-  Widget _buildAction(IconData icon, Color color, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 48,
-        height: 48,
-        decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(15)),
-        child: Icon(icon, color: color, size: 22),
+  Widget _iconAction(IconData icon, Color color, VoidCallback onTap) {
+    return Material(
+      color: color.withValues(alpha: 0.12),
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: SizedBox(
+          width: 48,
+          height: 48,
+          child: Icon(icon, color: color, size: 22),
+        ),
       ),
     );
   }

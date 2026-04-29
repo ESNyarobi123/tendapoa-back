@@ -90,7 +90,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final result = await _walletService.submitWithdrawal(
+      await _walletService.submitWithdrawal(
         amount: amount,
         phoneNumber: _phoneController.text.trim(),
         registeredName: _nameController.text.trim(),
@@ -117,68 +117,77 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFDCFCE7),
-                  shape: BoxShape.circle,
+      builder: (dialogContext) {
+        final cs = Theme.of(dialogContext).colorScheme;
+        final successTint = AppColors.success.withValues(
+            alpha: cs.brightness == Brightness.dark ? 0.28 : 0.14);
+        return Dialog(
+          backgroundColor: cs.surface,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: successTint,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check_circle,
+                    color: AppColors.success,
+                    size: 50,
+                  ),
                 ),
-                child: const Icon(
-                  Icons.check_circle,
-                  color: AppColors.success,
-                  size: 50,
+                const SizedBox(height: 24),
+                Text(
+                  context.tr('withdrawal_success_title'),
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: cs.onSurface,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                context.tr('withdrawal_success_title'),
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                const SizedBox(height: 12),
+                Text(
+                  '${context.tr('withdrawal_success_body')} ${NumberFormat('#,###').format(amount)}.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: cs.onSurfaceVariant,
+                    height: 1.5,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                '${context.tr('withdrawal_success_body')} ${NumberFormat('#,###').format(amount)}.',
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: AppColors.textSecondary,
-                  height: 1.5,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFEF3C7),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.info_outline, color: Color(0xFFF59E0B), size: 20),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        context.tr('withdrawal_success_footer'),
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Color(0xFF92400E),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: cs.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                        color: cs.outlineVariant.withValues(alpha: 0.5)),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.info_outline,
+                          color: cs.onSurfaceVariant, size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          context.tr('withdrawal_success_footer'),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: cs.onSurfaceVariant,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
@@ -207,7 +216,8 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
             ],
           ),
         ),
-      ),
+        );
+      },
     );
   }
 
@@ -230,8 +240,9 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: cs.surface,
       body: CustomScrollView(
         slivers: [
           // App Bar
@@ -244,7 +255,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
               icon: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
@@ -270,7 +281,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
+                                color: Colors.white.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: const Icon(
@@ -327,10 +338,10 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                     // Title
                     Text(
                       context.tr('withdrawal_title'),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                        color: cs.onSurface,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -338,7 +349,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                       context.tr('withdrawal_subtitle'),
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey[600],
+                        color: cs.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -351,13 +362,16 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                       keyboardType: TextInputType.number,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       onChanged: (_) => setState(() {}),
-                      decoration: InputDecoration(
+                        decoration: InputDecoration(
                         hintText: context.tr('withdrawal_amount_hint'),
                         prefixIcon: Container(
                           margin: const EdgeInsets.all(12),
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           decoration: BoxDecoration(
-                            color: AppColors.walletAccent.withOpacity(0.1),
+                            color: AppColors.walletAccent.withValues(
+                                alpha: cs.brightness == Brightness.dark
+                                    ? 0.22
+                                    : 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Text(
@@ -369,14 +383,16 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                           ),
                         ),
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: cs.surfaceContainerHighest,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: AppColors.grey200),
+                          borderSide: BorderSide(
+                              color: cs.outlineVariant.withValues(alpha: 0.65)),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: AppColors.grey200),
+                          borderSide: BorderSide(
+                              color: cs.outlineVariant.withValues(alpha: 0.65)),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
@@ -399,8 +415,10 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF1F5F9),
+                        color: context.tpMutedFill,
                         borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                            color: cs.outlineVariant.withValues(alpha: 0.4)),
                       ),
                       child: Column(
                         children: [
@@ -409,11 +427,14 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                             children: [
                               Text(
                                 context.tr('withdrawal_min_label'),
-                                style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                                style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant),
                               ),
                               Text(
                                 'TZS ${NumberFormat('#,###').format(_minWithdrawal)}',
-                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: cs.onSurface),
                               ),
                             ],
                           ),
@@ -423,7 +444,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                             children: [
                               Text(
                                 context.tr('withdrawal_fee_label'),
-                                style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                                style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant),
                               ),
                               Text(
                                 'TZS ${NumberFormat('#,###').format(_withdrawalFee)}',
@@ -432,13 +453,13 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                             ],
                           ),
                           if (_amountController.text.isNotEmpty) ...[
-                            const Divider(height: 16),
+                            Divider(height: 16, color: cs.outlineVariant.withValues(alpha: 0.5)),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
                                   context.tr('withdrawal_you_receive'),
-                                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: cs.onSurface),
                                 ),
                                 Text(
                                   'TZS ${NumberFormat('#,###').format(_netAmount)}',
@@ -466,16 +487,20 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                             duration: const Duration(milliseconds: 200),
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             decoration: BoxDecoration(
-                              color: isSelected ? (network['color'] as Color).withOpacity(0.1) : Colors.white,
+                              color: isSelected
+                                  ? (network['color'] as Color).withValues(alpha: 0.14)
+                                  : context.tpCardElevated,
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                color: isSelected ? network['color'] as Color : AppColors.grey200,
+                                color: isSelected
+                                    ? network['color'] as Color
+                                    : cs.outlineVariant.withValues(alpha: 0.65),
                                 width: isSelected ? 2 : 1,
                               ),
                               boxShadow: isSelected
                                   ? [
                                       BoxShadow(
-                                        color: (network['color'] as Color).withOpacity(0.2),
+                                        color: (network['color'] as Color).withValues(alpha: 0.22),
                                         blurRadius: 8,
                                         offset: const Offset(0, 2),
                                       ),
@@ -492,7 +517,9 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                    color: isSelected ? network['color'] as Color : AppColors.textSecondary,
+                                    color: isSelected
+                                        ? network['color'] as Color
+                                        : cs.onSurfaceVariant,
                                   ),
                                 ),
                                 if (isSelected) ...[
@@ -516,16 +543,18 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       decoration: InputDecoration(
                         hintText: context.tr('withdrawal_phone_hint'),
-                        prefixIcon: const Icon(Icons.phone_android, color: AppColors.textSecondary),
+                        prefixIcon: Icon(Icons.phone_android, color: cs.onSurfaceVariant),
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: cs.surfaceContainerHighest,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: AppColors.grey200),
+                          borderSide: BorderSide(
+                              color: cs.outlineVariant.withValues(alpha: 0.65)),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: AppColors.grey200),
+                          borderSide: BorderSide(
+                              color: cs.outlineVariant.withValues(alpha: 0.65)),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
@@ -552,16 +581,18 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                       textCapitalization: TextCapitalization.words,
                       decoration: InputDecoration(
                         hintText: context.tr('withdrawal_name_hint'),
-                        prefixIcon: const Icon(Icons.badge, color: AppColors.textSecondary),
+                        prefixIcon: Icon(Icons.badge, color: cs.onSurfaceVariant),
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: cs.surfaceContainerHighest,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: AppColors.grey200),
+                          borderSide: BorderSide(
+                              color: cs.outlineVariant.withValues(alpha: 0.65)),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: AppColors.grey200),
+                          borderSide: BorderSide(
+                              color: cs.outlineVariant.withValues(alpha: 0.65)),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
@@ -625,14 +656,16 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFEF3C7),
+                        color: cs.tertiaryContainer.withValues(alpha: 0.45),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFFFCD34D)),
+                        border: Border.all(
+                            color: cs.outlineVariant.withValues(alpha: 0.55)),
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.info_outline, color: Color(0xFFF59E0B), size: 22),
+                          Icon(Icons.info_outline,
+                              color: cs.onTertiaryContainer, size: 22),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Column(
@@ -640,10 +673,10 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                               children: [
                                 Text(
                                   context.tr('withdrawal_important_note'),
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF92400E),
+                                    color: cs.onTertiaryContainer,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
@@ -651,7 +684,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                                   context.tr('withdrawal_note_body'),
                                   style: TextStyle(
                                     fontSize: 13,
-                                    color: Colors.amber[900],
+                                    color: cs.onSurfaceVariant,
                                     height: 1.4,
                                   ),
                                 ),
@@ -673,14 +706,14 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
               child: Row(
                 children: [
-                  const Icon(Icons.history, color: AppColors.textSecondary, size: 20),
+                  Icon(Icons.history, color: cs.onSurfaceVariant, size: 20),
                   const SizedBox(width: 8),
                   Text(
                     context.tr('withdrawal_history_title'),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                      color: cs.onSurface,
                     ),
                   ),
                 ],
@@ -704,19 +737,21 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                         margin: const EdgeInsets.all(20),
                         padding: const EdgeInsets.all(40),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.tpCardElevated,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: AppColors.grey200),
+                          border: Border.all(
+                              color: cs.outlineVariant.withValues(alpha: 0.45)),
                         ),
                         child: Column(
                           children: [
-                            Icon(Icons.history, size: 48, color: Colors.grey[300]),
+                            Icon(Icons.history,
+                                size: 48, color: cs.onSurfaceVariant),
                             const SizedBox(height: 16),
                             Text(
                               context.tr('withdrawal_no_history'),
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.grey[500],
+                                color: cs.onSurfaceVariant,
                               ),
                             ),
                           ],
@@ -737,16 +772,17 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
   }
 
   Widget _buildSectionTitle(String title, IconData icon) {
+    final cs = Theme.of(context).colorScheme;
     return Row(
       children: [
-        Icon(icon, size: 18, color: AppColors.textSecondary),
+        Icon(icon, size: 18, color: cs.onSurfaceVariant),
         const SizedBox(width: 8),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+            color: cs.onSurface,
           ),
         ),
       ],
@@ -754,6 +790,8 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
   }
 
   Widget _buildHistoryItem(Map<String, dynamic> withdrawal) {
+    final cs = Theme.of(context).colorScheme;
+    final isDark = cs.brightness == Brightness.dark;
     final status = withdrawal['status']?.toString().toLowerCase() ?? 'processing';
     final amount = withdrawal['amount'] ?? 0;
     final account = withdrawal['account'] ?? '';
@@ -770,19 +808,21 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
     switch (status) {
       case 'paid':
         statusColor = AppColors.success;
-        statusBgColor = const Color(0xFFDCFCE7);
+        statusBgColor =
+            AppColors.success.withValues(alpha: isDark ? 0.28 : 0.14);
         statusText = context.tr('withdrawal_status_paid');
         statusIcon = Icons.check_circle;
         break;
       case 'rejected':
         statusColor = AppColors.error;
-        statusBgColor = const Color(0xFFFEE2E2);
+        statusBgColor = AppColors.error.withValues(alpha: isDark ? 0.28 : 0.14);
         statusText = context.tr('withdrawal_status_rejected');
         statusIcon = Icons.cancel;
         break;
       default:
         statusColor = const Color(0xFFF59E0B);
-        statusBgColor = const Color(0xFFFEF3C7);
+        statusBgColor =
+            const Color(0xFFF59E0B).withValues(alpha: isDark ? 0.28 : 0.14);
         statusText = context.tr('withdrawal_status_pending');
         statusIcon = Icons.hourglass_empty;
     }
@@ -797,9 +837,10 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.tpCardElevated,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.grey200),
+        border: Border.all(
+            color: cs.outlineVariant.withValues(alpha: 0.45)),
       ),
       child: Row(
         children: [
@@ -808,7 +849,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: (networkInfo['color'] as Color).withOpacity(0.1),
+              color: (networkInfo['color'] as Color).withValues(alpha: 0.14),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Center(
@@ -826,26 +867,26 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
               children: [
                 Text(
                   'TZS ${NumberFormat('#,###').format(amount)}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: cs.onSurface,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   '$account • ${networkInfo['label']}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
-                    color: AppColors.textSecondary,
+                    color: cs.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   '${createdAt.day}/${createdAt.month}/${createdAt.year}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: AppColors.textLight,
+                    color: cs.onSurfaceVariant,
                   ),
                 ),
               ],

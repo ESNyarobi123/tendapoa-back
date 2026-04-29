@@ -55,11 +55,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
+      builder: (sheetContext) {
+        final cs = Theme.of(sheetContext).colorScheme;
+        return Container(
         padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+        decoration: BoxDecoration(
+          color: cs.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -68,17 +70,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.grey200,
+                color: cs.outlineVariant,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
             const SizedBox(height: 20),
             Text(
               context.tr('choose_photo'),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: cs.onSurface,
               ),
             ),
             const SizedBox(height: 20),
@@ -106,7 +108,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             const SizedBox(height: 20),
           ],
         ),
-      ),
+      );
+      },
     );
 
     if (source == null) return;
@@ -164,6 +167,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() => _isLoading = true);
 
     try {
+      final updateFailedMsg = context.tr('update_failed');
       final fields = <String, String>{};
       
       final user = context.read<AuthProvider>().user;
@@ -180,10 +184,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         files: _selectedImage != null ? {'photo': _selectedImage!} : null,
       );
 
-      if (response.success && mounted) {
+      if (!mounted) return;
+
+      if (response.success) {
         // Refresh user data
         await context.read<AuthProvider>().refreshUser();
-        
+        if (!mounted) return;
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
@@ -199,7 +206,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         );
         Navigator.pop(context, true);
       } else {
-        throw Exception(response.message ?? context.tr('update_failed'));
+        throw Exception(response.message ?? updateFailedMsg);
       }
     } catch (e) {
       if (mounted) {
@@ -224,8 +231,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final isMfanyakazi = user?.role == 'mfanyakazi';
     final themeColor = isMfanyakazi ? const Color(0xFFF97316) : AppColors.primary;
 
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: cs.surface,
       appBar: AppBar(
         backgroundColor: themeColor,
         elevation: 0,
@@ -462,23 +470,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Widget _buildSectionTitle(String title) {
+    final cs = Theme.of(context).colorScheme;
     return Row(
       children: [
         Container(
           width: 4,
           height: 20,
           decoration: BoxDecoration(
-            color: AppColors.primary,
+            color: cs.primary,
             borderRadius: BorderRadius.circular(2),
           ),
         ),
         const SizedBox(width: 10),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: cs.onSurface,
           ),
         ),
       ],
@@ -494,28 +503,33 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     String? helperText,
     TextInputType? keyboardType,
   }) {
+    final cs = Theme.of(context).colorScheme;
+    final fill = readOnly
+        ? cs.surfaceContainerHigh.withValues(alpha: 0.85)
+        : cs.surfaceContainerHighest;
+    final fg = readOnly ? cs.onSurfaceVariant : cs.onSurface;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.w600,
-            color: Color(0xFF475569),
+            color: cs.onSurfaceVariant,
             fontSize: 13,
           ),
         ),
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: readOnly ? AppColors.surfaceLight : Colors.white,
+            color: fill,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.grey200),
+            border: Border.all(color: cs.outlineVariant),
             boxShadow: readOnly
                 ? null
                 : [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.02),
+                      color: Colors.black.withValues(alpha: 0.06),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -528,8 +542,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             validator: (v) => v!.isEmpty ? context.tr('please_fill_here') : null,
             style: TextStyle(
               fontSize: 15,
-              color: readOnly ? AppColors.textLight : AppColors.textPrimary,
+              fontWeight: FontWeight.w500,
+              color: fg,
             ),
+            cursorColor: themeColor,
             decoration: InputDecoration(
               prefixIcon: Icon(icon, size: 20, color: themeColor.withValues(alpha: readOnly ? 0.5 : 1)),
               border: OutlineInputBorder(
@@ -548,9 +564,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           const SizedBox(height: 6),
           Text(
             helperText,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11,
-              color: AppColors.textLight,
+              color: cs.onSurfaceVariant,
             ),
           ),
         ],

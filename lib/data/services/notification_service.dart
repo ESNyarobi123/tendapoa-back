@@ -6,10 +6,24 @@ class NotificationService {
 
   Future<Map<String, dynamic>> getNotifications({int page = 1}) async {
     final response = await _api.get('/notifications?page=$page');
-    final result = response.data!;
-    final notificationData = result['notifications'] ?? result;
+    final body = response.data;
+    if (body == null) {
+      throw StateError('Invalid notifications response');
+    }
+    final result = Map<String, dynamic>.from(body);
+    final envelope = result['data'];
+    Map<String, dynamic>? envMap;
+    if (envelope is Map) {
+      envMap = Map<String, dynamic>.from(envelope);
+    }
 
-    final dynamic rawData = notificationData['data'];
+    // API: { success, data: { notifications: paginator, unread_count }, notifications, unread_count }
+    final dynamic notificationData =
+        result['notifications'] ?? envMap?['notifications'] ?? result;
+
+    final dynamic rawData = notificationData is Map
+        ? notificationData['data']
+        : null;
     List list = [];
     if (rawData is Map) {
       list = rawData.values.toList();
@@ -19,11 +33,19 @@ class NotificationService {
 
     final notifications = list.map((e) => AppNotification.fromJson(e)).toList();
 
+    final unreadRaw = result['unread_count'] ?? envMap?['unread_count'] ?? 0;
+    final unread = unreadRaw is num ? unreadRaw.toInt() : int.tryParse('$unreadRaw') ?? 0;
+
+    Map<String, dynamic>? pageMap;
+    if (notificationData is Map) {
+      pageMap = Map<String, dynamic>.from(notificationData);
+    }
+
     return {
       'notifications': notifications,
-      'unread_count': result['unread_count'] ?? 0,
-      'current_page': notificationData['current_page'],
-      'last_page': notificationData['last_page'],
+      'unread_count': unread,
+      'current_page': pageMap?['current_page'],
+      'last_page': pageMap?['last_page'],
     };
   }
   

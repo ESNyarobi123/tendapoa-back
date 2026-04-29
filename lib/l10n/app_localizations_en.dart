@@ -564,6 +564,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get success_application_sent => 'Your application has been sent!';
 
   @override
+  String get worker_apply_pending_status =>
+      'You have already applied. Wait for the client to choose.';
+
+  @override
   String get job_accepted_success => 'You have accepted this job.';
 
   @override
@@ -894,6 +898,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get apply_job_dialog_title => 'Apply for this Job';
+
+  @override
+  String get worker_apply_title => 'Apply to do this job';
+
+  @override
+  String get worker_apply_lead =>
+      'After you submit, track status (counter, being chosen, etc.) in My applications. You will not see other workers\' applications here.';
+
+  @override
+  String get worker_apply_budget_label => 'Your proposed price (TZS)';
+
+  @override
+  String worker_apply_client_budget(Object amount) {
+    return 'Client budget: $amount TZS';
+  }
+
+  @override
+  String get worker_apply_message_label =>
+      'Message — why should they choose you?';
+
+  @override
+  String get worker_apply_eta_label => 'Time to complete (optional)';
+
+  @override
+  String get worker_apply_eta_hint => 'e.g. 2 days';
+
+  @override
+  String get worker_apply_submit => 'Submit application';
+
+  @override
+  String get worker_apply_my_applications => 'My applications';
 
   @override
   String get bid_hint => 'Enter your price and a short message...';
@@ -1594,4 +1629,219 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get withdrawal_status_pending => 'Pending';
+
+  @override
+  String get deposit_title => 'Add Money';
+
+  @override
+  String get deposit_amount_label => 'Amount to deposit';
+
+  @override
+  String get deposit_min_error => 'Minimum amount is TZS 1,000';
+
+  @override
+  String get deposit_ussd_info =>
+      'You will receive a USSD prompt on your phone. Enter your PIN to confirm.';
+
+  @override
+  String get deposit_submit_btn => 'Deposit Now';
+
+  @override
+  String get deposit_status_processing => 'PROCESSING';
+
+  @override
+  String get deposit_status_done => 'COMPLETED';
+
+  @override
+  String get deposit_status_failed => 'FAILED';
+
+  @override
+  String get deposit_waiting_msg => 'Check your phone to confirm payment';
+
+  @override
+  String get deposit_success_msg => 'Money has been added to your wallet!';
+
+  @override
+  String get deposit_timeout_msg => 'Time expired. Please try again.';
+
+  @override
+  String get deposit_success_redirect => 'Redirecting...';
+
+  @override
+  String get deposit_step_phone => 'Phone';
+
+  @override
+  String get deposit_step_pin => 'PIN';
+
+  @override
+  String get deposit_step_confirm => 'Confirm';
+
+  @override
+  String get go_back_btn => 'Go Back';
+
+  @override
+  String get forgot_title => 'Forgot Password?';
+
+  @override
+  String get forgot_email_subtitle =>
+      'Enter your email address and we\'ll send you an OTP code to reset your password.';
+
+  @override
+  String get forgot_email_label => 'Email Address';
+
+  @override
+  String get forgot_email_hint => 'example@email.com';
+
+  @override
+  String get forgot_enter_valid_email => 'Enter a valid email address';
+
+  @override
+  String get forgot_send_otp_btn => 'Send OTP Code';
+
+  @override
+  String get forgot_otp_title => 'Verify OTP';
+
+  @override
+  String get forgot_otp_subtitle => 'We sent a 6-digit code to';
+
+  @override
+  String get forgot_enter_6_digits => 'Enter all 6 digits';
+
+  @override
+  String get forgot_verify_btn => 'Verify OTP';
+
+  @override
+  String get forgot_resend_in => 'Resend in';
+
+  @override
+  String get forgot_resend_otp => 'Resend OTP';
+
+  @override
+  String get forgot_otp_resent => 'New OTP sent!';
+
+  @override
+  String get forgot_new_pw_title => 'New Password';
+
+  @override
+  String get forgot_new_pw_subtitle =>
+      'Create a new password with at least 8 characters.';
+
+  @override
+  String get forgot_new_pw_label => 'New Password';
+
+  @override
+  String get forgot_confirm_pw_label => 'Confirm Password';
+
+  @override
+  String get forgot_password_min_8 => 'Password must be at least 8 characters';
+
+  @override
+  String get forgot_passwords_no_match => 'Passwords don\'t match';
+
+  @override
+  String get forgot_reset_btn => 'Reset Password';
+
+  @override
+  String get forgot_success_title => 'Success!';
+
+  @override
+  String get forgot_success_subtitle =>
+      'Your password has been reset. You can now log in with your new password.';
+
+  @override
+  String get forgot_go_login => 'Go to Login';
+
+  @override
+  String get change_password_now => 'Update password';
+
+  @override
+  String get settings_edit_profile_subtitle => 'Photo, name & phone';
+
+  @override
+  String get settings_quick_access => 'QUICK ACCESS';
+
+  @override
+  String get settings_app_permissions => 'App permissions';
+
+  @override
+  String get settings_permissions_subtitle =>
+      'Open system settings for location & notifications';
+
+  @override
+  String get fees_policy_subtitle => 'How fees and payments work';
+
+  @override
+  String get privacy_policy_subtitle => 'How we collect and use your data';
+
+  @override
+  String get terms_subtitle => 'Terms of use';
+
+  @override
+  String get settings_role_client => 'Client account';
+
+  @override
+  String get settings_role_worker => 'Worker account';
+
+  @override
+  String get settings_my_applications_worker => 'My job applications';
+
+  @override
+  String get settings_wallet_open_subtitle => 'Payments and balance';
+
+  @override
+  String get settings_worker_inbox_client => 'Applications from workers';
+
+  @override
+  String get settings_notifications_subtitle =>
+      'Job and message alerts. Stored on this device only.';
+
+  @override
+  String get drawer_section_menu => 'Menu';
+
+  @override
+  String get drawer_sub_map => 'Browse jobs on the map';
+
+  @override
+  String get drawer_sub_wallet => 'Balance, top up & withdraw';
+
+  @override
+  String get drawer_sub_notifications => 'Alerts for jobs and messages';
+
+  @override
+  String get drawer_sub_inbox_client => 'Review applicants and hire';
+
+  @override
+  String get drawer_sub_my_apps => 'Track jobs you applied for';
+
+  @override
+  String get drawer_sub_post_worker => 'Offer your skills to clients';
+
+  @override
+  String get drawer_sub_settings => 'Theme, language & account';
+
+  @override
+  String get drawer_sub_dashboard => 'Earnings, balance & activity';
+
+  @override
+  String get drawer_sub_dashboard_client => 'Jobs, wallet & payments overview';
+
+  @override
+  String get worker_nav_maombi => 'Applied';
+
+  @override
+  String get client_nav_worker_apps => 'Applicants';
+
+  @override
+  String get dash_attention_title => 'Needs your action';
+
+  @override
+  String get dash_empty_earnings => 'No earnings history yet.';
+
+  @override
+  String get dash_empty_withdrawals => 'No withdrawals yet.';
+
+  @override
+  String app_version_line(String version, String build_number) {
+    return 'Version $version · Build $build_number';
+  }
 }

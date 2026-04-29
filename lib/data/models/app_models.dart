@@ -1,3 +1,5 @@
+import 'job_model.dart';
+
 class AppNotification {
   final String id;
   final String type;
@@ -97,6 +99,10 @@ class ClientDashboard {
   final int completed;
   final double totalPaid;
   final List<PaymentHistory> paymentHistory;
+  final List<Job> attentionJobs;
+  final int pendingApplicationsCount;
+  final int? walletBalance;
+  final int? walletAvailable;
 
   ClientDashboard({
     required this.role,
@@ -104,6 +110,10 @@ class ClientDashboard {
     required this.completed,
     required this.totalPaid,
     this.paymentHistory = const [],
+    this.attentionJobs = const [],
+    this.pendingApplicationsCount = 0,
+    this.walletBalance,
+    this.walletAvailable,
   });
 
   factory ClientDashboard.fromJson(Map<String, dynamic> json) {
@@ -119,6 +129,13 @@ class ClientDashboard {
       return 0;
     }
 
+    List<Job> parseAttention(dynamic raw) {
+      if (raw is! List) return [];
+      return raw
+          .map((e) => Job.fromJson(Map<String, dynamic>.from(e as Map)))
+          .toList();
+    }
+
     return ClientDashboard(
       role: json['role'] ?? 'muhitaji',
       posted: parseInt(json['posted']),
@@ -129,6 +146,14 @@ class ClientDashboard {
               .map((p) => PaymentHistory.fromJson(p))
               .toList()
           : [],
+      attentionJobs: parseAttention(json['attention_jobs']),
+      pendingApplicationsCount: parseInt(json['pending_applications_count']),
+      walletBalance: json['wallet_balance'] != null
+          ? parseInt(json['wallet_balance'])
+          : null,
+      walletAvailable: json['available'] != null
+          ? parseInt(json['available'])
+          : null,
     );
   }
 }

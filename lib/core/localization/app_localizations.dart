@@ -373,6 +373,8 @@ extension AppLocalizationsExtension on BuildContext {
         return loc.submit_application_btn;
       case 'success_application_sent':
         return loc.success_application_sent;
+      case 'worker_apply_pending_status':
+        return loc.worker_apply_pending_status;
       case 'job_accepted_success':
         return loc.job_accepted_success;
       case 'enter_completion_code':
@@ -1041,6 +1043,117 @@ extension AppLocalizationsExtension on BuildContext {
         return loc.withdrawal_status_rejected;
       case 'withdrawal_status_pending':
         return loc.withdrawal_status_pending;
+
+      // Deposit
+      case 'deposit_title':
+        return loc.deposit_title;
+      case 'deposit_amount_label':
+        return loc.deposit_amount_label;
+      case 'deposit_min_error':
+        return loc.deposit_min_error;
+      case 'deposit_ussd_info':
+        return loc.deposit_ussd_info;
+      case 'deposit_submit_btn':
+        return loc.deposit_submit_btn;
+      case 'deposit_status_processing':
+        return loc.deposit_status_processing;
+      case 'deposit_status_done':
+        return loc.deposit_status_done;
+      case 'deposit_status_failed':
+        return loc.deposit_status_failed;
+      case 'deposit_waiting_msg':
+        return loc.deposit_waiting_msg;
+      case 'deposit_success_msg':
+        return loc.deposit_success_msg;
+      case 'deposit_timeout_msg':
+        return loc.deposit_timeout_msg;
+      case 'deposit_success_redirect':
+        return loc.deposit_success_redirect;
+      case 'deposit_step_phone':
+        return loc.deposit_step_phone;
+      case 'deposit_step_pin':
+        return loc.deposit_step_pin;
+      case 'deposit_step_confirm':
+        return loc.deposit_step_confirm;
+      case 'go_back_btn':
+        return loc.go_back_btn;
+
+      // Forgot Password
+      case 'forgot_title':
+        return loc.forgot_title;
+      case 'forgot_email_subtitle':
+        return loc.forgot_email_subtitle;
+      case 'forgot_email_label':
+        return loc.forgot_email_label;
+      case 'forgot_email_hint':
+        return loc.forgot_email_hint;
+      case 'forgot_enter_valid_email':
+        return loc.forgot_enter_valid_email;
+      case 'forgot_send_otp_btn':
+        return loc.forgot_send_otp_btn;
+      case 'forgot_otp_title':
+        return loc.forgot_otp_title;
+      case 'forgot_otp_subtitle':
+        return loc.forgot_otp_subtitle;
+      case 'forgot_enter_6_digits':
+        return loc.forgot_enter_6_digits;
+      case 'forgot_verify_btn':
+        return loc.forgot_verify_btn;
+      case 'forgot_resend_in':
+        return loc.forgot_resend_in;
+      case 'forgot_resend_otp':
+        return loc.forgot_resend_otp;
+      case 'forgot_otp_resent':
+        return loc.forgot_otp_resent;
+      case 'forgot_new_pw_title':
+        return loc.forgot_new_pw_title;
+      case 'forgot_new_pw_subtitle':
+        return loc.forgot_new_pw_subtitle;
+      case 'forgot_new_pw_label':
+        return loc.forgot_new_pw_label;
+      case 'forgot_confirm_pw_label':
+        return loc.forgot_confirm_pw_label;
+      case 'forgot_password_min_8':
+        return loc.forgot_password_min_8;
+      case 'forgot_passwords_no_match':
+        return loc.forgot_passwords_no_match;
+      case 'forgot_reset_btn':
+        return loc.forgot_reset_btn;
+      case 'forgot_success_title':
+        return loc.forgot_success_title;
+      case 'forgot_success_subtitle':
+        return loc.forgot_success_subtitle;
+      case 'forgot_go_login':
+        return loc.forgot_go_login;
+      case 'change_password_now':
+        return loc.change_password_now;
+      case 'settings_edit_profile_subtitle':
+        return loc.settings_edit_profile_subtitle;
+      case 'settings_quick_access':
+        return loc.settings_quick_access;
+      case 'settings_app_permissions':
+        return loc.settings_app_permissions;
+      case 'settings_permissions_subtitle':
+        return loc.settings_permissions_subtitle;
+      case 'fees_policy_subtitle':
+        return loc.fees_policy_subtitle;
+      case 'privacy_policy_subtitle':
+        return loc.privacy_policy_subtitle;
+      case 'terms_subtitle':
+        return loc.terms_subtitle;
+      case 'settings_role_client':
+        return loc.settings_role_client;
+      case 'settings_role_worker':
+        return loc.settings_role_worker;
+      case 'settings_my_applications_worker':
+        return loc.settings_my_applications_worker;
+      case 'settings_wallet_open_subtitle':
+        return loc.settings_wallet_open_subtitle;
+      case 'settings_worker_inbox_client':
+        return loc.settings_worker_inbox_client;
+      case 'settings_notifications_subtitle':
+        return loc.settings_notifications_subtitle;
+
       default:
         return key;
     }

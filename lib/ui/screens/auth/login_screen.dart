@@ -8,6 +8,7 @@ import '../../../core/localization/app_localizations.dart';
 import '../../../ui/widgets/buttons.dart';
 import '../../../core/router/app_router.dart';
 import '../../../providers/providers.dart';
+import 'forgot_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -57,8 +58,9 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final settingsProvider = context.watch<SettingsProvider>();
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: cs.surface,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: AppSpacing.screenPaddingLarge,
@@ -103,13 +105,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
                 const SizedBox(height: 30),
                 Center(
-                    child: Text(context.tr('login_welcome_title'),
-                        style: AppTextStyles.h1)),
+                    child: Text(
+                  context.tr('login_welcome_title'),
+                  style: AppTextStyles.h1.copyWith(color: cs.onSurface),
+                )),
                 const SizedBox(height: 10),
                 Center(
-                    child: Text(context.tr('login_subtitle'),
-                        style: AppTextStyles.bodyLarge.copyWith(
-                            color: AppColors.textSecondary))),
+                    child: Text(
+                  context.tr('login_subtitle'),
+                  style: AppTextStyles.bodyLarge.copyWith(
+                    color: cs.onSurfaceVariant,
+                  ),
+                )),
                 const SizedBox(height: 50),
 
                 // Inputs
@@ -134,7 +141,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ? Icons.visibility_outlined
                             : Icons.visibility_off_outlined,
                         size: 20,
-                        color: AppColors.textLight),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant),
                     onPressed: () =>
                         setState(() => _obscurePassword = !_obscurePassword),
                   ),
@@ -145,7 +152,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const ForgotPasswordScreen()),
+                        );
+                      },
                       child: Text(context.tr('login_forgot_password'),
                           style: AppTextStyles.link)),
                 ),
@@ -171,7 +184,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     Expanded(
                       child: RichText(
                         text: TextSpan(
-                          style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+                          style: AppTextStyles.caption.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
                           children: [
                             TextSpan(text: context.tr('login_terms_agree')),
                             TextSpan(
@@ -212,12 +227,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         Navigator.pushNamed(context, AppRouter.roleSelect),
                     child: RichText(
                       text: TextSpan(
-                        style: AppTextStyles.bodyLarge.copyWith(color: AppColors.textSecondary),
+                        style: AppTextStyles.bodyLarge.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                         children: [
                           TextSpan(text: context.tr('login_no_account')),
                           TextSpan(
                               text: context.tr('login_register_here'),
-style: AppTextStyles.link.copyWith(decoration: TextDecoration.none)),
+                              style: AppTextStyles.link
+                                  .copyWith(decoration: TextDecoration.none)),
                         ],
                       ),
                     ),
@@ -233,20 +251,24 @@ style: AppTextStyles.link.copyWith(decoration: TextDecoration.none)),
   }
 
   Widget _buildLangChip(String label, bool active, VoidCallback onTap) {
+    final cs = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: active ? AppColors.primary.withValues(alpha: 0.15) : AppColors.surfaceLight,
+          color: active
+              ? cs.primary.withValues(alpha: 0.18)
+              : cs.surfaceContainerHighest,
           borderRadius: AppSpacing.borderRadiusRound,
-          border: active ? Border.all(color: AppColors.primary, width: 1.5) : null,
+          border:
+              active ? Border.all(color: cs.primary, width: 1.5) : null,
         ),
         child: Text(
           label,
           style: AppTextStyles.labelLarge.copyWith(
-            color: active ? AppColors.primary : AppColors.textLight,
+            color: active ? cs.primary : cs.onSurfaceVariant,
           ),
         ),
       ),
@@ -254,9 +276,12 @@ style: AppTextStyles.link.copyWith(decoration: TextDecoration.none)),
   }
 
   Widget _buildLabel(String text) {
+    final cs = Theme.of(context).colorScheme;
     return Padding(
         padding: const EdgeInsets.only(bottom: 8, left: 4),
-        child: Text(text, style: AppTextStyles.labelLarge.copyWith(color: AppColors.textSecondary)));
+        child: Text(text,
+            style: AppTextStyles.labelLarge
+                .copyWith(color: cs.onSurfaceVariant)));
   }
 
   Widget _buildInput(
@@ -266,20 +291,28 @@ style: AppTextStyles.link.copyWith(decoration: TextDecoration.none)),
       bool obscureText = false,
       Widget? suffix,
       String? Function(String?)? validator}) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
-          color: AppColors.background,
+          color: cs.surfaceContainerHighest,
           borderRadius: AppSpacing.borderRadiusLg,
-          border: Border.all(color: AppColors.surfaceLight)),
+          border: Border.all(color: cs.outlineVariant)),
       child: TextFormField(
         controller: controller,
         obscureText: obscureText,
         validator: validator,
+        style: TextStyle(
+          color: cs.onSurface,
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+        ),
+        cursorColor: cs.primary,
         decoration: InputDecoration(
-          prefixIcon: Icon(icon, size: AppSpacing.iconSizeSm, color: AppColors.textLight),
+          prefixIcon: Icon(icon,
+              size: AppSpacing.iconSizeSm, color: cs.onSurfaceVariant),
           suffixIcon: suffix,
           hintText: hint,
-          hintStyle: AppTextStyles.bodyLarge.copyWith(color: AppColors.textLight),
+          hintStyle: TextStyle(color: cs.onSurfaceVariant, fontSize: 15),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 18),
         ),

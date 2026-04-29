@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:geolocator/geolocator.dart';
 import '../../../core/constants/constants.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/router/app_router.dart';
@@ -8,6 +9,9 @@ import '../../../data/models/models.dart';
 import '../../../data/services/job_service.dart';
 import '../../../providers/providers.dart';
 import '../chat/chat_list_screen.dart';
+import '../common/map_screen.dart';
+import '../../widgets/tendapoa_drawer.dart';
+import 'client_applications_screen.dart';
 
 class ClientHomeScreen extends StatefulWidget {
   const ClientHomeScreen({super.key});
@@ -18,29 +22,118 @@ class ClientHomeScreen extends StatefulWidget {
 
 class _ClientHomeScreenState extends State<ClientHomeScreen> {
   int _currentIndex = 0;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  final List<Widget> _screens = [
-    const _ClientHomeTab(),
+  late final List<Widget> _screens = [
+    _ClientHomeTab(openDrawer: () => _scaffoldKey.currentState?.openDrawer()),
     const _ClientMyJobsTab(),
+    const ClientApplicationsScreen(embeddedInMainShell: true),
     const _ClientChatTab(),
-    const _ClientDashboardTab(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: _buildDrawer(context),
       body: IndexedStack(index: _currentIndex, children: _screens),
       bottomNavigationBar: _buildBottomNav(context),
     );
   }
 
+  Widget _buildDrawer(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    final user = context.watch<AuthProvider>().user;
+    final cs = Theme.of(context).colorScheme;
+
+    return Drawer(
+      backgroundColor: cs.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.horizontal(right: Radius.circular(20)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          TendapoaDrawerHeader(
+            gradientColors: const [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
+            appTitle: loc.appTitle,
+            userName: user?.name,
+            userEmail: user?.email,
+            roleLabel: loc.settings_role_client,
+            profilePhotoUrl: user?.profilePhotoUrl,
+          ),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.only(top: 4, bottom: 20),
+              children: [
+                TendapoaDrawerSectionLabel(label: loc.drawer_section_menu),
+                TendapoaDrawerLink(
+                  icon: Icons.dashboard_rounded,
+                  title: loc.dashboard,
+                  subtitle: loc.drawer_sub_dashboard_client,
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, AppRouter.clientDashboard);
+                  },
+                ),
+                TendapoaDrawerLink(
+                  icon: Icons.map_rounded,
+                  title: loc.view_map,
+                  subtitle: loc.drawer_sub_map,
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (_) => const MapScreen(fetchFromApi: true),
+                      ),
+                    );
+                  },
+                ),
+                TendapoaDrawerLink(
+                  icon: Icons.account_balance_wallet_rounded,
+                  title: loc.wallet_balance,
+                  subtitle: loc.drawer_sub_wallet,
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, AppRouter.wallet);
+                  },
+                ),
+                TendapoaDrawerLink(
+                  icon: Icons.notifications_active_rounded,
+                  title: loc.notifications,
+                  subtitle: loc.drawer_sub_notifications,
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, AppRouter.notifications);
+                  },
+                ),
+                TendapoaDrawerLink(
+                  icon: Icons.settings_rounded,
+                  title: loc.settings,
+                  subtitle: loc.drawer_sub_settings,
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, AppRouter.settingsPage);
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildBottomNav(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final loc = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: cs.surfaceContainerHigh,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: context.tpShadowSoft,
             blurRadius: 20,
             offset: const Offset(0, -5),
           ),
@@ -48,14 +141,45 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(context, Icons.home_rounded, context.tr('nyumbani_nav'), 0),
-              _buildNavItem(context, Icons.work_outline_rounded, context.tr('kazi_zangu_nav'), 1),
-              _buildNavItem(context, Icons.chat_bubble_outline_rounded, context.tr('inbox_nav'), 2),
-              _buildNavItem(context, Icons.grid_view_rounded, context.tr('dash_nav'), 3),
+              Expanded(
+                child: _buildNavItem(
+                  context,
+                  Icons.home_rounded,
+                  Icons.home_outlined,
+                  loc.nyumbani_nav,
+                  0,
+                ),
+              ),
+              Expanded(
+                child: _buildNavItem(
+                  context,
+                  Icons.work_rounded,
+                  Icons.work_outline_rounded,
+                  loc.kazi_zangu_nav,
+                  1,
+                ),
+              ),
+              Expanded(
+                child: _buildNavItem(
+                  context,
+                  Icons.groups_rounded,
+                  Icons.groups_outlined,
+                  loc.client_nav_worker_apps,
+                  2,
+                ),
+              ),
+              Expanded(
+                child: _buildNavItem(
+                  context,
+                  Icons.chat_bubble_rounded,
+                  Icons.chat_bubble_outline_rounded,
+                  loc.inbox_nav,
+                  3,
+                ),
+              ),
             ],
           ),
         ),
@@ -63,36 +187,51 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     );
   }
 
-  Widget _buildNavItem(BuildContext context, IconData icon, String label, int index) {
+  Widget _buildNavItem(
+    BuildContext context,
+    IconData iconSelected,
+    IconData iconOutlined,
+    String label,
+    int index,
+  ) {
     final isSelected = _currentIndex == index;
+    final cs = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: () => setState(() => _currentIndex = index),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.transparent,
+          color: isSelected ? cs.primary : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? AppColors.textWhite : AppColors.textLight,
-              size: 20,
-            ),
-            if (isSelected) ...[
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: AppColors.textWhite,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                isSelected ? iconSelected : iconOutlined,
+                color: isSelected ? cs.onPrimary : cs.onSurfaceVariant,
+                size: 22,
               ),
+              if (isSelected) ...[
+                const SizedBox(width: 4),
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: cs.onPrimary,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -101,7 +240,9 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
 
 // === HOME TAB (NYUMBANI) ===
 class _ClientHomeTab extends StatefulWidget {
-  const _ClientHomeTab();
+  const _ClientHomeTab({required this.openDrawer});
+
+  final VoidCallback openDrawer;
 
   @override
   State<_ClientHomeTab> createState() => _ClientHomeTabState();
@@ -132,10 +273,16 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
     final provider = context.read<ClientProvider>();
     provider.loadUnreadCounts();
     provider.loadMyJobs();
-    provider.loadNearbyWorkers(
-      lat: AppConstants.defaultLat,
-      lng: AppConstants.defaultLng,
-    );
+    double lat = AppConstants.defaultLat;
+    double lng = AppConstants.defaultLng;
+    try {
+      final pos = await Geolocator.getCurrentPosition();
+      lat = pos.latitude;
+      lng = pos.longitude;
+    } catch (_) {
+      // Tumia default ikiwa ruhusa/huduma haipo
+    }
+    provider.loadNearbyWorkers(lat: lat, lng: lng);
   }
 
   @override
@@ -147,7 +294,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
     final greetingName = nameParts.isEmpty ? context.tr('client_label') : nameParts.first;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: RefreshIndicator(
         onRefresh: _loadData,
         color: AppColors.primary,
@@ -170,10 +317,14 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Top Row - Logo and Profile
+                        // Top Row - Menu, Logo, Notifications
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
+                            IconButton(
+                              icon: const Icon(Icons.menu_rounded, color: AppColors.surface),
+                              onPressed: widget.openDrawer,
+                            ),
                             Expanded(
                               child: Row(
                                 children: [
@@ -185,7 +336,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                                       shape: BoxShape.circle,
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(0.1),
+                                          color: Colors.black.withValues(alpha: 0.1),
                                           blurRadius: 8,
                                           offset: const Offset(0, 2),
                                         ),
@@ -226,7 +377,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                                         Text(
                                           context.tr('client_tagline'),
                                           style: TextStyle(
-                                            color: AppColors.surface.withOpacity(0.8),
+                                            color: AppColors.surface.withValues(alpha: 0.8),
                                             fontSize: 12,
                                           ),
                                           overflow: TextOverflow.ellipsis,
@@ -244,7 +395,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                               children: [
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: AppColors.surface.withOpacity(0.2),
+                                    color: AppColors.surface.withValues(alpha: 0.2),
                                     shape: BoxShape.circle,
                                   ),
                                   child: IconButton(
@@ -341,7 +492,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                         Text(
                           context.tr('what_help_today'),
                           style: TextStyle(
-                            color: AppColors.surface.withOpacity(0.8),
+                            color: AppColors.surface.withValues(alpha: 0.8),
                             fontSize: 14,
                           ),
                           overflow: TextOverflow.ellipsis,
@@ -425,10 +576,10 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                   children: [
                     Text(
                       context.tr('recent_jobs_title'),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     TextButton(
@@ -475,7 +626,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
+                            color: AppColors.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: const Icon(
@@ -487,10 +638,10 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                         const SizedBox(width: 10),
                         Text(
                           context.tr('categories_title'),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ],
@@ -498,14 +649,14 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
-                        color: AppColors.surfaceLight,
+                        color: context.tpMutedFill,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         '${categories.length} aina',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -540,7 +691,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                   child: OutlinedButton(
                     onPressed: () {},
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: AppColors.primary.withOpacity(0.3)),
+                      side: BorderSide(color: AppColors.primary.withValues(alpha: 0.3)),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -582,11 +733,12 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
       child: Container(
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: context.tpCardElevated,
           borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: context.tpScheme.outlineVariant.withValues(alpha: 0.35)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: context.tpShadowSoft,
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -605,17 +757,17 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
             const SizedBox(height: 10),
             Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 11,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -635,11 +787,12 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
         width: 200,
         margin: const EdgeInsets.only(right: 15),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: context.tpCardElevated,
           borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: context.tpScheme.outlineVariant.withValues(alpha: 0.35)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: context.tpShadowSoft,
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -663,20 +816,20 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => Container(
                             height: 100,
-                            color: AppColors.surfaceLight,
-                            child: const Icon(
+                            color: context.tpMutedFill,
+                            child: Icon(
                               Icons.image_not_supported,
-                              color: AppColors.textLight,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
                           ),
                         )
                       : Container(
                           height: 100,
-                          color: AppColors.surfaceLight,
-                          child: const Center(
+                          color: context.tpMutedFill,
+                          child: Center(
                             child: Icon(
                               Icons.work_outline_rounded,
-                              color: AppColors.textLight,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                               size: 32,
                             ),
                           ),
@@ -691,13 +844,13 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: _getStatusColor(job.status),
+                        color: _getStatusColor(context, job.status),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         _getStatusText(context, job.status),
                         style: const TextStyle(
-                          color: AppColors.surface,
+                          color: Colors.white,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                         ),
@@ -717,10 +870,10 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
                     job.title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -747,15 +900,20 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
     
     return GestureDetector(
       onTap: () {
-        // TODO: Navigate to category jobs
+        Navigator.pushNamed(
+          context,
+          AppRouter.clientCategoryFeed,
+          arguments: {'category': cat},
+        );
       },
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: context.tpCardElevated,
           borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: context.tpScheme.outlineVariant.withValues(alpha: 0.35)),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.08),
+              color: context.tpShadowSoft,
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -768,7 +926,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [color.withOpacity(0.15), color.withOpacity(0.05)],
+                  colors: [color.withValues(alpha: 0.15), color.withValues(alpha: 0.05)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -859,7 +1017,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
     );
   }
 
-  Color _getStatusColor(String status) {
+  Color _getStatusColor(BuildContext context, String status) {
     switch (status) {
       case 'open':
       case 'posted':
@@ -876,7 +1034,7 @@ class _ClientHomeTabState extends State<_ClientHomeTab> {
       case 'cancelled':
         return const Color(0xFFEF4444);
       default:
-        return AppColors.textLight;
+        return Theme.of(context).colorScheme.onSurfaceVariant;
     }
   }
 
@@ -969,7 +1127,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
     final cancelledJobs = _getCancelledJobs(allJobs);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: RefreshIndicator(
         onRefresh: () => clientProvider.loadMyJobs(),
         color: AppColors.primary,
@@ -1014,7 +1172,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                               Text(
                                 '${context.tr('all_tab')}: ${allJobs.length}',
                                 style: TextStyle(
-                                  color: AppColors.surface.withOpacity(0.8),
+                                  color: AppColors.surface.withValues(alpha: 0.8),
                                   fontSize: 14,
                                 ),
                               ),
@@ -1023,7 +1181,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                           // Refresh Button
                           Container(
                             decoration: BoxDecoration(
-                              color: AppColors.surface.withOpacity(0.2),
+                              color: AppColors.surface.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: IconButton(
@@ -1086,7 +1244,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                         ),
                         dividerColor: Colors.transparent,
                         labelColor: AppColors.primary,
-                        unselectedLabelColor: AppColors.surface.withOpacity(0.8),
+                        unselectedLabelColor: AppColors.surface.withValues(alpha: 0.8),
                         labelStyle: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
@@ -1137,16 +1295,16 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         decoration: BoxDecoration(
-          color: AppColors.surface.withOpacity(0.15),
+          color: AppColors.surface.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: AppColors.surface.withOpacity(0.2)),
+          border: Border.all(color: AppColors.surface.withValues(alpha: 0.2)),
         ),
         child: Column(
           children: [
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
+                color: color.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: AppColors.surface, size: 18),
@@ -1163,7 +1321,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
             Text(
               label,
               style: TextStyle(
-                color: AppColors.surface.withOpacity(0.8),
+                color: AppColors.surface.withValues(alpha: 0.8),
                 fontSize: 10,
               ),
             ),
@@ -1180,7 +1338,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
         decoration: BoxDecoration(
           color: isSelected ? AppColors.textWhite : Colors.transparent,
           borderRadius: BorderRadius.circular(25),
-          border: isSelected ? null : Border.all(color: AppColors.surface.withOpacity(0.3)),
+          border: isSelected ? null : Border.all(color: AppColors.surface.withValues(alpha: 0.3)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -1190,7 +1348,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primary.withOpacity(0.1) : AppColors.surface.withOpacity(0.2),
+                color: isSelected ? AppColors.primary.withValues(alpha: 0.1) : AppColors.surface.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
@@ -1210,6 +1368,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
 
   Widget _buildPendingPaymentJobList(List<Job> jobs) {
     if (jobs.isEmpty) {
+      final cs = Theme.of(context).colorScheme;
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -1217,7 +1376,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color(0xFF22C55E).withOpacity(0.1),
+                color: const Color(0xFF22C55E).withValues(alpha: context.tpBrightness == Brightness.dark ? 0.2 : 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -1239,7 +1398,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
             Text(
               context.tr('all_paid_msg'),
               style: TextStyle(
-                color: Colors.grey[400],
+                color: cs.onSurfaceVariant,
                 fontSize: 13,
               ),
             ),
@@ -1256,15 +1415,16 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
   }
 
   Widget _buildPendingPaymentJobCard(Job job) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.tpCardElevated,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFFECACA), width: 2),
+        border: Border.all(color: cs.error.withValues(alpha: 0.55), width: 2),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFEF4444).withOpacity(0.1),
+            color: cs.error.withValues(alpha: context.tpBrightness == Brightness.dark ? 0.25 : 0.12),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -1275,9 +1435,9 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
           // Warning Banner
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            decoration: const BoxDecoration(
-              color: Color(0xFFFEF2F2),
-              borderRadius: BorderRadius.only(
+            decoration: BoxDecoration(
+              color: cs.error.withValues(alpha: context.tpBrightness == Brightness.dark ? 0.22 : 0.12),
+              borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(18),
                 topRight: Radius.circular(18),
               ),
@@ -1287,18 +1447,18 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEF4444).withOpacity(0.1),
+                    color: cs.error.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.warning_amber_rounded, 
-                    color: Color(0xFFEF4444), size: 18),
+                  child: Icon(Icons.warning_amber_rounded,
+                    color: cs.error, size: 18),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     context.tr('payment_status_waiting'),
-                    style: const TextStyle(
-                      color: Color(0xFFEF4444),
+                    style: TextStyle(
+                      color: cs.onSurface,
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
                     ),
@@ -1307,13 +1467,13 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEF4444),
+                    color: cs.error,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Text(
+                  child: Text(
                     'PENDING',
                     style: TextStyle(
-                      color: AppColors.surface,
+                      color: cs.onError,
                       fontSize: 9,
                       fontWeight: FontWeight.bold,
                     ),
@@ -1344,22 +1504,22 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                                 width: 60,
                                 height: 60,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFFEF2F2),
+                                  color: cs.error.withValues(alpha: 0.15),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: const Icon(Icons.work_outline_rounded, 
-                                  color: Color(0xFFEF4444), size: 28),
+                                child: Icon(Icons.work_outline_rounded,
+                                  color: cs.error, size: 28),
                               ),
                             )
                           : Container(
                               width: 60,
                               height: 60,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFEF2F2),
+                                color: cs.error.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: const Icon(Icons.work_outline_rounded, 
-                                color: Color(0xFFEF4444), size: 28),
+                              child: Icon(Icons.work_outline_rounded,
+                                color: cs.error, size: 28),
                             ),
                     ),
                     const SizedBox(width: 12),
@@ -1372,10 +1532,10 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                             job.title,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           const SizedBox(height: 6),
@@ -1384,14 +1544,14 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                 decoration: BoxDecoration(
-                                  color: AppColors.surfaceLight,
+                                  color: context.tpMutedFill,
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
                                   job.categoryName ?? 'Kazi',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 10,
-                                    color: AppColors.textSecondary,
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -1408,7 +1568,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppColors.background,
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -1416,15 +1576,15 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                     children: [
                       Text(
                         context.tr('amount_to_pay_label'),
-                        style: const TextStyle(
-                          color: AppColors.textSecondary,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 13,
                         ),
                       ),
                       Text(
                         'TZS ${_formatJobPrice(job.price)}',
-                        style: const TextStyle(
-                          color: AppColors.textPrimary,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -1462,7 +1622,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                         label: Text(context.tr('retry_payment_btn').toUpperCase()),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF22C55E),
-                          foregroundColor: AppColors.surface,
+                          foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
@@ -1491,7 +1651,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFFEF4444).withOpacity(0.1),
+                color: const Color(0xFFEF4444).withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.delete_outline_rounded, 
@@ -1503,7 +1663,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
         ),
         content: Text(
           context.tr('confirm_delete_job'),
-          style: const TextStyle(color: AppColors.textSecondary),
+          style: TextStyle(color: Theme.of(ctx).colorScheme.onSurfaceVariant),
         ),
         actions: [
           TextButton(
@@ -1514,7 +1674,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
             onPressed: () => Navigator.pop(ctx, true),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFEF4444),
-              foregroundColor: AppColors.surface,
+              foregroundColor: Theme.of(ctx).colorScheme.onPrimary,
             ),
             child: Text(context.tr('yes_delete').toUpperCase()),
           ),
@@ -1636,27 +1796,28 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
 
   Widget _buildJobList(List<Job> jobs) {
     if (jobs.isEmpty) {
+      final cs = Theme.of(context).colorScheme;
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
               padding: const EdgeInsets.all(24),
-              decoration: const BoxDecoration(
-                color: AppColors.surfaceLight,
+              decoration: BoxDecoration(
+                color: context.tpMutedFill,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.work_off_outlined,
                 size: 48,
-                color: Colors.grey[400],
+                color: cs.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 20),
             Text(
               context.tr('no_jobs_here'),
               style: TextStyle(
-                color: Colors.grey[600],
+                color: cs.onSurface,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -1665,7 +1826,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
             Text(
               context.tr('jobs_will_appear_here'),
               style: TextStyle(
-                color: Colors.grey[400],
+                color: cs.onSurfaceVariant,
                 fontSize: 13,
               ),
             ),
@@ -1682,7 +1843,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
   }
 
   Widget _buildJobCard(Job job) {
-    final statusColor = _getStatusColor(job.status);
+    final statusColor = _getStatusColor(context, job.status);
     final hasWorker = job.workerId != null;
     
     return GestureDetector(
@@ -1695,11 +1856,12 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: context.tpCardElevated,
           borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: context.tpScheme.outlineVariant.withValues(alpha: 0.35)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: context.tpShadowSoft,
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -1736,10 +1898,10 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                           job.title,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
+                            color: Theme.of(context).colorScheme.onSurface,
                             height: 1.3,
                           ),
                         ),
@@ -1749,7 +1911,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: statusColor.withOpacity(0.1),
+                          color: statusColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -1771,14 +1933,14 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: AppColors.surfaceLight,
+                          color: context.tpMutedFill,
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
                           job.categoryName ?? 'Other',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 10,
-                            color: AppColors.textSecondary,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -1805,7 +1967,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                           width: 20,
                           height: 20,
                           decoration: BoxDecoration(
-                            color: const Color(0xFF3B82F6).withOpacity(0.1),
+                            color: const Color(0xFF3B82F6).withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(Icons.person_rounded, size: 12, color: Color(0xFF3B82F6)),
@@ -1814,7 +1976,10 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                         Expanded(
                           child: Text(
                             job.workerName ?? context.tr('worker_role'),
-                            style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -1834,7 +1999,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF22C55E).withOpacity(0.1),
+                            color: const Color(0xFF22C55E).withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Row(
@@ -1872,13 +2037,13 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
       height: 70,
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [color.withOpacity(0.15), color.withOpacity(0.05)],
+          colors: [color.withValues(alpha: 0.15), color.withValues(alpha: 0.05)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Icon(Icons.work_outline_rounded, size: 28, color: color.withOpacity(0.5)),
+      child: Icon(Icons.work_outline_rounded, size: 28, color: color.withValues(alpha: 0.5)),
     );
   }
 
@@ -1910,7 +2075,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
     }
   }
 
-  Color _getStatusColor(String status) {
+  Color _getStatusColor(BuildContext context, String status) {
     switch (status) {
       case 'open':
       case 'posted':
@@ -1927,7 +2092,7 @@ class _ClientMyJobsTabState extends State<_ClientMyJobsTab>
       case 'cancelled':
         return const Color(0xFFEF4444);
       default:
-        return AppColors.textLight;
+        return Theme.of(context).colorScheme.onSurfaceVariant;
     }
   }
 
@@ -1963,1081 +2128,3 @@ class _ClientChatTab extends StatelessWidget {
   }
 }
 
-// === DASHBOARD TAB (PROFILE) ===
-class _ClientDashboardTab extends StatefulWidget {
-  const _ClientDashboardTab();
-
-  @override
-  State<_ClientDashboardTab> createState() => _ClientDashboardTabState();
-}
-
-class _ClientDashboardTabState extends State<_ClientDashboardTab> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadData();
-    });
-  }
-
-  Future<void> _loadData() async {
-    if (!mounted) return;
-    await context.read<ClientProvider>().loadDashboard();
-  }
-
-  String _formatCurrency(double amount) {
-    return amount.toStringAsFixed(0).replaceAllMapped(
-      RegExp(r'\B(?=(\d{3})+(?!\d))'),
-      (match) => ',',
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final user = context.watch<AuthProvider>().user;
-    final clientProvider = context.watch<ClientProvider>();
-    final dashboard = clientProvider.dashboard;
-    final isLoading = clientProvider.isDashboardLoading;
-
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: RefreshIndicator(
-        onRefresh: _loadData,
-        color: AppColors.primary,
-        child: CustomScrollView(
-          slivers: [
-            // Gradient Header with Profile
-            SliverToBoxAdapter(
-              child: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30),
-                  ),
-                ),
-                child: SafeArea(
-                  bottom: false,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 25),
-                    child: Column(
-                      children: [
-                        // Header Row
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              context.tr('dash_nav'),
-                              style: const TextStyle(
-                                color: AppColors.surface,
-                                fontSize: 26,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: -0.5,
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: AppColors.surface.withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: IconButton(
-                                    icon: isLoading
-                                        ? const SizedBox(
-                                            width: 20,
-                                            height: 20,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              color: AppColors.surface,
-                                            ),
-                                          )
-                                        : const Icon(Icons.refresh_rounded, color: AppColors.surface),
-                                    onPressed: _loadData,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: AppColors.surface.withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: IconButton(
-                                    icon: const Icon(Icons.settings_outlined, color: AppColors.surface),
-                                    onPressed: () => Navigator.pushNamed(context, AppRouter.settingsPage),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 25),
-                        // Profile Card
-                        Container(
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            color: AppColors.surface.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: AppColors.surface.withOpacity(0.2)),
-                          ),
-                          child: Row(
-                            children: [
-                              // Avatar with badge
-                              Stack(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(3),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(color: AppColors.surface, width: 2),
-                                    ),
-                                    child: CircleAvatar(
-                                      radius: 32,
-                                      backgroundColor: AppColors.surface,
-                                      backgroundImage: user?.profilePhotoUrl != null
-                                          ? NetworkImage(user!.profilePhotoUrl!)
-                                          : null,
-                                      child: user?.profilePhotoUrl == null
-                                          ? Text(
-                                              user?.name.isNotEmpty == true ? user!.name[0].toUpperCase() : 'U',
-                                              style: const TextStyle(
-                                                color: AppColors.primary,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 26,
-                                              ),
-                                            )
-                                          : null,
-                                    ),
-                                  ),
-                                  Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: Container(
-                                      padding: const EdgeInsets.all(4),
-                                      decoration: const BoxDecoration(
-                                        color: Color(0xFF22C55E),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(Icons.check, size: 12, color: AppColors.surface),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(width: 15),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      user?.name ?? context.tr('client_label'),
-                                      style: const TextStyle(
-                                        color: AppColors.surface,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      user?.email ?? '',
-                                      style: TextStyle(
-                                        color: AppColors.surface.withOpacity(0.8),
-                                        fontSize: 13,
-                                      ),
-                                    ),
-                                    if (user?.phone != null) ...[
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        user!.phone!,
-                                        style: TextStyle(
-                                          color: AppColors.surface.withOpacity(0.7),
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFF97316),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: const Text(
-                                  'Muhitaji',
-                                  style: TextStyle(
-                                    color: AppColors.surface,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            // Wallet Balance Card
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-                child: Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF7C3AED), Color(0xFF8B5CF6)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF7C3AED).withValues(alpha: 0.3),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: AppColors.surface.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: const Icon(Icons.account_balance_wallet_rounded, color: AppColors.surface, size: 24),
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                context.tr('wallet_balance'),
-                                style: const TextStyle(
-                                  color: AppColors.surface,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                          if (clientProvider.walletBalance > 0)
-                            GestureDetector(
-                              onTap: () => _showWithdrawDialog(context, clientProvider),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: AppColors.surface,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: const Row(
-                                  children: [
-                                    Icon(Icons.arrow_upward_rounded, size: 16, color: Color(0xFF7C3AED)),
-                                    SizedBox(width: 4),
-                                    Text(
-                                      'Toa Pesa',
-                                      style: TextStyle(
-                                        color: Color(0xFF7C3AED),
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          const Text(
-                            'TZS ',
-                            style: TextStyle(
-                              color: AppColors.surface,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          clientProvider.isWalletLoading
-                              ? const SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    color: AppColors.surface,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : Text(
-                                  _formatCurrency(clientProvider.walletBalance),
-                                  style: const TextStyle(
-                                    color: AppColors.surface,
-                                    fontSize: 36,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: -1,
-                                  ),
-                                ),
-                        ],
-                      ),
-                      if (clientProvider.walletBalance > 0) ...[
-                        const SizedBox(height: 12),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: AppColors.surface.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            context.tr('refund_from_cancelled'),
-                            style: const TextStyle(color: Colors.white70, fontSize: 11),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            // Total Paid Card
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [AppColors.success, AppColors.success],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.success.withValues(alpha: 0.3),
-                        blurRadius: 15,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: AppColors.surface.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: const Icon(Icons.payments_rounded, color: AppColors.surface, size: 28),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              context.tr('client_budget'),
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 13,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'TZS ${_formatCurrency(dashboard?.totalPaid ?? 0)}',
-                              style: const TextStyle(
-                                color: AppColors.surface,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: AppColors.surface.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          '${dashboard?.paymentHistory.length ?? 0} malipo',
-                          style: const TextStyle(color: AppColors.surface, fontSize: 11),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            // Stats Grid (4 cards)
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        _buildStatCard(
-                          icon: Icons.post_add_rounded,
-                          value: '${dashboard?.posted ?? 0}',
-                          label: context.tr('posted_jobs_label'),
-                          color: const Color(0xFF3B82F6),
-                        ),
-                        const SizedBox(width: 12),
-                        _buildStatCard(
-                          icon: Icons.check_circle_rounded,
-                          value: '${dashboard?.completed ?? 0}',
-                          label: 'Zilizokamilika',
-                          color: const Color(0xFF22C55E),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // Payment History Section
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 15, 20, 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      context.tr('dash_earnings_history'),
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    if (dashboard?.paymentHistory.isNotEmpty == true)
-                      TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          context.tr('view_all'),
-                          style: const TextStyle(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-
-            // Payment History List
-            if (dashboard?.paymentHistory.isEmpty ?? true)
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Container(
-                    padding: const EdgeInsets.all(30),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Column(
-                      children: [
-                        Icon(Icons.receipt_long_outlined, size: 48, color: Colors.grey[300]),
-                        const SizedBox(height: 12),
-                        Text(
-                          context.tr('no_transactions'),
-                          style: TextStyle(color: Colors.grey[500], fontSize: 14),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              )
-            else
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final payment = dashboard!.paymentHistory[index];
-                    return Padding(
-                      padding: EdgeInsets.fromLTRB(20, index == 0 ? 0 : 8, 20, 8),
-                      child: _buildPaymentCard(payment),
-                    );
-                  },
-                  childCount: (dashboard?.paymentHistory.length ?? 0).clamp(0, 5),
-                ),
-              ),
-
-            // Logout Button
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-                child: OutlinedButton.icon(
-                  onPressed: () async {
-                    await context.read<AuthProvider>().logout();
-                    if (context.mounted) {
-                      Navigator.pushReplacementNamed(context, AppRouter.welcome);
-                    }
-                  },
-                  icon: const Icon(Icons.logout_rounded, color: Color(0xFFEF4444)),
-                  label: Text(
-                    context.tr('logout'),
-                    style: const TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.w600),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFFEF4444)),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
-                ),
-              ),
-            ),
-
-            const SliverToBoxAdapter(child: SizedBox(height: 30)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatCard({
-    required IconData icon,
-    required String value,
-    required String label,
-    required Color color,
-  }) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(icon, color: color, size: 20),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    value,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    label,
-                    style: const TextStyle(
-                      fontSize: 10,
-                      color: AppColors.textSecondary,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPaymentCard(PaymentHistory payment) {
-    final isCompleted = payment.isCompleted;
-    
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Status Icon
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: isCompleted
-                  ? const Color(0xFF22C55E).withOpacity(0.1)
-                  : const Color(0xFFF59E0B).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              isCompleted ? Icons.check_circle_rounded : Icons.pending_rounded,
-              color: isCompleted ? const Color(0xFF22C55E) : const Color(0xFFF59E0B),
-              size: 22,
-            ),
-          ),
-          const SizedBox(width: 14),
-          // Details
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  payment.job?.title ?? 'Malipo #${payment.id}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    if (payment.channel != null) ...[
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: AppColors.surfaceLight,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          payment.channel!,
-                          style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                    ],
-                    if (payment.createdAt != null)
-                      Text(
-                        _formatPaymentDate(context, payment.createdAt!),
-                        style: const TextStyle(fontSize: 11, color: AppColors.textLight),
-                      ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          // Amount
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                'TZS ${_formatCurrency(payment.amount)}',
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: isCompleted
-                      ? const Color(0xFF22C55E).withOpacity(0.1)
-                      : const Color(0xFFF59E0B).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  isCompleted ? context.tr('status_completed') : context.tr('status_pending_payment'),
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: isCompleted ? const Color(0xFF22C55E) : const Color(0xFFF59E0B),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _formatPaymentDate(BuildContext context, DateTime date) {
-    final now = DateTime.now();
-    final diff = now.difference(date);
-    final ago = context.tr('time_ago_suffix');
-
-    if (diff.inDays == 0) {
-      return context.tr('today');
-    } else if (diff.inDays == 1) {
-      return context.tr('yesterday');
-    } else if (diff.inDays < 7) {
-      return '${diff.inDays} ${context.tr('time_days')} $ago';
-    } else {
-      return '${date.day}/${date.month}/${date.year}';
-    }
-  }
-
-  void _showWithdrawDialog(BuildContext context, ClientProvider clientProvider) {
-    final amountController = TextEditingController();
-    final phoneController = TextEditingController();
-    final nameController = TextEditingController();
-    String selectedNetwork = 'vodacom';
-
-    // Pre-fill phone from user
-    final user = context.read<AuthProvider>().user;
-    if (user?.phone != null) {
-      phoneController.text = user!.phone!;
-    }
-    if (user?.name != null) {
-      nameController.text = user!.name;
-    }
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) {
-          return Container(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom,
-            ),
-            decoration: const BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(30),
-                topRight: Radius.circular(30),
-              ),
-            ),
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(25),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Handle bar
-                  Center(
-                    child: Container(
-                      width: 50,
-                      height: 5,
-                      decoration: BoxDecoration(
-                        color: AppColors.grey200,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 25),
-
-                  // Title
-                  const Row(
-                    children: [
-                      Icon(Icons.arrow_upward_rounded, color: Color(0xFF7C3AED), size: 28),
-                      SizedBox(width: 12),
-                      Text(
-                        'Toa Pesa',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${context.tr('balance_label')} TZS ${_formatCurrency(clientProvider.walletBalance)}',
-                    style: const TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 25),
-
-                  // Amount Field
-                  const Text(
-                    'Kiasi (TZS)',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: amountController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      hintText: context.tr('amount_hint'),
-                      prefixIcon: const Icon(Icons.payments_outlined, color: AppColors.textLight),
-                      filled: true,
-                      fillColor: AppColors.background,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(color: AppColors.grey200),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(color: Color(0xFF7C3AED), width: 2),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Phone Field
-                  Text(
-                    context.tr('phone_number'),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: phoneController,
-                    keyboardType: TextInputType.phone,
-                    decoration: InputDecoration(
-                      hintText: '07XXXXXXXX',
-                      prefixIcon: const Icon(Icons.phone_android_rounded, color: AppColors.textLight),
-                      filled: true,
-                      fillColor: AppColors.background,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(color: AppColors.grey200),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(color: Color(0xFF7C3AED), width: 2),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Registered Name Field
-                  Text(
-                    context.tr('mpesa_name_label'),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: nameController,
-                    decoration: InputDecoration(
-                      hintText: context.tr('mpesa_name_hint'),
-                      prefixIcon: const Icon(Icons.person_outline_rounded, color: AppColors.textLight),
-                      filled: true,
-                      fillColor: AppColors.background,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(color: AppColors.grey200),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(color: Color(0xFF7C3AED), width: 2),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Network Selection
-                  const Text(
-                    'Mtandao',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
-                    children: [
-                      _buildNetworkChip('Vodacom', 'vodacom', selectedNetwork, (v) {
-                        setModalState(() => selectedNetwork = v);
-                      }),
-                      _buildNetworkChip('Tigo', 'tigo', selectedNetwork, (v) {
-                        setModalState(() => selectedNetwork = v);
-                      }),
-                      _buildNetworkChip('Airtel', 'airtel', selectedNetwork, (v) {
-                        setModalState(() => selectedNetwork = v);
-                      }),
-                      _buildNetworkChip('Halotel', 'halotel', selectedNetwork, (v) {
-                        setModalState(() => selectedNetwork = v);
-                      }),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-
-                  // Submit Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: clientProvider.isWithdrawing
-                          ? null
-                          : () async {
-                              final amount = int.tryParse(amountController.text.replaceAll(',', '')) ?? 0;
-                              final phone = phoneController.text.trim();
-                              final name = nameController.text.trim();
-
-                              if (amount < 5000) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(context.tr('min_amount_error')),
-                                    backgroundColor: const Color(0xFFEF4444),
-                                  ),
-                                );
-                                return;
-                              }
-
-                              if (amount > clientProvider.walletBalance) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(context.tr('insufficient_balance_error')),
-                                    backgroundColor: const Color(0xFFEF4444),
-                                  ),
-                                );
-                                return;
-                              }
-
-                              if (phone.isEmpty || name.isEmpty) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(context.tr('fill_all_fields')),
-                                    backgroundColor: const Color(0xFFEF4444),
-                                  ),
-                                );
-                                return;
-                              }
-
-                              try {
-                                await clientProvider.submitWithdrawal(
-                                  amount: amount,
-                                  phoneNumber: phone,
-                                  registeredName: name,
-                                  networkType: selectedNetwork,
-                                );
-
-                                if (context.mounted) {
-                                  Navigator.pop(context);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(context.tr('withdrawal_submitted')),
-                                      backgroundColor: const Color(0xFF22C55E),
-                                    ),
-                                  );
-                                }
-                              } catch (e) {
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('${context.tr("error_prefix")}: $e'),
-                                      backgroundColor: const Color(0xFFEF4444),
-                                    ),
-                                  );
-                                }
-                              }
-                            },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF7C3AED),
-                        foregroundColor: AppColors.surface,
-                        padding: const EdgeInsets.symmetric(vertical: 18),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: clientProvider.isWithdrawing
-                          ? const SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                color: AppColors.surface,
-                                strokeWidth: 2.5,
-                              ),
-                            )
-                          : const Text(
-                              'TOA PESA',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildNetworkChip(String label, String value, String selected, Function(String) onTap) {
-    final isSelected = selected == value;
-    return GestureDetector(
-      onTap: () => onTap(value),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF7C3AED) : AppColors.background,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? const Color(0xFF7C3AED) : AppColors.grey200,
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? AppColors.textWhite : AppColors.textSecondary,
-            fontWeight: FontWeight.w600,
-            fontSize: 13,
-          ),
-        ),
-      ),
-    );
-  }
-}

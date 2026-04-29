@@ -1,7 +1,7 @@
 name: tendapoa
 description: "Tendapoa - Pata Mfanyakazi Karibu Nawe"
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.0.2+3
 
 environment:
   sdk: ^3.5.0
@@ -50,6 +50,8 @@ dependencies:
   intl: ^0.20.0
   timeago: ^3.6.1
   url_launcher: ^6.2.5
+  package_info_plus: ^8.1.2
+  app_settings: ^5.1.1
   flutter_localizations:
     sdk: flutter
   pull_to_refresh: ^2.0.0

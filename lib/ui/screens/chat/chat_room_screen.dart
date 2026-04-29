@@ -131,23 +131,25 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     final auth = context.watch<AuthProvider>();
     final currentUserId = auth.user?.id;
     final otherUser = widget.conversation.otherUser;
+    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F5F9), // Softer background
+      backgroundColor: cs.surface,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: cs.surface,
+        foregroundColor: cs.onSurface,
         elevation: 0,
         centerTitle: false,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded,
-              color: AppColors.textPrimary, size: 18),
+          icon: Icon(Icons.arrow_back_ios_new_rounded,
+              color: cs.onSurface, size: 18),
           onPressed: () => Navigator.pop(context),
         ),
         title: Row(
           children: [
             CircleAvatar(
               radius: 18,
-              backgroundColor: const Color(0xFFF1F5F9),
+              backgroundColor: cs.primaryContainer,
               backgroundImage: otherUser?.profilePhotoUrl != null
                   ? NetworkImage(otherUser!.profilePhotoUrl!)
                   : null,
@@ -156,8 +158,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                       otherUser?.name.isNotEmpty == true
                           ? otherUser!.name[0]
                           : 'U',
-                      style: const TextStyle(
-                          color: AppColors.primary,
+                      style: TextStyle(
+                          color: cs.onPrimaryContainer,
                           fontWeight: FontWeight.bold,
                           fontSize: 14))
                   : null,
@@ -168,14 +170,14 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(otherUser?.name ?? 'Chat',
-                      style: const TextStyle(
-                          color: AppColors.textPrimary,
+                      style: TextStyle(
+                          color: cs.onSurface,
                           fontSize: 16,
                           fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis),
                   const Text('Online Now',
                       style: TextStyle(
-                          color: Color(0xFF22C55E),
+                          color: AppColors.success,
                           fontSize: 11,
                           fontWeight: FontWeight.w600)),
                 ],
@@ -185,8 +187,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.call_outlined,
-                color: AppColors.textPrimary, size: 22),
+            icon: Icon(Icons.call_outlined,
+                color: cs.onSurface, size: 22),
             onPressed: () {
               if (otherUser?.phone != null) {
                 _makePhoneCall(otherUser!.phone!);
@@ -205,16 +207,23 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-              color: const Color(0xFFEFF6FF),
+              decoration: BoxDecoration(
+                color: cs.primaryContainer.withValues(alpha: 0.55),
+                border: Border(
+                  bottom: BorderSide(
+                    color: cs.outlineVariant.withValues(alpha: 0.45),
+                  ),
+                ),
+              ),
               child: Row(
                 children: [
-                  const Icon(Icons.work_outline_rounded,
-                      size: 14, color: AppColors.primary),
+                  Icon(Icons.work_outline_rounded,
+                      size: 14, color: cs.primary),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text('Kuhusu: ${widget.conversation.job!.title}',
-                        style: const TextStyle(
-                            color: AppColors.primary,
+                        style: TextStyle(
+                            color: cs.onPrimaryContainer,
                             fontSize: 12,
                             fontWeight: FontWeight.w600),
                         maxLines: 1,
@@ -249,6 +258,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   }
 
   Widget _buildMessageBubble(ChatMessage msg, bool isMe) {
+    final cs = Theme.of(context).colorScheme;
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Column(
@@ -259,7 +269,12 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             margin: const EdgeInsets.symmetric(vertical: 4),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: isMe ? AppColors.primary : Colors.white,
+              color: isMe ? cs.primary : context.tpCardElevated,
+              border: isMe
+                  ? null
+                  : Border.all(
+                      color: cs.outlineVariant.withValues(alpha: 0.45),
+                    ),
               borderRadius: BorderRadius.only(
                 topLeft: const Radius.circular(20),
                 topRight: const Radius.circular(20),
@@ -268,7 +283,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
               ),
               boxShadow: [
                 BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.02),
+                    color: context.tpShadowSoft,
                     blurRadius: 5,
                     offset: const Offset(0, 2))
               ],
@@ -278,7 +293,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             child: Text(
               msg.message,
               style: TextStyle(
-                color: isMe ? Colors.white : AppColors.textPrimary,
+                color: isMe ? cs.onPrimary : cs.onSurface,
                 fontSize: 15,
                 height: 1.4,
               ),
@@ -288,7 +303,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
             child: Text(
               DateFormat('HH:mm').format(msg.createdAt ?? DateTime.now()),
-              style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10),
+              style: TextStyle(color: cs.onSurfaceVariant, fontSize: 10),
             ),
           ),
           const SizedBox(height: 8),
@@ -298,27 +313,42 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   }
 
   Widget _buildInputBar() {
-    return Container(
-      color: Colors.white,
-      padding: EdgeInsets.fromLTRB(
-          20, 15, 20, MediaQuery.of(context).padding.bottom + 15),
-      child: Row(
+    final cs = Theme.of(context).colorScheme;
+    return Material(
+      color: cs.surfaceContainerHigh,
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(
+              color: cs.outlineVariant.withValues(alpha: 0.45),
+            ),
+          ),
+        ),
+        padding: EdgeInsets.fromLTRB(
+            20, 15, 20, MediaQuery.of(context).padding.bottom + 15),
+        child: Row(
         children: [
           Expanded(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 15),
               decoration: BoxDecoration(
-                color: const Color(0xFFF1F5F9),
+                color: context.tpMutedFill,
                 borderRadius: BorderRadius.circular(25),
+                border: Border.all(
+                  color: cs.outlineVariant.withValues(alpha: 0.35),
+                ),
               ),
               child: TextField(
                 controller: _msgController,
                 maxLines: 4,
                 minLines: 1,
+                style: TextStyle(color: cs.onSurface, fontSize: 15),
+                cursorColor: cs.primary,
                 decoration: InputDecoration(
                   hintText: context.tr('enter_message_hint'),
                   border: InputBorder.none,
-                  hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
+                  hintStyle:
+                      TextStyle(color: cs.onSurfaceVariant, fontSize: 14),
                 ),
               ),
             ),
@@ -328,19 +358,20 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             onTap: _isSending ? null : _sendMessage,
             child: Container(
               padding: const EdgeInsets.all(12),
-              decoration: const BoxDecoration(
-                  color: AppColors.primary, shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                  color: cs.primary, shape: BoxShape.circle),
               child: _isSending
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white))
-                  : const Icon(Icons.send_rounded,
-                      color: Colors.white, size: 20),
+                          strokeWidth: 2, color: cs.onPrimary))
+                  : Icon(Icons.send_rounded,
+                      color: cs.onPrimary, size: 20),
             ),
           ),
         ],
+      ),
       ),
     );
   }

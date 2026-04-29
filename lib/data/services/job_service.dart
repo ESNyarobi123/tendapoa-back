@@ -144,9 +144,11 @@ class JobService {
   /// Returns: {done: bool, status: String}
   Future<Map<String, dynamic>> pollPayment(int jobId) async {
     final response = await _api.get('/jobs/$jobId/poll');
+    final d = response.data!;
     return {
-      'done': response.data!['done'] ?? false,
-      'status': response.data!['status'] ?? 'PENDING',
+      'done': d['done'] ?? false,
+      'status': d['status'] ?? 'PENDING',
+      'job_status': d['job_status'],
     };
   }
 
@@ -301,6 +303,151 @@ class JobService {
   /// Returns success message and refund info
   Future<Map<String, dynamic>> deleteJob(int jobId) async {
     final response = await _api.post('/jobs/$jobId/cancel');
+    return response.data!;
+  }
+
+  /// Maombi ya wafanyakazi kwenye kazi za muhitaji (inbox).
+  Future<Map<String, dynamic>> getMyApplications({
+    String? filter,
+    int page = 1,
+  }) async {
+    final response = await _api.get(
+      '/my/applications',
+      queryParams: {
+        if (filter != null) 'filter': filter,
+        'page': page,
+      },
+    );
+    return response.data!;
+  }
+
+  /// Ombi jipya kupitia mfumo mpya (`job_applications`).
+  Future<models.JobApplication> applyToJobApi(
+    int jobId, {
+    required int proposedAmount,
+    required String message,
+    String? etaText,
+  }) async {
+    final response = await _api.post(
+      '/jobs/$jobId/apply',
+      body: {
+        'proposed_amount': proposedAmount,
+        'message': message,
+        if (etaText != null && etaText.trim().isNotEmpty) 'eta_text': etaText.trim(),
+      },
+    );
+    final d = response.data!['data'];
+    return models.JobApplication.fromJson(Map<String, dynamic>.from(d as Map));
+  }
+
+  /// Mteja achague mfanyakazi (mfumo mpya).
+  Future<models.Job> selectApplication(int jobId, int applicationId) async {
+    final response = await _api.post(
+      '/jobs/$jobId/applications/$applicationId/select',
+    );
+    final d = response.data!['data'] ?? response.data!;
+    return models.Job.fromJson(Map<String, dynamic>.from(d as Map));
+  }
+
+  Future<models.Job> fundJobFromWallet(int jobId) async {
+    final response = await _api.post('/jobs/$jobId/fund/wallet');
+    final d = response.data!['data'] ?? response.data!;
+    return models.Job.fromJson(Map<String, dynamic>.from(d as Map));
+  }
+
+  Future<Map<String, dynamic>> fundJobExternal(int jobId, String phone) async {
+    final response = await _api.post(
+      '/jobs/$jobId/fund/external',
+      body: {'phone': phone},
+    );
+    return response.data!;
+  }
+
+  Future<Map<String, dynamic>> pollJobFund(int jobId) async {
+    final response = await _api.get('/jobs/$jobId/fund/poll');
+    return response.data!;
+  }
+
+  Future<models.Job?> clientConfirmJob(int jobId) async {
+    final response = await _api.post('/jobs/$jobId/client-confirm');
+    final inner = response.data!['data'];
+    if (inner is Map<String, dynamic> && inner['job'] != null) {
+      return models.Job.fromJson(
+        Map<String, dynamic>.from(inner['job'] as Map),
+      );
+    }
+    return null;
+  }
+
+  Future<void> clientRequestRevision(int jobId, String reason) async {
+    await _api.post(
+      '/jobs/$jobId/client-revision',
+      body: {'reason': reason},
+    );
+  }
+
+  /// Mfanyakazi akubali kazi baada ya escrow (`funded`).
+  Future<models.Job> workerAcceptFundedJob(int jobId) async {
+    final response = await _api.post('/jobs/$jobId/worker-accept');
+    final d = response.data!['data'] ?? response.data!;
+    return models.Job.fromJson(Map<String, dynamic>.from(d as Map));
+  }
+
+  /// Mfanyakazi akatae — malipo yarudi kwa mteja, kazi hurudi wazi.
+  Future<void> workerDeclineFundedJob(int jobId) async {
+    await _api.post('/jobs/$jobId/worker-decline');
+  }
+
+  /// Mfanyakazi awasilishe kazi kama imekamilika.
+  Future<models.Job> workerSubmitCompletion(
+    int jobId, {
+    String? notes,
+    String? code,
+  }) async {
+    final response = await _api.post(
+      '/jobs/$jobId/worker-submit',
+      body: {
+        if (notes != null && notes.trim().isNotEmpty) 'notes': notes.trim(),
+        if (code != null && code.trim().isNotEmpty) 'code': code.trim(),
+      },
+    );
+    final d = response.data!['data'] ?? response.data!;
+    return models.Job.fromJson(Map<String, dynamic>.from(d as Map));
+  }
+
+  /// Maombi yote aliyowasilisha mfanyakazi.
+  Future<Map<String, dynamic>> getWorkerApplications({int page = 1}) async {
+    final response = await _api.get(
+      '/worker/applications',
+      queryParams: {'page': page},
+    );
+    return response.data!;
+  }
+
+  /// Chapisha kazi kama mfanyakazi (`POST /worker/jobs`).
+  Future<Map<String, dynamic>> postWorkerJob({
+    required String title,
+    required int categoryId,
+    required int price,
+    required String description,
+    required double lat,
+    required double lng,
+    required String phone,
+    String? addressText,
+  }) async {
+    final response = await _api.post(
+      '/worker/jobs',
+      body: {
+        'title': title,
+        'category_id': categoryId,
+        'price': price,
+        'description': description,
+        'lat': lat,
+        'lng': lng,
+        'phone': phone,
+        if (addressText != null && addressText.isNotEmpty) 'address_text': addressText,
+      },
+    );
     return response.data!;
   }
 }
