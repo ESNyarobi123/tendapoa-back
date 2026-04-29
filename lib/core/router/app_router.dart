@@ -34,6 +34,8 @@ class AppRouter {
   static const String workerMyApplications = '/worker-my-applications';
   static const String workerPostJob = '/worker-post-job';
   static const String workerDashboard = '/worker-dashboard';
+  static const String workerPostedJobs = '/worker-posted-jobs';
+  static const String workerJobApplicants = '/worker-job-applicants';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -180,6 +182,24 @@ class AppRouter {
         return _buildRoute(const WorkerDashboardScreen(), settings);
       case workerPostJob:
         return _buildRoute(const WorkerPostJobScreen(), settings);
+      case workerPostedJobs:
+        return _buildRoute(const WorkerPostedJobsScreen(), settings);
+      case workerJobApplicants:
+        final args = settings.arguments as Map<String, dynamic>?;
+        final jobId = args?['job_id'] as int?;
+        if (jobId == null) {
+          return _buildRoute(
+            const Scaffold(body: Center(child: Text('Invalid job id'))),
+            settings,
+          );
+        }
+        return _buildRoute(
+          WorkerJobApplicantsScreen(
+            jobId: jobId,
+            jobTitle: args?['job_title'] as String?,
+          ),
+          settings,
+        );
       default:
         return _buildRoute(
             const Scaffold(body: Center(child: Text('Route not found'))),

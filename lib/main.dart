@@ -1,3 +1,5 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +11,7 @@ import 'core/router/app_router.dart';
 import 'core/localization/app_localizations.dart';
 import 'core/theme/tendapoa_material_themes.dart';
 import 'data/services/storage_service.dart';
+import 'data/services/firebase_messaging_service.dart';
 import 'providers/providers.dart';
 
 void main() async {
@@ -16,6 +19,17 @@ void main() async {
 
   // Initialize storage service FIRST before anything else
   await StorageService().init();
+
+  // Firebase + FCM. Gracefully handles missing google-services.json
+  // during development so the app keeps working.
+  try {
+    await Firebase.initializeApp();
+    await FirebaseMessagingService.instance.init();
+  } catch (e) {
+    if (kDebugMode) {
+      debugPrint('[Firebase] init skipped: $e');
+    }
+  }
 
   // Load saved language so app shows correct locale from first frame
   final prefs = await SharedPreferences.getInstance();
@@ -73,7 +87,9 @@ class TendapoaApp extends StatelessWidget {
                   }
                 }
               }
-              return supported.isNotEmpty ? supported.first : const Locale('sw');
+              return supported.isNotEmpty
+                  ? supported.first
+                  : const Locale('sw');
             },
             localizationsDelegates: const [
               AppLocalizations.delegate,

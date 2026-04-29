@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1013993621084",
+    "project_id": "tendapoa-eb234",
+    "storage_bucket": "tendapoa-eb234.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1013993621084:android:e462c1f46de5b45c4c4899",
+        "android_client_info": {
+          "package_name": "com.example.tendapoa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7rWYni7qm4923obbsMCrWRQksgjVvgRo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

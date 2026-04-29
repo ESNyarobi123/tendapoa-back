@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/constants.dart';
 import '../../../core/localization/app_localizations.dart';
@@ -8,7 +9,8 @@ import '../../../data/models/models.dart';
 import '../../../data/services/services.dart';
 import '../../../providers/providers.dart';
 
-/// Chapisha kazi kama mfanyakazi — `POST /worker/jobs` (hakuna picha).
+/// Mfanyakazi posts a job they can do, with optional image upload.
+/// Backend: `POST /api/worker/jobs` (multipart when image provided).
 class WorkerPostJobScreen extends StatefulWidget {
   const WorkerPostJobScreen({super.key});
 
@@ -27,6 +29,7 @@ class _WorkerPostJobScreenState extends State<WorkerPostJobScreen> {
   double? _lat;
   double? _lng;
   String? _addressText;
+  XFile? _pickedImage;
   bool _submitting = false;
 
   @override
@@ -70,6 +73,65 @@ class _WorkerPostJobScreenState extends State<WorkerPostJobScreen> {
     } catch (_) {}
   }
 
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final picker = ImagePicker();
+      final picked = await picker.pickImage(
+        source: source,
+        maxWidth: AppConstants.maxImageSize.toDouble(),
+        imageQuality: AppConstants.imageQuality,
+      );
+      if (picked != null && mounted) {
+        setState(() => _pickedImage = picked);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Imeshindwa kuchagua picha: $e')),
+        );
+      }
+    }
+  }
+
+  void _showImagePickerSheet() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Wrap(children: [
+          ListTile(
+            leading: const Icon(Icons.camera_alt_outlined),
+            title: const Text('Piga picha'),
+            onTap: () {
+              Navigator.pop(ctx);
+              _pickImage(ImageSource.camera);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.photo_library_outlined),
+            title: const Text('Chagua kwenye galari'),
+            onTap: () {
+              Navigator.pop(ctx);
+              _pickImage(ImageSource.gallery);
+            },
+          ),
+          if (_pickedImage != null)
+            ListTile(
+              leading: const Icon(Icons.delete_outline, color: Colors.red),
+              title: const Text('Ondoa picha',
+                  style: TextStyle(color: Colors.red)),
+              onTap: () {
+                Navigator.pop(ctx);
+                setState(() => _pickedImage = null);
+              },
+            ),
+        ]),
+      ),
+    );
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedCategory == null) {
@@ -90,9 +152,11 @@ class _WorkerPostJobScreenState extends State<WorkerPostJobScreen> {
     }
 
     final price = int.tryParse(_priceController.text.replaceAll(',', '')) ?? 0;
-    if (price < 1000) {
+    if (price < AppConstants.minPrice) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Bei lazima iwe angalau TZS 1,000.')),
+        SnackBar(
+            content: Text(
+                'Bei lazima iwe angalau TZS ${AppConstants.minPrice.toString()}.')),
       );
       return;
     }
@@ -108,6 +172,7 @@ class _WorkerPostJobScreenState extends State<WorkerPostJobScreen> {
         lng: _lng!,
         phone: _phoneController.text.trim(),
         addressText: _addressText,
+        image: _pickedImage,
       );
 
       if (!mounted) return;
@@ -171,8 +236,8 @@ class _WorkerPostJobScreenState extends State<WorkerPostJobScreen> {
   @override
   Widget build(BuildContext context) {
     final categories = context.watch<AppProvider>().categories;
-
     final cs = Theme.of(context).colorScheme;
+
     return Scaffold(
       backgroundColor: cs.surface,
       appBar: AppBar(
@@ -197,6 +262,11 @@ class _WorkerPostJobScreenState extends State<WorkerPostJobScreen> {
               style: TextStyle(color: cs.onSurfaceVariant, fontSize: 14),
             ),
             const SizedBox(height: 20),
+
+            // Image picker
+            _buildImagePicker(cs),
+            const SizedBox(height: 20),
+
             TextFormField(
               controller: _titleController,
               style: TextStyle(color: cs.onSurface),
@@ -207,8 +277,9 @@ class _WorkerPostJobScreenState extends State<WorkerPostJobScreen> {
                 filled: true,
                 fillColor: cs.surfaceContainerHighest,
               ),
-              validator: (v) =>
-                  v == null || v.trim().isEmpty ? context.tr('job_title_error') : null,
+              validator: (v) => v == null || v.trim().isEmpty
+                  ? context.tr('job_title_error')
+                  : null,
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<Category>(
@@ -240,8 +311,9 @@ class _WorkerPostJobScreenState extends State<WorkerPostJobScreen> {
                 filled: true,
                 fillColor: cs.surfaceContainerHighest,
               ),
-              validator: (v) =>
-                  v == null || v.trim().isEmpty ? context.tr('budget_error') : null,
+              validator: (v) => v == null || v.trim().isEmpty
+                  ? context.tr('budget_error')
+                  : null,
             ),
             const SizedBox(height: 16),
             TextFormField(
@@ -277,7 +349,9 @@ class _WorkerPostJobScreenState extends State<WorkerPostJobScreen> {
                 fillColor: cs.surfaceContainerHighest,
               ),
               validator: (v) {
-                if (v == null || v.trim().isEmpty) return 'Lazima uweke namba ya simu';
+                if (v == null || v.trim().isEmpty) {
+                  return 'Lazima uweke namba ya simu';
+                }
                 final p = v.replaceAll(RegExp(r'\s'), '');
                 final ok = RegExp(r'^(0[6-7]\d{8}|255[6-7]\d{8})$').hasMatch(p);
                 return ok ? null : 'Namba si sahihi (Tanzania)';
@@ -292,8 +366,10 @@ class _WorkerPostJobScreenState extends State<WorkerPostJobScreen> {
                 style: TextStyle(color: cs.onSurface),
               ),
               subtitle: _lat != null
-                  ? Text('GPS imetambuliwa', style: TextStyle(color: cs.onSurfaceVariant))
-                  : Text('Gusa kutafuta eneo tena', style: TextStyle(color: cs.onSurfaceVariant)),
+                  ? Text('GPS imetambuliwa',
+                      style: TextStyle(color: cs.onSurfaceVariant))
+                  : Text('Gusa kutafuta eneo tena',
+                      style: TextStyle(color: cs.onSurfaceVariant)),
               onTap: _detectLocation,
             ),
             const SizedBox(height: 24),
@@ -317,11 +393,111 @@ class _WorkerPostJobScreenState extends State<WorkerPostJobScreen> {
                     )
                   : const Text(
                       'Tuma kazi',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildImagePicker(ColorScheme cs) {
+    return GestureDetector(
+      onTap: _showImagePickerSheet,
+      child: Container(
+        height: 180,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: cs.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: _pickedImage != null
+                ? const Color(0xFFF97316)
+                : cs.outlineVariant,
+            width: _pickedImage != null ? 2 : 1,
+          ),
+        ),
+        clipBehavior: Clip.hardEdge,
+        child: _pickedImage != null
+            ? Stack(
+                fit: StackFit.expand,
+                children: [
+                  FutureBuilder(
+                    future: _pickedImage!.readAsBytes(),
+                    builder: (ctx, snap) {
+                      if (snap.hasData) {
+                        return Image.memory(snap.data!, fit: BoxFit.cover);
+                      }
+                      return const Center(child: CircularProgressIndicator());
+                    },
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Material(
+                      color: Colors.black54,
+                      shape: const CircleBorder(),
+                      child: InkWell(
+                        customBorder: const CircleBorder(),
+                        onTap: () => setState(() => _pickedImage = null),
+                        child: const Padding(
+                          padding: EdgeInsets.all(6),
+                          child:
+                              Icon(Icons.close, color: Colors.white, size: 18),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 8,
+                    right: 8,
+                    child: Material(
+                      color: const Color(0xFFF97316),
+                      shape: const StadiumBorder(),
+                      child: InkWell(
+                        customBorder: const StadiumBorder(),
+                        onTap: _showImagePickerSheet,
+                        child: const Padding(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.edit, color: Colors.white, size: 14),
+                              SizedBox(width: 4),
+                              Text('Badilisha',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600)),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.add_photo_alternate_outlined,
+                      size: 40, color: cs.onSurfaceVariant),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Ongeza picha (hiari)',
+                    style: TextStyle(
+                        color: cs.onSurface, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Picha husaidia kuvutia waombaji wengi',
+                    style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12),
+                  ),
+                ],
+              ),
       ),
     );
   }

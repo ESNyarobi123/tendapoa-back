@@ -16,7 +16,9 @@ class JobService {
   Future<List<models.Category>> getCategories() async {
     final response = await _api.get('/categories', requiresAuth: false);
     // API may return 'categories' or 'data' key, or direct list
-    final dynamic rawData = response.data!['categories'] ?? response.data!['data'] ?? response.data!;
+    final dynamic rawData = response.data!['categories'] ??
+        response.data!['data'] ??
+        response.data!;
     List dataList = [];
     if (rawData is List) {
       dataList = rawData;
@@ -107,7 +109,8 @@ class JobService {
   Future<List<models.Job>> getMyJobs() async {
     final response = await _api.get('/jobs/my');
     // API returns 'jobs' key, not 'data'
-    final dynamic rawData = response.data!['jobs'] ?? response.data!['data'] ?? [];
+    final dynamic rawData =
+        response.data!['jobs'] ?? response.data!['data'] ?? [];
     List dataList = [];
     if (rawData is Map) {
       dataList = rawData.values.toList();
@@ -202,7 +205,9 @@ class JobService {
 
   /// Post a comment on a job
   /// type: 'comment' (maoni), 'application' (ombi la kazi), 'offer' (bei)
-  Future<void> postComment(int jobId, String message, {
+  Future<void> postComment(
+    int jobId,
+    String message, {
     String type = 'comment',
     int? bidAmount,
   }) async {
@@ -218,9 +223,9 @@ class JobService {
   }
 
   Future<void> applyForJob(int jobId, String message, {int? bidAmount}) async {
-    await postComment(jobId, message, 
-      type: bidAmount != null ? 'offer' : 'application', 
-      bidAmount: bidAmount);
+    await postComment(jobId, message,
+        type: bidAmount != null ? 'offer' : 'application',
+        bidAmount: bidAmount);
   }
 
   /// Accept an assigned job (Worker)
@@ -333,7 +338,8 @@ class JobService {
       body: {
         'proposed_amount': proposedAmount,
         'message': message,
-        if (etaText != null && etaText.trim().isNotEmpty) 'eta_text': etaText.trim(),
+        if (etaText != null && etaText.trim().isNotEmpty)
+          'eta_text': etaText.trim(),
       },
     );
     final d = response.data!['data'];
@@ -425,6 +431,7 @@ class JobService {
   }
 
   /// Chapisha kazi kama mfanyakazi (`POST /worker/jobs`).
+  /// Supports optional image upload (XFile or File).
   Future<Map<String, dynamic>> postWorkerJob({
     required String title,
     required int categoryId,
@@ -434,20 +441,57 @@ class JobService {
     required double lng,
     required String phone,
     String? addressText,
+    dynamic image,
   }) async {
+    final fields = <String, String>{
+      'title': title,
+      'category_id': categoryId.toString(),
+      'price': price.toString(),
+      'description': description,
+      'lat': lat.toString(),
+      'lng': lng.toString(),
+      'phone': phone,
+      if (addressText != null && addressText.isNotEmpty)
+        'address_text': addressText,
+    };
+
+    if (image != null) {
+      final response = await _api.postMultipart(
+        '/worker/jobs',
+        fields: fields,
+        files: {'image': image},
+      );
+      return response.data!;
+    }
+
     final response = await _api.post(
       '/worker/jobs',
-      body: {
-        'title': title,
-        'category_id': categoryId,
-        'price': price,
-        'description': description,
-        'lat': lat,
-        'lng': lng,
-        'phone': phone,
-        if (addressText != null && addressText.isNotEmpty) 'address_text': addressText,
-      },
+      body: fields,
     );
     return response.data!;
+  }
+
+  /// Worker's posted jobs (jobs they themselves listed as work-they-can-do).
+  /// Backend: `GET /worker/posted-jobs` (returns paginator with applications_count).
+  Future<Map<String, dynamic>> getWorkerPostedJobs({int page = 1}) async {
+    final response = await _api.get(
+      '/worker/posted-jobs',
+      queryParams: {'page': page},
+    );
+    return response.data!;
+  }
+
+  /// Applicants for a specific job posted by the worker.
+  /// Backend: `GET /jobs/{job}/applications` — returns list of JobApplication.
+  Future<List<models.JobApplication>> getJobApplicants(int jobId) async {
+    final response = await _api.get('/jobs/$jobId/applications');
+    final dynamic raw =
+        response.data!['data'] ?? response.data!['applications'] ?? [];
+    final List items =
+        raw is List ? raw : (raw is Map ? raw.values.toList() : []);
+    return items
+        .map((e) =>
+            models.JobApplication.fromJson(Map<String, dynamic>.from(e as Map)))
+        .toList();
   }
 }

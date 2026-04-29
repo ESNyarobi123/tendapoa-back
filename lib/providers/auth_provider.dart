@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../data/models/models.dart';
 import '../data/services/services.dart';
@@ -29,7 +30,7 @@ class AuthProvider extends ChangeNotifier {
       // Ensure storage is initialized first
       await _storageService.init();
       _user = await _storageService.getUser();
-      
+
       // Also verify token exists (user data without token is invalid)
       final token = await _storageService.getToken();
       if (_user != null && token == null) {
@@ -37,16 +38,21 @@ class AuthProvider extends ChangeNotifier {
         _user = null;
         await _storageService.deleteUser();
       }
-      
+
       _isInitialized = true;
       notifyListeners();
+
+      // Re-register FCM token on app start if already logged in.
+      if (_user != null) {
+        unawaited(FirebaseMessagingService.instance.registerWithBackend());
+      }
     } catch (e) {
       debugPrint('AuthProvider init error: $e');
       _isInitialized = true;
       notifyListeners();
     }
   }
-  
+
   /// Wait for initialization to complete
   Future<void> waitForInit() async {
     while (!_isInitialized) {
@@ -59,6 +65,7 @@ class AuthProvider extends ChangeNotifier {
     try {
       _user = await _authService.login(email, password);
       _setLoading(false);
+      unawaited(FirebaseMessagingService.instance.registerWithBackend());
       return true;
     } catch (e) {
       _setError(e.toString());
@@ -87,6 +94,7 @@ class AuthProvider extends ChangeNotifier {
         lng: lng,
       );
       _setLoading(false);
+      unawaited(FirebaseMessagingService.instance.registerWithBackend());
       return true;
     } catch (e) {
       _setError(e.toString());
@@ -95,6 +103,8 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> logout() async {
+    // Unregister this device's FCM token first so it stops receiving pushes.
+    await FirebaseMessagingService.instance.unregisterFromBackend();
     await _authService.logout();
     _user = null;
     notifyListeners();

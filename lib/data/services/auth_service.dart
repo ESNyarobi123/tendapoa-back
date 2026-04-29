@@ -69,7 +69,7 @@ class AuthService {
   }
 
   Future<User> getProfile() async {
-    final response = await _api.get('/user');
+    final response = await _api.get('/auth/user');
     if (response.success && response.data != null) {
       final user = User.fromJson(response.data!);
       await _storage.saveUser(user);
@@ -123,39 +123,42 @@ class AuthService {
   // ─── FORGOT PASSWORD (OTP) ──────────────────────────────────────────
 
   /// Step 1: Send OTP to email
+  /// Backend always returns generic success message (no email enumeration).
   Future<String> sendPasswordOtp(String email) async {
     final response = await _api.post(
-      '/password/send-otp',
+      '/auth/password/send-otp',
       body: {'email': email},
       requiresAuth: false,
     );
     if (response.success) {
-      return response.data?['message'] ?? 'OTP sent';
+      return response.data?['message'] ?? 'Msimbo wa OTP umetumwa.';
     }
-    throw ApiException(response.message ?? 'Failed to send OTP');
+    throw ApiException(response.message ?? 'Imeshindwa kutuma OTP');
   }
 
-  /// Step 2: Verify OTP → returns reset_token
+  /// Step 2: Verify OTP → returns reset_token (64 chars, valid 15 min)
+  /// Throws with `attempts_remaining` info on wrong OTP.
   Future<String> verifyPasswordOtp(String email, String otp) async {
     final response = await _api.post(
-      '/password/verify-otp',
+      '/auth/password/verify-otp',
       body: {'email': email, 'otp': otp},
       requiresAuth: false,
     );
     if (response.success && response.data?['reset_token'] != null) {
       return response.data!['reset_token'];
     }
-    throw ApiException(response.message ?? 'Invalid OTP');
+    throw ApiException(response.message ?? 'OTP si sahihi');
   }
 
-  /// Step 3: Reset password with token
+  /// Step 3: Reset password with reset_token from verifyPasswordOtp().
+  /// Backend will revoke all active Sanctum tokens on success.
   Future<String> resetPassword({
     required String email,
     required String resetToken,
     required String password,
   }) async {
     final response = await _api.post(
-      '/password/reset',
+      '/auth/password/reset',
       body: {
         'email': email,
         'reset_token': resetToken,

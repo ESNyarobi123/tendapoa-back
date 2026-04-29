@@ -25,6 +25,8 @@ export 'worker/worker_active_job_screen.dart';
 export 'worker/worker_dashboard_screen.dart';
 export 'worker/worker_my_applications_screen.dart';
 export 'worker/worker_post_job_screen.dart';
+export 'worker/worker_posted_jobs_screen.dart';
+export 'worker/worker_job_applicants_screen.dart';
 export 'worker/withdrawal_screen.dart';
 export 'notification_screen.dart';
 export 'settings_screen.dart';

@@ -21,9 +21,8 @@ class NotificationService {
     final dynamic notificationData =
         result['notifications'] ?? envMap?['notifications'] ?? result;
 
-    final dynamic rawData = notificationData is Map
-        ? notificationData['data']
-        : null;
+    final dynamic rawData =
+        notificationData is Map ? notificationData['data'] : null;
     List list = [];
     if (rawData is Map) {
       list = rawData.values.toList();
@@ -34,7 +33,8 @@ class NotificationService {
     final notifications = list.map((e) => AppNotification.fromJson(e)).toList();
 
     final unreadRaw = result['unread_count'] ?? envMap?['unread_count'] ?? 0;
-    final unread = unreadRaw is num ? unreadRaw.toInt() : int.tryParse('$unreadRaw') ?? 0;
+    final unread =
+        unreadRaw is num ? unreadRaw.toInt() : int.tryParse('$unreadRaw') ?? 0;
 
     Map<String, dynamic>? pageMap;
     if (notificationData is Map) {
@@ -48,7 +48,7 @@ class NotificationService {
       'last_page': pageMap?['last_page'],
     };
   }
-  
+
   Future<bool> markAsRead(String id) async {
     try {
       await _api.post('/notifications/$id/read');
@@ -67,11 +67,45 @@ class NotificationService {
     }
   }
 
+  /// Legacy single-device token registration (backward compat).
+  /// Backend: `POST /api/fcm-token`.
   Future<void> updateFcmToken(String token) async {
     try {
-      await _api.post('/update-fcm-token', body: {'token': token});
+      await _api.post('/fcm-token', body: {'token': token});
     } catch (_) {
       // Ignore errors updating token
+    }
+  }
+
+  /// Register a device token for multi-device FCM (preferred).
+  /// Backend: `POST /api/fcm/register`.
+  Future<bool> registerDevice({
+    required String token,
+    String? platform,
+    String? deviceName,
+    String? appVersion,
+  }) async {
+    try {
+      await _api.post('/fcm/register', body: {
+        'token': token,
+        if (platform != null) 'platform': platform,
+        if (deviceName != null) 'device_name': deviceName,
+        if (appVersion != null) 'app_version': appVersion,
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Unregister a device token (e.g. on logout).
+  /// Backend: `POST /api/fcm/unregister`.
+  Future<bool> unregisterDevice(String token) async {
+    try {
+      await _api.post('/fcm/unregister', body: {'token': token});
+      return true;
+    } catch (_) {
+      return false;
     }
   }
 }
