@@ -192,9 +192,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       onTap: () => _showChangePasswordDialog(context),
                     ),
                   ]),
-
                   const SizedBox(height: 25),
-
                   _sectionHeader(context, context.tr('settings_quick_access')),
                   _settingsCard(context, [
                     if (isClient) ...[
@@ -250,9 +248,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ],
                   ]),
-
                   const SizedBox(height: 25),
-
                   _sectionHeader(context, context.tr('general').toUpperCase()),
                   _settingsCard(context, [
                     _toggleTile(
@@ -335,7 +331,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               segments: [
                                 ButtonSegment(
                                   value: ThemeMode.system,
-                                  icon: const Icon(Icons.brightness_auto, size: 18),
+                                  icon: const Icon(Icons.brightness_auto,
+                                      size: 18),
                                   label: Text(loc.systemTheme),
                                 ),
                                 ButtonSegment(
@@ -360,9 +357,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                   ]),
-
                   const SizedBox(height: 25),
-
                   _sectionHeader(context, context.tr('help_section_header')),
                   _settingsCard(context, [
                     _tile(
@@ -412,9 +407,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                   ]),
-
                   const SizedBox(height: 30),
-
                   SizedBox(
                     width: double.infinity,
                     child: TextButton.icon(
@@ -444,7 +437,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                   ),
-
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: TextButton.icon(
+                      onPressed: () => _showDeleteAccountDialog(context),
+                      icon: Icon(Icons.delete_forever_rounded,
+                          color: Colors.red.shade800),
+                      label: Text(
+                        context.tr('delete_account'),
+                        style: TextStyle(
+                          color: Colors.red.shade800,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      style: TextButton.styleFrom(
+                        backgroundColor:
+                            Colors.red.shade800.withValues(alpha: 0.08),
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 20),
                   Center(
                     child: Column(
@@ -856,8 +872,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  void _showSnackbar(BuildContext context, String msg,
-      {bool isError = false}) {
+  void _showSnackbar(BuildContext context, String msg, {bool isError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(msg),
@@ -897,5 +912,155 @@ class _SettingsScreenState extends State<SettingsScreen> {
     const whatsappUrl =
         'https://api.whatsapp.com/send/?phone=255626957138&text&type=phone_number&app_absent=0';
     await _openUrl(whatsappUrl);
+  }
+
+  void _showDeleteAccountDialog(BuildContext context) {
+    final passwordCtrl = TextEditingController();
+    bool isLoading = false;
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        final bottomInset = MediaQuery.of(ctx).viewInsets.bottom;
+        return StatefulBuilder(
+          builder: (ctx, setDialogState) => Container(
+            padding: EdgeInsets.fromLTRB(25, 30, 25, bottomInset + 30),
+            decoration: BoxDecoration(
+              color: Theme.of(ctx).colorScheme.surface,
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(30)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(Icons.warning_amber_rounded,
+                          color: Colors.red.shade700, size: 28),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        context.tr('delete_account'),
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red.shade700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  context.tr('delete_account_warning'),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Theme.of(ctx).colorScheme.onSurfaceVariant,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 25),
+                _field(
+                  ctx,
+                  context.tr('current_password'),
+                  passwordCtrl,
+                  Icons.lock_open_rounded,
+                  isPassword: true,
+                ),
+                const SizedBox(height: 30),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: isLoading
+                        ? null
+                        : () async {
+                            if (passwordCtrl.text.isEmpty) {
+                              _showSnackbar(
+                                context,
+                                context.tr('enter_password_prompt'),
+                                isError: true,
+                              );
+                              return;
+                            }
+                            setDialogState(() => isLoading = true);
+                            try {
+                              await context
+                                  .read<AuthProvider>()
+                                  .deleteAccount(password: passwordCtrl.text);
+                              if (ctx.mounted) Navigator.pop(ctx);
+                              if (context.mounted) {
+                                Navigator.pushNamedAndRemoveUntil(
+                                  context,
+                                  AppRouter.splash,
+                                  (route) => false,
+                                );
+                              }
+                            } catch (e) {
+                              String msg = e.toString();
+                              if (msg.contains('current_password') ||
+                                  msg.contains('password')) {
+                                if (context.mounted) {
+                                  msg = context.tr('wrong_password');
+                                }
+                              }
+                              if (context.mounted) {
+                                _showSnackbar(context, msg, isError: true);
+                              }
+                            } finally {
+                              setDialogState(() => isLoading = false);
+                            }
+                          },
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Colors.red.shade700,
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    child: isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Colors.white),
+                          )
+                        : Text(
+                            context.tr('delete_account_confirm').toUpperCase(),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    child: Text(context.tr('cancel')),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }

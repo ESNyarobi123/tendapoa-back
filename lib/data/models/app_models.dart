@@ -1,5 +1,29 @@
 import 'job_model.dart';
 
+int _pInt(dynamic v, [int fallback = 0]) {
+  if (v == null) return fallback;
+  if (v is int) return v;
+  if (v is String) return int.tryParse(v) ?? fallback;
+  if (v is double) return v.toInt();
+  return fallback;
+}
+
+int? _pIntOrNull(dynamic v) {
+  if (v == null) return null;
+  if (v is int) return v;
+  if (v is String) return int.tryParse(v);
+  if (v is double) return v.toInt();
+  return null;
+}
+
+double _pDouble(dynamic v, [double fallback = 0.0]) {
+  if (v == null) return fallback;
+  if (v is double) return v;
+  if (v is num) return v.toDouble();
+  if (v is String) return double.tryParse(v) ?? fallback;
+  return fallback;
+}
+
 class AppNotification {
   final String id;
   final String type;
@@ -85,9 +109,9 @@ class HomeStats {
 
   factory HomeStats.fromJson(Map<String, dynamic> json) {
     return HomeStats(
-      totalWorkers: json['total_workers'] ?? 0,
-      totalJobs: json['total_jobs'] ?? 0,
-      activeJobs: json['active_jobs'] ?? 0,
+      totalWorkers: _pInt(json['total_workers']),
+      totalJobs: _pInt(json['total_jobs']),
+      activeJobs: _pInt(json['active_jobs']),
     );
   }
 }
@@ -151,9 +175,8 @@ class ClientDashboard {
       walletBalance: json['wallet_balance'] != null
           ? parseInt(json['wallet_balance'])
           : null,
-      walletAvailable: json['available'] != null
-          ? parseInt(json['available'])
-          : null,
+      walletAvailable:
+          json['available'] != null ? parseInt(json['available']) : null,
     );
   }
 }
@@ -184,15 +207,13 @@ class PaymentHistory {
 
   factory PaymentHistory.fromJson(Map<String, dynamic> json) {
     return PaymentHistory(
-      id: json['id'] ?? 0,
-      workOrderId: json['work_order_id'],
-      orderId: json['order_id'],
-      amount: json['amount'] is String
-          ? double.tryParse(json['amount']) ?? 0
-          : (json['amount'] ?? 0).toDouble(),
-      status: json['status'] ?? '',
-      channel: json['channel'],
-      reference: json['reference'],
+      id: _pInt(json['id']),
+      workOrderId: _pIntOrNull(json['work_order_id']),
+      orderId: json['order_id']?.toString(),
+      amount: _pDouble(json['amount']),
+      status: json['status']?.toString() ?? '',
+      channel: json['channel']?.toString(),
+      reference: json['reference']?.toString(),
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'].toString())
           : null,
@@ -221,13 +242,11 @@ class PaymentJob {
 
   factory PaymentJob.fromJson(Map<String, dynamic> json) {
     return PaymentJob(
-      id: json['id'] ?? 0,
-      title: json['title'] ?? '',
-      price: json['price'] is String
-          ? int.tryParse(json['price']) ?? 0
-          : (json['price'] ?? 0),
-      status: json['status'] ?? '',
-      imageUrl: json['image_url'],
+      id: _pInt(json['id']),
+      title: json['title']?.toString() ?? '',
+      price: _pInt(json['price']),
+      status: json['status']?.toString() ?? '',
+      imageUrl: json['image_url']?.toString(),
     );
   }
 }
@@ -246,9 +265,9 @@ class AppSettings {
 
   factory AppSettings.fromJson(Map<String, dynamic> json) {
     return AppSettings(
-      commissionRate: (json['commission_rate'] ?? 10).toDouble(),
-      minWithdrawal: (json['min_withdrawal'] ?? 5000).toDouble(),
-      systemCurrency: json['system_currency'] ?? 'TZS',
+      commissionRate: _pDouble(json['commission_rate'], 10),
+      minWithdrawal: _pDouble(json['min_withdrawal'], 5000),
+      systemCurrency: json['system_currency']?.toString() ?? 'TZS',
     );
   }
 }

@@ -1154,6 +1154,17 @@ extension AppLocalizationsExtension on BuildContext {
       case 'settings_notifications_subtitle':
         return loc.settings_notifications_subtitle;
 
+      case 'delete_account':
+        return loc.delete_account;
+      case 'delete_account_warning':
+        return loc.delete_account_warning;
+      case 'delete_account_confirm':
+        return loc.delete_account_confirm;
+      case 'enter_password_prompt':
+        return loc.enter_password_prompt;
+      case 'wrong_password':
+        return loc.wrong_password;
+
       default:
         return key;
     }

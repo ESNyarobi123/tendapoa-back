@@ -1845,6 +1845,22 @@ class AppLocalizationsSw extends AppLocalizations {
   String get dash_empty_withdrawals => 'Bado hakuna historia ya kutoa pesa.';
 
   @override
+  String get delete_account => 'Futa Akaunti';
+
+  @override
+  String get delete_account_warning =>
+      'Kitendo hiki ni cha kudumu na hakiwezi kubatilishwa. Data zako zote, kazi, salio la mkoba, na historia zitafutwa kabisa.';
+
+  @override
+  String get delete_account_confirm => 'Futa Akaunti Yangu';
+
+  @override
+  String get enter_password_prompt => 'Tafadhali weka nenosiri lako';
+
+  @override
+  String get wrong_password => 'Nenosiri si sahihi. Tafadhali jaribu tena.';
+
+  @override
   String app_version_line(String version, String build_number) {
     return 'Toleo $version · Ujenzi $build_number';
   }

@@ -172,6 +172,38 @@ class ApiService {
     }
   }
 
+  Future<ApiResponse<Map<String, dynamic>>> delete(
+    String endpoint, {
+    Map<String, dynamic>? body,
+    bool requiresAuth = true,
+  }) async {
+    try {
+      final uri = Uri.parse('${AppConstants.baseUrl}$endpoint');
+      final response = await http
+          .delete(
+            uri,
+            headers: await _getHeaders(requiresAuth: requiresAuth),
+            body: body != null ? jsonEncode(body) : null,
+          )
+          .timeout(AppConstants.apiTimeout);
+      return _handleResponse(response);
+    } on SocketException catch (e) {
+      print('SocketException: $e');
+      throw ApiException('Hakuna mtandao. Tafadhali angalia internet yako.');
+    } on TimeoutException catch (e) {
+      print('TimeoutException: $e');
+      throw ApiException('Muda umekwisha. Tafadhali jaribu tena.');
+    } on HandshakeException catch (e) {
+      print('HandshakeException (SSL): $e');
+      throw ApiException('Tatizo la SSL. Wasiliana na msaada.');
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      print('Unknown Error: $e');
+      throw ApiException('Hitilafu: ${e.toString()}');
+    }
+  }
+
   Future<ApiResponse<Map<String, dynamic>>> postMultipart(
     String endpoint, {
     Map<String, String>? fields,

@@ -1841,6 +1841,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dash_empty_withdrawals => 'No withdrawals yet.';
 
   @override
+  String get delete_account => 'Delete Account';
+
+  @override
+  String get delete_account_warning =>
+      'This action is permanent and cannot be undone. All your data, jobs, wallet balance, and history will be permanently deleted.';
+
+  @override
+  String get delete_account_confirm => 'Delete My Account';
+
+  @override
+  String get enter_password_prompt => 'Please enter your password';
+
+  @override
+  String get wrong_password => 'Incorrect password. Please try again.';
+
+  @override
   String app_version_line(String version, String build_number) {
     return 'Version $version · Build $build_number';
   }

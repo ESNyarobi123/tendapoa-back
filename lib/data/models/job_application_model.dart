@@ -1,3 +1,20 @@
+/// Safe int/double parsers (shared with Job model).
+int _parseInt(dynamic v, [int fallback = 0]) {
+  if (v == null) return fallback;
+  if (v is int) return v;
+  if (v is String) return int.tryParse(v) ?? fallback;
+  if (v is double) return v.toInt();
+  return fallback;
+}
+
+int? _parseIntOrNull(dynamic v) {
+  if (v == null) return null;
+  if (v is int) return v;
+  if (v is String) return int.tryParse(v);
+  if (v is double) return v.toInt();
+  return null;
+}
+
 /// Ombi la mfanyakazi (job_applications) — lingana na backend.
 class JobApplication {
   final int id;
@@ -11,6 +28,7 @@ class JobApplication {
   final String? clientResponseNote;
   final String? workerName;
   final String? workerPhotoUrl;
+
   /// Kutoka `job` nested (orodha ya mfanyakazi).
   final String? jobTitle;
   final String? clientName;
@@ -37,20 +55,14 @@ class JobApplication {
 
   factory JobApplication.fromJson(Map<String, dynamic> json) {
     return JobApplication(
-      id: json['id'] ?? 0,
-      workOrderId: json['work_order_id'] ?? 0,
-      workerId: json['worker_id'] ?? 0,
-      proposedAmount: json['proposed_amount'] is String
-          ? int.tryParse(json['proposed_amount']) ?? 0
-          : (json['proposed_amount'] ?? 0) as int,
+      id: _parseInt(json['id']),
+      workOrderId: _parseInt(json['work_order_id']),
+      workerId: _parseInt(json['worker_id']),
+      proposedAmount: _parseInt(json['proposed_amount']),
       message: json['message']?.toString() ?? '',
       etaText: json['eta_text']?.toString(),
       status: json['status']?.toString() ?? 'applied',
-      counterAmount: json['counter_amount'] != null
-          ? (json['counter_amount'] is String
-              ? int.tryParse(json['counter_amount'])
-              : json['counter_amount'] as int?)
-          : null,
+      counterAmount: _parseIntOrNull(json['counter_amount']),
       clientResponseNote: json['client_response_note']?.toString(),
       workerName: json['worker']?['name']?.toString(),
       workerPhotoUrl: json['worker']?['profile_photo_url']?.toString(),

@@ -22,10 +22,12 @@ class Job {
   final int? workerId;
   final String? workerName;
   final String? workerPhotoUrl;
+
   /// Mfanyakazi aliyechaguliwa kabla ya malipo (escrow)
   final int? selectedWorkerId;
   final String? selectedWorkerName;
   final String? selectedWorkerPhotoUrl;
+
   /// Kiasi kilichokubaliwa baada ya kuchagua mfanyakazi
   final int? agreedAmount;
   final String? completionCode;
@@ -68,10 +70,35 @@ class Job {
     this.applications,
   });
 
+  static int _parseInt(dynamic v, [int fallback = 0]) {
+    if (v == null) return fallback;
+    if (v is int) return v;
+    if (v is String) return int.tryParse(v) ?? fallback;
+    if (v is double) return v.toInt();
+    return fallback;
+  }
+
+  static int? _parseIntOrNull(dynamic v) {
+    if (v == null) return null;
+    if (v is int) return v;
+    if (v is String) return int.tryParse(v);
+    if (v is double) return v.toInt();
+    return null;
+  }
+
+  static double? _parseDoubleOrNull(dynamic v) {
+    if (v == null) return null;
+    if (v is double) return v;
+    if (v is num) return v.toDouble();
+    if (v is String) return double.tryParse(v);
+    return null;
+  }
+
   factory Job.fromJson(Map<String, dynamic> json) {
     // Parse distance from distance_info if available
     double? parsedDistance;
-    if (json['distance_info'] != null && json['distance_info']['distance'] != null) {
+    if (json['distance_info'] != null &&
+        json['distance_info']['distance'] != null) {
       final d = json['distance_info']['distance'];
       parsedDistance = d is String ? double.tryParse(d) : d?.toDouble();
     } else if (json['distance'] != null) {
@@ -80,46 +107,47 @@ class Job {
     }
 
     return Job(
-      id: json['id'] ?? 0,
-      title: json['title'] ?? '',
-      description: json['description'],
-      categoryId: json['category_id'],
-      categoryName: json['category']?['name'] ?? json['category_name'],
-      categoryIcon: json['category']?['icon'] ?? json['category_icon'],
-      price: json['price'] is String
-          ? int.tryParse(json['price']) ?? 0
-          : (json['price'] ?? 0),
-      status: json['status'] ?? 'open',
-      imageUrl: json['image_url'],
-      lat: json['lat'] is String
-          ? double.tryParse(json['lat'])
-          : json['lat']?.toDouble(),
-      lng: json['lng'] is String
-          ? double.tryParse(json['lng'])
-          : json['lng']?.toDouble(),
-      addressText: json['address_text'],
-      phone: json['phone'],
-      userId: json['user_id'],
-      userName: json['muhitaji']?['name'] ?? json['user']?['name'] ?? json['user_name'],
-      userPhotoUrl:
-          json['muhitaji']?['profile_photo_url'] ?? json['user']?['profile_photo_url'] ?? json['user_photo_url'],
-      userPhone: json['muhitaji']?['phone'] ?? json['user']?['phone'] ?? json['user_phone'],
-      workerId: json['accepted_worker_id'] ?? json['worker_id'],
-      workerName: json['accepted_worker']?['name'] ?? json['worker']?['name'] ?? json['worker_name'],
-      workerPhotoUrl: json['accepted_worker']?['profile_photo_url']?.toString() ??
-          json['worker']?['profile_photo_url']?.toString(),
-      selectedWorkerId: json['selected_worker_id'],
+      id: _parseInt(json['id']),
+      title: json['title']?.toString() ?? '',
+      description: json['description']?.toString(),
+      categoryId: _parseIntOrNull(json['category_id']),
+      categoryName: json['category']?['name']?.toString() ??
+          json['category_name']?.toString(),
+      categoryIcon: json['category']?['icon']?.toString() ??
+          json['category_icon']?.toString(),
+      price: _parseInt(json['price']),
+      status: json['status']?.toString() ?? 'open',
+      imageUrl: json['image_url']?.toString(),
+      lat: _parseDoubleOrNull(json['lat']),
+      lng: _parseDoubleOrNull(json['lng']),
+      addressText: json['address_text']?.toString(),
+      phone: json['phone']?.toString(),
+      userId: _parseIntOrNull(json['user_id']),
+      userName: json['muhitaji']?['name']?.toString() ??
+          json['user']?['name']?.toString() ??
+          json['user_name']?.toString(),
+      userPhotoUrl: json['muhitaji']?['profile_photo_url']?.toString() ??
+          json['user']?['profile_photo_url']?.toString() ??
+          json['user_photo_url']?.toString(),
+      userPhone: json['muhitaji']?['phone']?.toString() ??
+          json['user']?['phone']?.toString() ??
+          json['user_phone']?.toString(),
+      workerId:
+          _parseIntOrNull(json['accepted_worker_id'] ?? json['worker_id']),
+      workerName: json['accepted_worker']?['name']?.toString() ??
+          json['worker']?['name']?.toString() ??
+          json['worker_name']?.toString(),
+      workerPhotoUrl:
+          json['accepted_worker']?['profile_photo_url']?.toString() ??
+              json['worker']?['profile_photo_url']?.toString(),
+      selectedWorkerId: _parseIntOrNull(json['selected_worker_id']),
       selectedWorkerName: json['selected_worker']?['name']?.toString(),
       selectedWorkerPhotoUrl:
           json['selected_worker']?['profile_photo_url']?.toString(),
-      agreedAmount: json['agreed_amount'] != null
-          ? (json['agreed_amount'] is String
-              ? int.tryParse(json['agreed_amount'])
-              : json['agreed_amount'] as int?)
-          : null,
-      completionCode: json['completion_code'],
+      agreedAmount: _parseIntOrNull(json['agreed_amount']),
+      completionCode: json['completion_code']?.toString(),
       createdAt: json['created_at'] != null
-          ? DateTime.parse(json['created_at'])
+          ? DateTime.parse(json['created_at'].toString())
           : null,
       distance: parsedDistance,
       distanceInfo: json['distance_info'] != null
@@ -142,13 +170,13 @@ class Job {
   bool get isOpen => status == 'open' || status == 'posted';
   bool get isPending => status == 'pending';
   bool get isPaid => status == 'paid';
-  bool get isAccepted => status == 'accepted' || status == 'in_progress' || status == 'assigned';
+  bool get isAccepted =>
+      status == 'accepted' || status == 'in_progress' || status == 'assigned';
   bool get isCompleted => status == 'completed';
   bool get isCancelled => status == 'cancelled';
 
   /// Kuna mfanyakazi aliyefungwa (aliyekubaliwa au aliyechaguliwa kabla ya malipo).
-  bool get hasWorkerOrSelection =>
-      workerId != null || selectedWorkerId != null;
+  bool get hasWorkerOrSelection => workerId != null || selectedWorkerId != null;
 
   /// Kazi bado inapokea maombi mapya (mfumo mpya).
   bool get acceptsNewApplications =>
@@ -169,7 +197,8 @@ class Job {
 
   bool get isAwaitingPayment => status == 'awaiting_payment';
   bool get isFunded => status == 'funded';
-  bool get isSubmitted => status == 'submitted' || status == 'ready_for_confirmation';
+  bool get isSubmitted =>
+      status == 'submitted' || status == 'ready_for_confirmation';
 
   /// Mfanyakazi aliyeidhinishwa (baada ya escrow).
   bool isAcceptedWorker(int? userId) =>
@@ -206,16 +235,20 @@ class JobComment {
 
   factory JobComment.fromJson(Map<String, dynamic> json) {
     return JobComment(
-      id: json['id'] ?? 0,
-      jobId: json['work_order_id'] ?? json['job_id'] ?? 0,
-      userId: json['user_id'] ?? 0,
-      userName: json['user']?['name'] ?? json['user_name'],
-      userPhoto: json['user']?['profile_photo_url'],
-      message: json['message'] ?? '',
-      proposedPrice: json['bid_amount'] ?? json['proposed_price'],
-      isApplication: json['is_application'] ?? false,
+      id: Job._parseInt(json['id']),
+      jobId: Job._parseInt(json['work_order_id'] ?? json['job_id']),
+      userId: Job._parseInt(json['user_id']),
+      userName:
+          json['user']?['name']?.toString() ?? json['user_name']?.toString(),
+      userPhoto: json['user']?['profile_photo_url']?.toString(),
+      message: json['message']?.toString() ?? '',
+      proposedPrice:
+          Job._parseIntOrNull(json['bid_amount'] ?? json['proposed_price']),
+      isApplication: json['is_application'] == true ||
+          json['is_application'] == 1 ||
+          json['is_application'] == '1',
       createdAt: json['created_at'] != null
-          ? DateTime.parse(json['created_at'])
+          ? DateTime.tryParse(json['created_at'].toString())
           : null,
     );
   }
@@ -256,17 +289,11 @@ class NearbyWorker {
 
   factory NearbyWorker.fromJson(Map<String, dynamic> json) {
     return NearbyWorker(
-      id: json['id'] ?? 0,
-      name: json['name'] ?? '',
-      lat: json['lat'] is String
-          ? double.tryParse(json['lat'])
-          : json['lat']?.toDouble(),
-      lng: json['lng'] is String
-          ? double.tryParse(json['lng'])
-          : json['lng']?.toDouble(),
-      distance: json['distance'] is String
-          ? double.tryParse(json['distance'])
-          : json['distance']?.toDouble(),
+      id: Job._parseInt(json['id']),
+      name: json['name']?.toString() ?? '',
+      lat: Job._parseDoubleOrNull(json['lat']),
+      lng: Job._parseDoubleOrNull(json['lng']),
+      distance: Job._parseDoubleOrNull(json['distance']),
     );
   }
 }

@@ -15,18 +15,25 @@ class Category {
   });
 
   /// Kwa API ya /feed (category=slug)
-  String get feedSlug =>
-      (slug != null && slug!.isNotEmpty)
-          ? slug!
-          : name.toLowerCase().trim().replaceAll(RegExp(r'\s+'), '-');
+  String get feedSlug => (slug != null && slug!.isNotEmpty)
+      ? slug!
+      : name.toLowerCase().trim().replaceAll(RegExp(r'\s+'), '-');
+
+  static int _parseInt(dynamic v, [int fallback = 0]) {
+    if (v == null) return fallback;
+    if (v is int) return v;
+    if (v is String) return int.tryParse(v) ?? fallback;
+    if (v is double) return v.toInt();
+    return fallback;
+  }
 
   factory Category.fromJson(Map<String, dynamic> json) {
     return Category(
-      id: json['id'] ?? 0,
-      name: json['name'] ?? '',
+      id: _parseInt(json['id']),
+      name: json['name']?.toString() ?? '',
       slug: json['slug']?.toString(),
-      icon: json['icon'],
-      color: json['color'],
+      icon: json['icon']?.toString(),
+      color: json['color']?.toString(),
     );
   }
 

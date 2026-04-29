@@ -13,11 +13,19 @@ class ChatUser {
     this.profilePhotoUrl,
   });
 
+  static int _parseInt(dynamic v, [int fallback = 0]) {
+    if (v == null) return fallback;
+    if (v is int) return v;
+    if (v is String) return int.tryParse(v) ?? fallback;
+    if (v is double) return v.toInt();
+    return fallback;
+  }
+
   factory ChatUser.fromJson(Map<String, dynamic> json) {
     return ChatUser(
-      id: json['id'] ?? 0,
-      name: json['name'] ?? '',
-      profilePhotoUrl: json['profile_photo_url'] ?? json['photo'],
+      id: _parseInt(json['id']),
+      name: json['name']?.toString() ?? '',
+      profilePhotoUrl: (json['profile_photo_url'] ?? json['photo'])?.toString(),
       phone: json['phone']?.toString(),
     );
   }
@@ -49,7 +57,7 @@ class ChatConversation {
       lastMessageAt: json['last_message_at'] != null
           ? DateTime.tryParse(json['last_message_at'].toString())
           : null,
-      unreadCount: json['unread_count'] ?? 0,
+      unreadCount: ChatUser._parseInt(json['unread_count']),
     );
   }
 }
@@ -80,13 +88,15 @@ class ChatMessage {
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) {
     return ChatMessage(
-      id: json['id'] ?? 0,
-      workOrderId: json['job_id'] ?? json['work_order_id'],
-      conversationId: json['conversation_id'],
-      senderId: json['sender_id'] ?? 0,
-      receiverId: json['receiver_id'],
-      message: json['message'] ?? '',
-      isRead: json['is_read'] == 1 || json['is_read'] == true,
+      id: ChatUser._parseInt(json['id']),
+      workOrderId: ChatUser._parseInt(json['job_id'] ?? json['work_order_id']),
+      conversationId: ChatUser._parseInt(json['conversation_id']),
+      senderId: ChatUser._parseInt(json['sender_id']),
+      receiverId: ChatUser._parseInt(json['receiver_id']),
+      message: json['message']?.toString() ?? '',
+      isRead: json['is_read'] == 1 ||
+          json['is_read'] == true ||
+          json['is_read'] == '1',
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'].toString())
           : null,

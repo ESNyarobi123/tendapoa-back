@@ -142,6 +142,23 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  /// Delete account permanently. On success the user is logged out locally.
+  Future<void> deleteAccount({required String password}) async {
+    _setLoading(true);
+    try {
+      await FirebaseMessagingService.instance.unregisterFromBackend();
+      await _authService.deleteAccount(password: password);
+      _user = null;
+      notifyListeners();
+    } catch (e) {
+      _setError(e.toString());
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> refreshUser() async {
     try {
       _user = await _authService.getProfile();

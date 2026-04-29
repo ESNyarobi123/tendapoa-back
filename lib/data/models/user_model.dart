@@ -22,22 +22,34 @@ class User {
     this.createdAt,
   });
 
+  static int _parseInt(dynamic v, [int fallback = 0]) {
+    if (v == null) return fallback;
+    if (v is int) return v;
+    if (v is String) return int.tryParse(v) ?? fallback;
+    if (v is double) return v.toInt();
+    return fallback;
+  }
+
+  static double? _parseDoubleOrNull(dynamic v) {
+    if (v == null) return null;
+    if (v is double) return v;
+    if (v is num) return v.toDouble();
+    if (v is String) return double.tryParse(v);
+    return null;
+  }
+
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'] ?? 0,
-      name: json['name'] ?? '',
-      email: json['email'] ?? '',
-      role: json['role'] ?? 'muhitaji',
-      phone: json['phone'],
-      profilePhotoUrl: json['profile_photo_url'],
-      lat: json['lat'] is String
-          ? double.tryParse(json['lat'])
-          : json['lat']?.toDouble(),
-      lng: json['lng'] is String
-          ? double.tryParse(json['lng'])
-          : json['lng']?.toDouble(),
+      id: _parseInt(json['id']),
+      name: json['name']?.toString() ?? '',
+      email: json['email']?.toString() ?? '',
+      role: json['role']?.toString() ?? 'muhitaji',
+      phone: json['phone']?.toString(),
+      profilePhotoUrl: json['profile_photo_url']?.toString(),
+      lat: _parseDoubleOrNull(json['lat']),
+      lng: _parseDoubleOrNull(json['lng']),
       createdAt: json['created_at'] != null
-          ? DateTime.parse(json['created_at'])
+          ? DateTime.tryParse(json['created_at'].toString())
           : null,
     );
   }

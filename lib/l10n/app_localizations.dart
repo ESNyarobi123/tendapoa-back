@@ -3578,6 +3578,21 @@ abstract class AppLocalizations {
   /// **'Arifa za kazi na ujumbe. Zimehifadhiwa kwenye simu tu.'**
   String get settings_notifications_subtitle;
 
+  /// No description provided for @delete_account.
+  String get delete_account;
+
+  /// No description provided for @delete_account_warning.
+  String get delete_account_warning;
+
+  /// No description provided for @delete_account_confirm.
+  String get delete_account_confirm;
+
+  /// No description provided for @enter_password_prompt.
+  String get enter_password_prompt;
+
+  /// No description provided for @wrong_password.
+  String get wrong_password;
+
   /// No description provided for @drawer_section_menu.
   ///
   /// In sw, this message translates to:

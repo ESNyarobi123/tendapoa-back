@@ -172,4 +172,19 @@ class AuthService {
     }
     throw ApiException(response.message ?? 'Password reset failed');
   }
+
+  /// Delete account permanently (requires current password).
+  Future<void> deleteAccount({required String password}) async {
+    final response = await _api.delete(
+      '/account',
+      body: {'password': password},
+    );
+
+    if (!response.success) {
+      throw ApiException(response.message ?? 'Account deletion failed');
+    }
+
+    // Clear local data after successful deletion
+    await _storage.clearAll();
+  }
 }
